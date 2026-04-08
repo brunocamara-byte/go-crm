@@ -807,15 +807,29 @@ async function dropCard(e,etapa,pipe){
   if(!dragged)return;
   const deal=allDeals.find(d=>d['ID']===dragged.id);
   if(!deal||deal['Etapa']===etapa)return;
+
+  // OPTIMISTIC UI — move na tela imediatamente
+  const etapaAnterior=deal['Etapa'];
+  deal['Etapa']=etapa;
+  renderBoard();
+  renderPipeTabs();
+
+  // Grava no Sheets em segundo plano
   try{
     const res=await apiPost({action:'ATUALIZAR_DEAL',payload:{id:dragged.id,etapa},usuario:currentUser.nome});
     if(res.success){
-      deal['Etapa']=etapa;
-      renderBoard();
-      renderPipeTabs();
-      toast(`✅ Movido para ${etapa}`,'ok');
+      toast(`✅ ${etapa}`,'ok');
+    } else {
+      // Reverte se falhou
+      deal['Etapa']=etapaAnterior;
+      renderBoard();renderPipeTabs();
+      toast('❌ Erro ao salvar — revertido','err');
     }
-  }catch(e){toast('❌ Erro ao mover','err');}
+  }catch(err){
+    deal['Etapa']=etapaAnterior;
+    renderBoard();renderPipeTabs();
+    toast('❌ Sem conexão — revertido','err');
+  }
 }
 
 // ══ DEAL PANEL ══
@@ -1053,14 +1067,23 @@ async function saveQLog(){
   const statusMap={'sel-a':'✅ Atendeu','sel-n':'❌ Não atendeu','sel-c':'🔁 Callback agendado','sel-e':'✉️ Email enviado'};
   const status=selBtn?statusMap[selBtn.classList[1]]||'Ligação':'Ligação';
   const deal=allDeals.find(d=>d['ID']===dealId)||{};
+
+  // OPTIMISTIC UI — fecha modal imediatamente
+  const fuAnterior=deal['Próximo Follow-up'];
+  if(fu) deal['Próximo Follow-up']=fu;
+  closeQLog();
+  toast('✅ Ligação registrada!','ok');
+  renderBoard();
+
+  // Grava em segundo plano
   try{
-    const res=await apiPost({action:'REGISTRAR_ATIVIDADE',payload:{idDeal:dealId,idContato:deal['ID Contato']||'',empresa:deal['Empresa']||'',tipo:'Ligação',statusLigacao:status,nota,proximoFollowUp:fu},usuario:currentUser.nome});
-    if(res.success){
-      closeQLog();
-      toast('✅ Ligação registrada!','ok');
-      if(fu){deal['Próximo Follow-up']=fu;renderBoard();}
-    } else {toast('❌ Erro: '+(res.error||''),'err');}
-  }catch(e){toast('❌ Erro de conexão','err');}
+    await apiPost({action:'REGISTRAR_ATIVIDADE',payload:{idDeal:dealId,idContato:deal['ID Contato']||'',empresa:deal['Empresa']||'',tipo:'Ligação',statusLigacao:status,nota,proximoFollowUp:fu},usuario:currentUser.nome});
+  }catch(e){
+    // Reverte follow-up se falhou
+    deal['Próximo Follow-up']=fuAnterior;
+    renderBoard();
+    toast('⚠ Ligação não salva — sem conexão','warn');
+  }
 }
 
 // ══ DELETE ══
