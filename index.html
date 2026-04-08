@@ -22,36 +22,10 @@
   --sh2:0 20px 60px rgba(0,0,0,.75);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);height:100vh;display:flex;overflow:hidden}
 
-/* ══ LOGIN ══ */
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden}
-.login-wrap::before{content:'';position:absolute;top:-200px;left:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(79,124,255,.08) 0%,transparent 70%);pointer-events:none}
-.login-wrap::after{content:'';position:absolute;bottom:-200px;right:-200px;width:500px;height:500px;background:radial-gradient(circle,rgba(34,208,122,.06) 0%,transparent 70%);pointer-events:none}
-.login-card{background:var(--sf);border:1px solid var(--bd2);border-radius:16px;padding:40px 36px;width:100%;max-width:420px;box-shadow:var(--sh2);position:relative;z-index:1;animation:fadeUp .4s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:32px;justify-content:center}
-.login-sq{width:40px;height:40px;background:linear-gradient(135deg,var(--ac),#8b5cf6);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:#fff;box-shadow:0 0 32px rgba(79,124,255,.3)}
-.login-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:18px}
-.login-brand-sub{font-size:11px;color:var(--t3);letter-spacing:.05em;text-transform:uppercase;margin-top:1px}
-.login-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;text-align:center}
-.login-sub{font-size:13px;color:var(--t2);text-align:center;margin-bottom:28px}
-.login-field{margin-bottom:14px}
-.login-label{font-size:12px;font-weight:600;color:var(--t2);margin-bottom:5px;display:block}
-.login-input{background:var(--s2);border:1px solid var(--bd);border-radius:var(--rsm);padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--tx);outline:none;transition:border-color .15s;width:100%}
-.login-input:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(79,124,255,.1)}
-.login-input::placeholder{color:var(--t3)}
-.login-err{background:var(--rs);border:1px solid rgba(240,84,84,.3);border-radius:var(--rsm);padding:10px 14px;font-size:13px;color:var(--re);margin-bottom:14px;display:none}
-.login-err.show{display:block}
-.login-btn{width:100%;background:var(--ac);color:#fff;border:none;border-radius:var(--rsm);padding:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:4px}
-.login-btn:hover{background:var(--a2);transform:translateY(-1px)}
-.login-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.login-footer{text-align:center;font-size:11.5px;color:var(--t3);margin-top:20px}
-
-/* ══ APP LAYOUT ══ */
-.app{display:none;height:100vh;overflow:hidden}
-.app.on{display:flex}
-.sb{width:210px;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;height:100vh}
+/* ══ SIDEBAR ══ */
+.sb{width:210px;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0}
 .sb-lg{padding:15px 13px 11px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:9px}
 .sq{width:28px;height:28px;background:linear-gradient(135deg,var(--ac),#8b5cf6);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:#fff;flex-shrink:0}
 .sb-w{font-family:'Syne',sans-serif;font-weight:800;font-size:13px}
@@ -61,12 +35,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .nv{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:var(--rsm);cursor:pointer;font-size:12.5px;font-weight:500;color:var(--t2);margin-bottom:2px;transition:all .15s;user-select:none}
 .nv:hover{background:var(--s2);color:var(--tx)}
 .nv.on{background:var(--as);color:var(--ac)}
-.nb{margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;font-family:'DM Mono',monospace}
+.nb{margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;font-family:'DM Mono',monospace;background:var(--as);color:var(--ac)}
 .sb-bt{margin-top:auto;padding:11px 7px;border-top:1px solid var(--bd)}
 .ur{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:var(--rsm);cursor:pointer;transition:background .15s}
 .ur:hover{background:var(--s2)}
-.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;color:#fff}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100vh}
+.uav{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;color:#fff}
+.uav-br{background:linear-gradient(135deg,#4f7cff,#8b5cf6)}
+.uav-sa{background:linear-gradient(135deg,#22d07a,#1ec8b0)}
+.uav-ni{background:linear-gradient(135deg,#f5b731,#f97340)}
+.un{font-size:12px;font-weight:600}.uro{font-size:10px;color:var(--t3)}
+
+/* ══ MAIN ══ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{background:var(--sf);border-bottom:1px solid var(--bd);padding:0 18px;height:50px;display:flex;align-items:center;gap:9px;flex-shrink:0}
 .tb-ti{font-family:'Syne',sans-serif;font-weight:800;font-size:15px}
 .v1badge{background:var(--gs);border:1px solid rgba(34,208,122,.3);color:var(--gn);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;font-family:'DM Mono',monospace}
@@ -76,15 +56,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .btn-p:hover{background:var(--a2);transform:translateY(-1px)}
 .btn-g{background:transparent;color:var(--t2);border:1px solid var(--bd)}
 .btn-g:hover{background:var(--s2);color:var(--tx)}
+.btn-gn{background:var(--gs);color:var(--gn);border:1px solid rgba(34,208,122,.25)}
 .btn-re{background:var(--rs);color:var(--re);border:1px solid rgba(240,84,84,.2)}
+.btn-re:hover{background:rgba(240,84,84,.2)}
 
 /* ══ SCREENS ══ */
 .scr{flex:1;display:none;flex-direction:column;overflow:hidden}
 .scr.on{display:flex}
 
-/* ══ TOOLBAR ══ */
-.tbar{padding:8px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0;background:var(--bg)}
-.srch{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rsm);padding:6px 11px;min-width:220px;transition:border-color .15s}
+/* ══ TBAR ══ */
+.tbar{padding:8px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0;background:var(--bg);flex-wrap:wrap}
+.srch{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rsm);padding:6px 11px;min-width:210px;transition:border-color .15s}
 .srch:focus-within{border-color:var(--ac)}
 .srch input{background:none;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--tx);width:100%}
 .srch input::placeholder{color:var(--t3)}
@@ -93,7 +75,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .fcp.on{background:var(--as);border-color:var(--ac);color:var(--ac)}
 .count-pill{margin-left:auto;font-family:'DM Mono',monospace;font-size:11px;color:var(--t3);background:var(--s2);padding:4px 10px;border-radius:6px;border:1px solid var(--bd)}
 
-/* ══ TABLE ══ */
+/* ══ CONTACTS TABLE ══ */
 .twrap{flex:1;overflow-y:auto;padding:16px 18px}
 .twrap::-webkit-scrollbar{width:4px}
 .twrap::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
@@ -124,18 +106,89 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .tbl tbody tr:hover .acts{opacity:1}
 .act-btn{width:26px;height:26px;border-radius:5px;background:var(--s3);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--t2);transition:all .1s}
 .act-btn:hover{background:var(--s2);color:var(--tx)}
+.act-btn.del:hover{background:var(--rs);color:var(--re);border-color:rgba(240,84,84,.3)}
 
-/* ══ EMPTY STATE ══ */
+/* ══ LOADING / EMPTY ══ */
+.loading{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.spinner{width:32px;height:32px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;color:var(--t2)}
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;color:var(--t3)}
 .empty-icon{font-size:48px;margin-bottom:16px;opacity:.4}
 .empty-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--t2);margin-bottom:6px}
 .empty-sub{font-size:13px;text-align:center;line-height:1.6;max-width:320px}
 
-/* ══ LOADING ══ */
-.loading{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
-.spinner{width:32px;height:32px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-size:13px;color:var(--t2)}
+/* ══ PIPELINE KANBAN ══ */
+.pipe-tabs{display:flex;align-items:center;gap:3px;padding:9px 18px;background:var(--sf);border-bottom:1px solid var(--bd);flex-shrink:0;overflow-x:auto}
+.ptab{display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:8px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--t2);transition:all .15s;border:1px solid transparent;white-space:nowrap}
+.ptab:hover{background:var(--s2);color:var(--tx)}
+.ptab.on{color:var(--tx);background:var(--s2);border-color:var(--bd2)}
+.ptab-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ptab-ct{font-family:'DM Mono',monospace;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:700}
+.ptab-vl{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--t3)}
+.tdiv{width:1px;height:18px;background:var(--bd);margin:0 3px;flex-shrink:0}
+.conv-area{margin-left:auto;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.ci{font-size:11px;color:var(--t2);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.cv{font-family:'DM Mono',monospace;font-weight:700;font-size:12px}
+.bwrap{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.bscroll{flex:1;overflow-x:auto;overflow-y:hidden;padding:14px 18px}
+.board{display:flex;gap:11px;height:100%;min-width:max-content}
+
+/* ══ COLUMN ══ */
+.col{width:300px;display:flex;flex-direction:column;flex-shrink:0}
+.ch{display:flex;align-items:center;gap:7px;padding:0 2px;margin-bottom:7px}
+.cdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.ctitle{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;flex:1}
+.cn{font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);background:var(--s2);padding:2px 6px;border-radius:20px}
+.cv2{font-size:10px;color:var(--t3);font-family:'DM Mono',monospace}
+.cbody{flex:1;background:rgba(255,255,255,.013);border:1px solid var(--bd);border-radius:var(--r);padding:6px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;min-height:120px;transition:all .15s}
+.cbody.dov{background:var(--as);border-color:var(--ac)}
+.cbody::-webkit-scrollbar{width:3px}
+.cbody::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+.addbtn{display:flex;align-items:center;gap:5px;padding:7px 9px;border-radius:var(--rsm);color:var(--t3);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;margin-top:3px;flex-shrink:0}
+.addbtn:hover{background:var(--s2);color:var(--tx)}
+
+/* ══ CARD ══ */
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);cursor:pointer;transition:all .18s;position:relative;overflow:hidden;animation:ci .2s ease}
+@keyframes ci{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card:hover{border-color:var(--bd2);transform:translateY(-3px);box-shadow:var(--sh)}
+.card[draggable]:active{cursor:grabbing;opacity:.8;transform:scale(.97)}
+.cstripe{height:3px;width:100%}
+.chead{padding:11px 12px 0}
+.ctoprow{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px}
+.cco{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--tx);flex:1;line-height:1.2}
+.cprio{width:21px;height:21px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.ph{background:var(--rs);color:var(--re)}.pw{background:var(--ys);color:var(--ye)}.pc{background:var(--ts);color:var(--te)}
+.ccrow{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.cseg{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600}
+.ccn{font-size:11.5px;color:var(--t2)}
+.cvrow{display:flex;align-items:baseline;gap:5px;margin-bottom:9px}
+.cval{font-family:'DM Mono',monospace;font-size:16px;font-weight:800;color:var(--gn)}
+.cvlb{font-size:10.5px;color:var(--t3)}
+.cprog{margin-bottom:8px}
+.pdrow{display:flex;gap:3px;margin-bottom:3px}
+.pdot2{flex:1;height:3px;border-radius:3px}
+.prlb{font-size:10px;color:var(--t3);font-family:'DM Mono',monospace}
+.cact{background:var(--s2);border-radius:6px;padding:7px 9px;margin-bottom:8px;display:flex;gap:6px;align-items:flex-start}
+.cai{font-size:12px;flex-shrink:0;margin-top:1px}
+.cat2{font-size:11px;color:var(--t2);line-height:1.4;flex:1}
+.catm{font-size:10px;color:var(--t3);font-family:'DM Mono',monospace;white-space:nowrap;flex-shrink:0}
+.cnote{margin:0 0 8px;background:rgba(245,183,49,.06);border:1px solid rgba(245,183,49,.18);border-radius:6px;padding:7px 9px;display:flex;gap:6px}
+.cni{font-size:11px;flex-shrink:0;margin-top:1px}
+.cnt{font-size:11px;color:var(--ye);line-height:1.4;opacity:.9}
+.cfoot{padding:0 12px 10px;display:flex;align-items:center;justify-content:space-between}
+.cowrow{display:flex;align-items:center;gap:5px}
+.mav{width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff}
+.own{font-size:11px;color:var(--t2)}
+.cfl{font-size:11px;font-family:'DM Mono',monospace}
+.fl-urg2{color:var(--re)}.fl-tod2{color:var(--ye)}.fl-ok2{color:var(--t3)}
+.cqact{display:flex;gap:3px;padding:7px 10px;border-top:1px solid var(--bd);background:var(--s2);opacity:0;transition:opacity .15s;pointer-events:none}
+.card:hover .cqact{opacity:1;pointer-events:all}
+.qa{display:flex;align-items:center;gap:4px;padding:5px 8px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--sf);color:var(--t2);transition:all .12s;flex:1;justify-content:center}
+.qa:hover{background:var(--s3);color:var(--tx)}
+.qa-c:hover{background:var(--gs);border-color:var(--gn);color:var(--gn)}
+.qa-e:hover{background:var(--as);border-color:var(--ac);color:var(--ac)}
+.qa-d:hover{background:var(--rs);border-color:var(--re);color:var(--re)}
 
 /* ══ SIDE PANEL ══ */
 .panel{position:fixed;right:0;top:0;bottom:0;width:460px;background:var(--sf);border-left:1px solid var(--bd2);z-index:200;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);overflow-y:auto;box-shadow:var(--sh2)}
@@ -145,9 +198,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .p-head{padding:18px 20px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--sf);z-index:1}
 .p-title{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;flex:1}
 .p-body{padding:18px 20px}
-.p-foot{padding:13px 20px;border-top:1px solid var(--bd);display:flex;gap:7px;position:sticky;bottom:0;background:var(--sf)}
-.overlay-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190;display:none}
-.overlay-bg.open{display:block}
+.p-foot{padding:13px 20px;border-top:1px solid var(--bd);display:flex;gap:7px;position:sticky;bottom:0;background:var(--sf);flex-wrap:wrap}
+.ovbg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190;display:none}
+.ovbg.open{display:block}
 
 /* ══ FORM ══ */
 .fsec{margin-bottom:18px}
@@ -167,42 +220,73 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .ceo-bx{background:rgba(245,183,49,.05);border:1px solid rgba(245,183,49,.2);border-radius:var(--rsm);padding:11px}
 .ceo-lb{font-size:11px;font-weight:700;color:var(--ye);margin-bottom:6px;display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:.04em}
 .notif-info{background:var(--as);border:1px solid rgba(79,124,255,.2);border-radius:var(--rsm);padding:10px 12px;font-size:12.5px;color:var(--a2);line-height:1.5;margin-top:4px;display:flex;gap:7px}
+.pipe-info{background:var(--gs);border:1px solid rgba(34,208,122,.2);border-radius:var(--rsm);padding:10px 12px;font-size:12.5px;color:var(--gn);line-height:1.5;margin-top:4px;display:flex;gap:7px}
 
-/* ══ DUPLICATE MODAL ══ */
-.dup-modal{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.8);display:none}
-.dup-modal.open{display:flex}
-.dup-card{background:var(--sf);border:1px solid rgba(240,84,84,.4);border-radius:14px;padding:24px;max-width:400px;width:100%;box-shadow:var(--sh2)}
-.dup-icon{font-size:32px;margin-bottom:12px}
-.dup-title{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;margin-bottom:6px;color:var(--re)}
-.dup-desc{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:18px}
-.dup-btns{display:flex;gap:8px}
+/* ══ LOG PANEL ══ */
+.log-area{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-bottom:14px}
+.log-input-row{padding:8px 11px;border-bottom:1px solid var(--bd);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.cbs{display:flex;gap:4px;flex-wrap:wrap}
+.cb{padding:5px 9px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:transparent;color:var(--t2);transition:all .15s;font-family:'DM Sans',sans-serif}
+.cb:hover{background:var(--s3)}
+.sel-a{background:var(--gs)!important;border-color:var(--gn)!important;color:var(--gn)!important}
+.sel-n{background:var(--rs)!important;border-color:var(--re)!important;color:var(--re)!important}
+.sel-c{background:var(--ys)!important;border-color:var(--ye)!important;color:var(--ye)!important}
+.sel-e{background:var(--as)!important;border-color:var(--ac)!important;color:var(--ac)!important}
+.lge{padding:10px 12px;border-bottom:1px solid var(--bd);display:flex;gap:9px}
+.lge:last-child{border-bottom:none}
+.lgic{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:1px}
+.lgan{font-size:12.5px;color:var(--tx);font-weight:500}
+.lgnt{font-size:11.5px;color:var(--t2);margin-top:2px;line-height:1.4}
+.lgtm{font-size:10.5px;color:var(--t3);margin-top:3px;font-family:'DM Mono',monospace}
 
-/* ══ TOAST ══ */
-.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.toast{padding:11px 18px;border-radius:8px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px;box-shadow:var(--sh);animation:toastIn .3s ease;max-width:320px}
-@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-.toast-ok{background:var(--gn);color:#000}
-.toast-err{background:var(--re);color:#fff}
-.toast-info{background:var(--ac);color:#fff}
-.toast-warn{background:var(--ye);color:#000}
+/* ══ MODAL PIPE ══ */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;display:none}
+.modal-ov.open{display:flex}
+.modal{background:var(--sf);border:1px solid var(--bd2);border-radius:14px;width:100%;max-width:440px;box-shadow:var(--sh2);animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-head{padding:18px 22px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:16px}
+.modal-body{padding:18px 22px}
+.modal-foot{padding:13px 22px;border-top:1px solid var(--bd);display:flex;gap:8px;justify-content:flex-end}
+
+/* ══ QUICK LOG MODAL ══ */
+.qlog-ov{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;display:none}
+.qlog-ov.open{display:flex}
+.qlog-card{background:var(--sf);border:1px solid var(--bd2);border-radius:12px;width:100%;max-width:420px;box-shadow:var(--sh2);padding:20px;animation:modalIn .2s ease}
+.qlog-title{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;margin-bottom:14px}
+.qlog-company{font-size:12.5px;color:var(--t2);margin-bottom:14px;padding:8px 11px;background:var(--s2);border-radius:6px}
+
+/* ══ CONFIRM MODAL ══ */
+.confirm-ov{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);z-index:400;display:none;align-items:center;justify-content:center;padding:20px}
+.confirm-ov.open{display:flex}
+.confirm-card{background:var(--sf);border:1px solid rgba(240,84,84,.4);border-radius:12px;width:100%;max-width:380px;padding:24px;box-shadow:var(--sh2);animation:modalIn .2s ease}
 
 /* ══ GLOBAL SEARCH ══ */
-.gsearch-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);z-index:500;display:none;align-items:flex-start;justify-content:center;padding-top:80px}
-.gsearch-overlay.open{display:flex}
-.gsearch-box{background:var(--sf);border:1px solid var(--bd2);border-radius:12px;width:100%;max-width:560px;overflow:hidden;box-shadow:var(--sh2)}
-.gsearch-input-row{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--bd)}
-.gsearch-input{background:none;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--tx);flex:1}
-.gsearch-input::placeholder{color:var(--t3)}
-.gsearch-results{max-height:360px;overflow-y:auto}
+.gso{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);z-index:500;display:none;align-items:flex-start;justify-content:center;padding-top:80px}
+.gso.open{display:flex}
+.gsbox{background:var(--sf);border:1px solid var(--bd2);border-radius:12px;width:100%;max-width:560px;overflow:hidden;box-shadow:var(--sh2)}
+.gsinput-row{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--bd)}
+.gsinput{background:none;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--tx);flex:1}
+.gsinput::placeholder{color:var(--t3)}
+.gsresults{max-height:360px;overflow-y:auto}
 .gsr-item{padding:12px 16px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s;display:flex;align-items:center;gap:10px}
 .gsr-item:hover{background:var(--s2)}
 .gsr-item:last-child{border-bottom:none}
 .gsr-ic{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;font-family:'Syne',sans-serif}
 .gsr-nm{font-weight:600;font-size:13.5px}
 .gsr-sub{font-size:11.5px;color:var(--t3)}
-.gsearch-empty{padding:24px;text-align:center;color:var(--t3);font-size:13px}
-.gsearch-hint{padding:10px 16px;font-size:11px;color:var(--t3);display:flex;justify-content:space-between}
-.hint-key{background:var(--s2);border:1px solid var(--bd);border-radius:4px;padding:2px 7px;font-family:'DM Mono',monospace;font-size:10px}
+.gs-empty{padding:24px;text-align:center;color:var(--t3);font-size:13px}
+.gs-hint{padding:10px 16px;font-size:11px;color:var(--t3);display:flex;justify-content:space-between}
+.hkey{background:var(--s2);border:1px solid var(--bd);border-radius:4px;padding:2px 7px;font-family:'DM Mono',monospace;font-size:10px}
+
+/* ══ TOAST ══ */
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:11px 18px;border-radius:8px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px;box-shadow:var(--sh);animation:toastIn .3s ease;max-width:320px}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.t-ok{background:var(--gn);color:#000}
+.t-err{background:var(--re);color:#fff}
+.t-info{background:var(--ac);color:#fff}
+.t-warn{background:var(--ye);color:#000}
 
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:5px}
@@ -216,116 +300,90 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 </head>
 <body>
 
-<!-- LOGIN REMOVIDO — fase de testes com Bruno. v1.1 = login completo -->
-
-<!-- ══ APP ══ -->
-<div id="appWrap" class="app">
-  <!-- SIDEBAR -->
-  <aside class="sb">
-    <div class="sb-lg">
-      <div class="sq">GO</div>
-      <div><div class="sb-w">GO CRM</div><div class="sb-su">v1.0</div></div>
-    </div>
-    <div class="sb-sc">
-      <div class="sb-lb">Principal</div>
-      <div class="nv" id="nav-pipeline" onclick="showScr('pipeline')"><span>⚡</span><span>Pipeline</span></div>
-      <div class="nv on" id="nav-contatos" onclick="showScr('contatos')"><span>👥</span><span>Contatos</span><span class="nb" id="ctCount" style="background:var(--as);color:var(--ac)">0</span></div>
-      <div class="nv" id="nav-followups" onclick="showScr('followups')"><span>📅</span><span>Follow-ups</span></div>
-      <div class="nv" id="nav-relatorios" onclick="showScr('relatorios')"><span>📊</span><span>Relatórios</span></div>
-      <div class="sb-lb" style="margin-top:6px">Sistema</div>
-      <div class="nv" id="nav-produtos" onclick="showScr('produtos')"><span>📦</span><span>Produtos GO</span></div>
-      <div class="nv" id="nav-config" onclick="showScr('config')"><span>⚙️</span><span>Config</span></div>
-    </div>
-    <div class="sb-bt">
-      <div class="ur">
-        <div class="av" id="userAv" style="background:linear-gradient(135deg,#4f7cff,#8b5cf6)">BR</div>
-        <div><div class="un" id="userName">Bruno Camara</div><div class="uro" id="userRole">Manager</div></div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <div class="main">
-    <div class="topbar">
-      <div class="tb-ti" id="mainTitle">Contatos</div>
-      <span class="v1badge">✦ v1.0 · LIVE</span>
-      <div class="tb-r">
-        <button class="btn btn-g" onclick="openGSearch()" title="Busca global Ctrl+K">🔍 Ctrl+K</button>
-        <button class="btn btn-g" id="syncBtn" onclick="loadContatos()">🔄 Sincronizar</button>
-        <button class="btn btn-p" id="newBtn" onclick="openPanel('new')">+ Novo Contato</button>
-      </div>
-    </div>
-
-    <!-- CONTATOS SCREEN -->
-    <div class="scr on" id="scr-contatos">
-      <div class="tbar">
-        <div class="srch">
-          <span style="color:var(--t3);font-size:13px">🔍</span>
-          <input type="text" placeholder="Buscar empresa, contato, telefone..." id="searchInput" oninput="filterContatos(this.value)">
-        </div>
-        <div class="fcp on" onclick="setFilter('todos',this)">Todos</div>
-        <div class="fcp" onclick="setFilter('lead',this)">Lead Novo</div>
-        <div class="fcp" onclick="setFilter('cliente',this)">Cliente Ativo</div>
-        <div class="fcp" onclick="setFilter('ni',this)">🎯 Nicolau</div>
-        <div class="fcp" onclick="setFilter('followup',this)">📅 Follow-up hoje</div>
-        <div class="count-pill" id="countPill">0 contatos</div>
-      </div>
-
-      <!-- loading state -->
-      <div class="loading" id="ctLoading">
-        <div class="spinner"></div>
-        <div class="loading-text">Carregando contatos...</div>
-      </div>
-
-      <!-- empty state -->
-      <div class="empty" id="ctEmpty" style="display:none">
-        <div class="empty-icon">👥</div>
-        <div class="empty-title">Nenhum contato ainda</div>
-        <div class="empty-sub">Cadastre o primeiro contato clicando em "+ Novo Contato" acima. Nicolau pode atribuir leads direto pelo sistema.</div>
-      </div>
-
-      <!-- table -->
-      <div class="twrap" id="ctTableWrap" style="display:none">
-        <table class="tbl">
-          <thead>
-            <tr>
-              <th>Empresa</th>
-              <th>Contato</th>
-              <th>Telefone</th>
-              <th>Tipo</th>
-              <th>Prioridade</th>
-              <th>Responsável</th>
-              <th>Atribuído por</th>
-              <th>Follow-up</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="ctBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- OTHER SCREENS PLACEHOLDER -->
-    <div class="scr" id="scr-pipeline">
-      <div class="empty"><div class="empty-icon">⚡</div><div class="empty-title">Pipeline — Sprint 2</div><div class="empty-sub">Kanban com os 3 pipelines será entregue no Sprint 2. Contatos cadastrados aqui já estarão disponíveis.</div></div>
-    </div>
-    <div class="scr" id="scr-followups">
-      <div class="empty"><div class="empty-icon">📅</div><div class="empty-title">Follow-ups — Sprint 2</div><div class="empty-sub">Agenda do Samuel com os follow-ups do dia. Disponível no Sprint 2.</div></div>
-    </div>
-    <div class="scr" id="scr-relatorios">
-      <div class="empty"><div class="empty-icon">📊</div><div class="empty-title">Relatórios — Sprint 4</div><div class="empty-sub">Dashboard executivo do Nicolau com forecast, metas e comissão.</div></div>
-    </div>
-    <div class="scr" id="scr-produtos">
-      <div class="empty"><div class="empty-icon">📦</div><div class="empty-title">Produtos GO — Sprint 2</div><div class="empty-sub">Catálogo de módulos, extensões e serviços da GO.</div></div>
-    </div>
-    <div class="scr" id="scr-config">
-      <div class="empty"><div class="empty-icon">⚙️</div><div class="empty-title">Configurações — em breve</div><div class="empty-sub">Metas, comissões, usuários, automações e URLs do sistema.</div></div>
+<!-- SIDEBAR -->
+<aside class="sb">
+  <div class="sb-lg">
+    <div class="sq">GO</div>
+    <div><div class="sb-w">GO CRM</div><div class="sb-su">v2.0</div></div>
+  </div>
+  <div class="sb-sc">
+    <div class="sb-lb">Principal</div>
+    <div class="nv" id="nav-pipeline" onclick="showScr('pipeline')"><span>⚡</span><span>Pipeline</span><span class="nb" id="dealCount">0</span></div>
+    <div class="nv on" id="nav-contatos" onclick="showScr('contatos')"><span>👥</span><span>Contatos</span><span class="nb" id="ctCount">0</span></div>
+    <div class="nv" id="nav-followups" onclick="showScr('followups')"><span>📅</span><span>Follow-ups</span></div>
+    <div class="nv" id="nav-relatorios" onclick="showScr('relatorios')"><span>📊</span><span>Relatórios</span></div>
+    <div class="sb-lb" style="margin-top:6px">Sistema</div>
+    <div class="nv" id="nav-produtos" onclick="showScr('produtos')"><span>📦</span><span>Produtos GO</span></div>
+    <div class="nv" id="nav-config" onclick="showScr('config')"><span>⚙️</span><span>Config</span></div>
+  </div>
+  <div class="sb-bt">
+    <div class="ur">
+      <div class="uav uav-br" id="userAv">BR</div>
+      <div><div class="un" id="userName">Bruno Camara</div><div class="uro" id="userRole">Manager</div></div>
     </div>
   </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-ti" id="mainTitle">Contatos</div>
+    <span class="v1badge">✦ v2.0 · LIVE</span>
+    <div class="tb-r" id="tbRight">
+      <button class="btn btn-g" onclick="openGSearch()" title="Ctrl+K">🔍 Ctrl+K</button>
+      <button class="btn btn-g" id="syncBtn" onclick="syncAll()">🔄 Sincronizar</button>
+      <button class="btn btn-p" id="newBtn" onclick="openPanel('new')">+ Novo Contato</button>
+    </div>
+  </div>
+
+  <!-- ══ CONTATOS ══ -->
+  <div class="scr on" id="scr-contatos">
+    <div class="tbar">
+      <div class="srch"><span style="color:var(--t3);font-size:13px">🔍</span><input type="text" placeholder="Buscar empresa, contato, telefone..." id="searchInput" oninput="filterContatos(this.value)"></div>
+      <div class="fcp on" onclick="setFilter('todos',this)">Todos</div>
+      <div class="fcp" onclick="setFilter('lead',this)">Lead Novo</div>
+      <div class="fcp" onclick="setFilter('cliente',this)">Cliente Ativo</div>
+      <div class="fcp" onclick="setFilter('ni',this)">🎯 Nicolau</div>
+      <div class="fcp" onclick="setFilter('followup',this)">📅 Hoje</div>
+      <div class="count-pill" id="countPill">0 contatos</div>
+    </div>
+    <div class="loading" id="ctLoading"><div class="spinner"></div><div class="loading-text">Carregando...</div></div>
+    <div class="empty" id="ctEmpty" style="display:none"><div class="empty-icon">👥</div><div class="empty-title">Nenhum contato ainda</div><div class="empty-sub">Clique em "+ Novo Contato" para começar.</div></div>
+    <div class="twrap" id="ctTableWrap" style="display:none">
+      <table class="tbl">
+        <thead><tr>
+          <th>Empresa</th><th>Contato</th><th>Telefone</th><th>Tipo</th>
+          <th>Prioridade</th><th>Responsável</th><th>Atribuído por</th><th>Follow-up</th><th></th>
+        </tr></thead>
+        <tbody id="ctBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ PIPELINE ══ -->
+  <div class="scr" id="scr-pipeline">
+    <div class="pipe-tabs" id="pipeTabs">
+      <!-- rendered by JS -->
+    </div>
+    <div class="tbar">
+      <div class="srch"><span style="color:var(--t3);font-size:13px">🔍</span><input type="text" placeholder="Buscar lead..." id="dealSearch" oninput="filterDeals(this.value)"></div>
+      <div class="fcp on" onclick="setDealFilter('todos',this)">Todos</div>
+      <div class="fcp" onclick="setDealFilter('hot',this)">🔥 Quentes</div>
+      <div class="fcp" onclick="setDealFilter('ni',this)">🎯 Nicolau</div>
+      <div class="fcp" onclick="setDealFilter('atrasado',this)">⚠ Atrasados</div>
+    </div>
+    <div class="bwrap"><div class="bscroll"><div class="board" id="board"></div></div></div>
+  </div>
+
+  <!-- PLACEHOLDER SCREENS -->
+  <div class="scr" id="scr-followups"><div class="empty"><div class="empty-icon">📅</div><div class="empty-title">Follow-ups — Sprint 3</div><div class="empty-sub">Agenda do Samuel com follow-ups do dia.</div></div></div>
+  <div class="scr" id="scr-relatorios"><div class="empty"><div class="empty-icon">📊</div><div class="empty-title">Relatórios — Sprint 4</div><div class="empty-sub">Dashboard executivo do Nicolau.</div></div></div>
+  <div class="scr" id="scr-produtos"><div class="empty"><div class="empty-icon">📦</div><div class="empty-title">Produtos GO — em breve</div></div></div>
+  <div class="scr" id="scr-config"><div class="empty"><div class="empty-icon">⚙️</div><div class="empty-title">Configurações — em breve</div></div></div>
 </div>
 
-<!-- SIDE PANEL — Novo/Editar Contato -->
-<div class="overlay-bg" id="overlayBg" onclick="closePanel()"></div>
+<!-- ══ CONTACT PANEL ══ -->
+<div class="ovbg" id="ovbg" onclick="closePanel()"></div>
 <div class="panel" id="panel">
   <div class="p-head">
     <div class="p-title" id="panelTitle">Novo Contato</div>
@@ -336,173 +394,127 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
     <div class="fsec">
       <div class="fsec-lb">Empresa</div>
       <div class="fg">
-        <div class="ff">
-          <label class="fl">Nome da empresa *</label>
-          <input class="fi" id="fEmpresa" placeholder="Ex: Construtora Vitória LTDA">
-          <div class="freq" id="errEmpresa">Campo obrigatório</div>
-        </div>
-        <div>
-          <label class="fl">CNPJ</label>
-          <input class="fi" id="fCNPJ" placeholder="00.000.000/0001-00">
-        </div>
-        <div>
-          <label class="fl">Segmento</label>
-          <select class="fse" id="fSegmento">
-            <option value="">Selecionar...</option>
-            <option>Contabilidade</option><option>Jurídico</option>
-            <option>Saúde</option><option>Indústria</option>
-            <option>Construção</option><option>Comércio</option>
-            <option>Tecnologia</option><option>Educação</option>
-            <option>Logística</option><option>Agronegócio</option>
-            <option>Outro</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">Papel ICP-Brasil</label>
-          <select class="fse" id="fICP">
-            <option value="">Selecionar...</option>
-            <option>AR — Autoridade de Registro</option>
-            <option>AC2 — 2º nível</option>
-            <option>AC — 1º nível</option>
-            <option>AR Virtual</option>
-            <option>Usuário Final (PF/PJ)</option>
-            <option>Não se aplica</option>
-          </select>
-        </div>
+        <div class="ff"><label class="fl">Nome da empresa *</label><input class="fi" id="fEmpresa" placeholder="Ex: Construtora Vitória LTDA"><div class="freq" id="errEmpresa">Campo obrigatório</div></div>
+        <div><label class="fl">CNPJ</label><input class="fi" id="fCNPJ" placeholder="00.000.000/0001-00"></div>
+        <div><label class="fl">Segmento</label><select class="fse" id="fSegmento"><option value="">Selecionar...</option><option>Contabilidade</option><option>Jurídico</option><option>Saúde</option><option>Indústria</option><option>Construção</option><option>Comércio</option><option>Tecnologia</option><option>Educação</option><option>Logística</option><option>Agronegócio</option><option>Outro</option></select></div>
+        <div><label class="fl">Papel ICP-Brasil</label><select class="fse" id="fICP"><option value="">Selecionar...</option><option>AR — Autoridade de Registro</option><option>AC2 — 2º nível</option><option>AC — 1º nível</option><option>AR Virtual</option><option>Usuário Final (PF/PJ)</option><option>Não se aplica</option></select></div>
       </div>
     </div>
-
     <div class="fsec">
       <div class="fsec-lb">Contato principal</div>
       <div class="fg">
-        <div>
-          <label class="fl">Nome *</label>
-          <input class="fi" id="fNome" placeholder="Nome do decisor">
-          <div class="freq" id="errNome">Campo obrigatório</div>
-        </div>
-        <div>
-          <label class="fl">Cargo</label>
-          <input class="fi" id="fCargo" placeholder="Ex: Sócio, Diretor...">
-        </div>
-        <div>
-          <label class="fl">Telefone *</label>
-          <input class="fi" id="fTelefone" placeholder="(00) 00000-0000">
-          <div class="freq" id="errTelefone">Campo obrigatório</div>
-        </div>
-        <div>
-          <label class="fl">Email</label>
-          <input class="fi" id="fEmail" placeholder="email@empresa.com" type="email">
-        </div>
+        <div><label class="fl">Nome *</label><input class="fi" id="fNome" placeholder="Nome do decisor"><div class="freq" id="errNome">Obrigatório</div></div>
+        <div><label class="fl">Cargo</label><input class="fi" id="fCargo" placeholder="Ex: Sócio, Diretor..."></div>
+        <div><label class="fl">Telefone *</label><input class="fi" id="fTelefone" placeholder="(00) 00000-0000"><div class="freq" id="errTelefone">Obrigatório</div></div>
+        <div><label class="fl">Email</label><input class="fi" id="fEmail" placeholder="email@empresa.com" type="email"></div>
       </div>
     </div>
-
     <div class="fsec">
       <div class="fsec-lb">Qualificação GO</div>
       <div class="fg">
-        <div>
-          <label class="fl">Tipo</label>
-          <select class="fse" id="fTipo">
-            <option>Lead Novo</option>
-            <option>Cliente Ativo</option>
-            <option>Inativo — Reativar</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">Prioridade</label>
-          <select class="fse" id="fPrioridade">
-            <option>🌡 Morno</option>
-            <option>🔥 Quente</option>
-            <option>❄️ Frio</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">Potencial</label>
-          <select class="fse" id="fPotencial">
-            <option>Médio</option><option>Alto</option><option>Baixo</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">Origem</label>
-          <select class="fse" id="fOrigem">
-            <option>Prospecção Samuel</option>
-            <option>Indicação — Nicolau</option>
-            <option>Site</option><option>WhatsApp</option>
-            <option>LinkedIn</option><option>Outro</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">Responsável</label>
-          <select class="fse" id="fResponsavel">
-            <option>Samuel Mateus</option>
-            <option>Nicolau</option>
-            <option>Bruno Camara</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">Próximo follow-up</label>
-          <input class="fi" id="fFollowup" type="date">
-        </div>
-        <div class="ff">
-          <label class="fl">Produtos GO de interesse</label>
-          <input class="fi" id="fProdutos" placeholder="Ex: Módulo NF-e, Certificado A3, Intellisign...">
-        </div>
-        <div class="ff">
-          <label class="fl">Observações</label>
-          <textarea class="fta" id="fObs" placeholder="Contexto do lead, necessidades, histórico..."></textarea>
-        </div>
+        <div><label class="fl">Tipo</label><select class="fse" id="fTipo"><option>Lead Novo</option><option>Cliente Ativo</option><option>Inativo — Reativar</option></select></div>
+        <div><label class="fl">Prioridade</label><select class="fse" id="fPrioridade"><option>🌡 Morno</option><option>🔥 Quente</option><option>❄️ Frio</option></select></div>
+        <div><label class="fl">Potencial</label><select class="fse" id="fPotencial"><option>Médio</option><option>Alto</option><option>Baixo</option></select></div>
+        <div><label class="fl">Origem</label><select class="fse" id="fOrigem"><option>Prospecção Samuel</option><option>Indicação — Nicolau</option><option>Site</option><option>WhatsApp</option><option>LinkedIn</option><option>Outro</option></select></div>
+        <div><label class="fl">Responsável</label><select class="fse" id="fResponsavel"><option>Samuel Mateus</option><option>Nicolau</option><option>Bruno Camara</option></select></div>
+        <div><label class="fl">Próximo follow-up</label><input class="fi" id="fFollowup" type="date"></div>
+        <div class="ff"><label class="fl">Produtos GO de interesse</label><input class="fi" id="fProdutos" placeholder="Ex: Módulo NF-e, Certificado A3..."></div>
+        <div class="ff"><label class="fl">Observações</label><textarea class="fta" id="fObs" placeholder="Contexto do lead..."></textarea></div>
       </div>
     </div>
-
     <div class="fsec">
       <div class="ceo-bx">
         <div class="ceo-lb">🎯 Contexto para o vendedor</div>
-        <textarea class="fta" id="fContextoCEO" style="background:transparent;border:none;padding:0;color:var(--tx);font-size:13px;width:100%" placeholder="Nota estratégica para o Samuel. Ex: cliente tem urgência, falar sobre produto X, tom consultivo..."></textarea>
+        <textarea class="fta" id="fContextoCEO" style="background:transparent;border:none;padding:0;color:var(--tx);font-size:13px;width:100%" placeholder="Nota estratégica para Samuel..."></textarea>
       </div>
     </div>
-
-    <div class="notif-info" id="notifInfo">
-      <span>📧</span>
-      <span><strong style="color:var(--ac)">Automação:</strong> ao salvar com responsável Samuel, ele receberá um email com os dados e contexto estratégico.</span>
-    </div>
+    <div class="notif-info" id="notifInfo"><span>📧</span><span><strong style="color:var(--ac)">Automação:</strong> ao salvar, Samuel receberá email com os dados do lead.</span></div>
+    <div class="pipe-info" id="pipeInfo" style="display:none"><span>⚡</span><span><strong style="color:var(--gn)">Pipeline:</strong> após salvar, você pode mover este contato para um pipeline abaixo.</span></div>
   </div>
   <div class="p-foot">
     <button class="btn btn-g" style="flex:1" onclick="closePanel()">Cancelar</button>
-    <button class="btn btn-p" style="flex:2" id="saveBtn" onclick="saveContato()">💾 Salvar Contato</button>
+    <button class="btn btn-re" id="deleteBtn" style="display:none" onclick="confirmDelete()">🗑 Excluir</button>
+    <button class="btn btn-gn" id="pipeBtn" style="display:none" onclick="openPipeModal()">⚡ Mover para pipeline</button>
+    <button class="btn btn-p" id="saveBtn" onclick="saveContato()">💾 Salvar Contato</button>
   </div>
 </div>
 
-<!-- DUPLICATE MODAL -->
-<div class="dup-modal" id="dupModal">
-  <div class="dup-card">
-    <div class="dup-icon">⚠️</div>
-    <div class="dup-title">Contato duplicado detectado</div>
-    <div class="dup-desc" id="dupDesc">Já existe um contato com este CNPJ ou telefone no sistema.</div>
-    <div class="dup-btns">
-      <button class="btn btn-g" style="flex:1" onclick="closeDupModal()">Cancelar</button>
-      <button class="btn btn-re" style="flex:1" onclick="forcarSalvar()">Salvar mesmo assim</button>
+<!-- ══ PIPE MODAL ══ -->
+<div class="modal-ov" id="pipeModal" onclick="if(event.target===this)closePipeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">⚡ Mover para pipeline</div>
+      <button class="btn btn-g" onclick="closePipeModal()" style="padding:6px;font-size:14px">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fsec-lb" style="margin-bottom:12px">Selecione o pipeline</div>
+      <div class="fg" style="gap:8px;margin-bottom:16px">
+        <div class="ff"><label class="fl">Pipeline</label>
+          <select class="fse" id="selPipeline" onchange="updateEtapas()">
+            <option value="Novos Leads">⚡ Novos Leads</option>
+            <option value="Reativação">🔄 Reativação</option>
+            <option value="Expansão">📈 Expansão</option>
+          </select>
+        </div>
+        <div class="ff"><label class="fl">Etapa inicial</label><select class="fse" id="selEtapa"></select></div>
+        <div><label class="fl">Valor estimado</label><input class="fi" id="selValor" placeholder="Ex: 5000"></div>
+        <div><label class="fl">Prioridade</label><select class="fse" id="selPrio"><option>🌡 Morno</option><option>🔥 Quente</option><option>❄️ Frio</option></select></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-g" onclick="closePipeModal()">Cancelar</button>
+      <button class="btn btn-p" onclick="createDeal()">⚡ Criar deal no pipeline</button>
     </div>
   </div>
 </div>
 
-<!-- GLOBAL SEARCH -->
-<div class="gsearch-overlay" id="gsearchOverlay" onclick="if(event.target===this)closeGSearch()">
-  <div class="gsearch-box">
-    <div class="gsearch-input-row">
+<!-- ══ QUICK LOG MODAL ══ -->
+<div class="qlog-ov" id="qlogOv" onclick="if(event.target===this)closeQLog()">
+  <div class="qlog-card">
+    <div class="qlog-title">📞 Registrar ligação</div>
+    <div class="qlog-company" id="qlogCompany">—</div>
+    <input type="hidden" id="qlogDealId">
+    <div class="cbs" style="margin-bottom:10px">
+      <button class="cb" onclick="selCb(this,'a')">✅ Atendeu</button>
+      <button class="cb" onclick="selCb(this,'n')">❌ Não atendeu</button>
+      <button class="cb" onclick="selCb(this,'c')">🔁 Callback</button>
+      <button class="cb" onclick="selCb(this,'e')">✉️ Email</button>
+    </div>
+    <div style="margin-bottom:10px"><input class="fi" id="qlogNota" placeholder="Nota rápida (opcional)..."></div>
+    <div><label class="fl">Próximo follow-up</label><input class="fi" id="qlogFollowup" type="date" style="margin-top:4px"></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn btn-g" style="flex:1" onclick="closeQLog()">Cancelar</button>
+      <button class="btn btn-gn" style="flex:2" onclick="saveQLog()">💾 Salvar ligação</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM DELETE ══ -->
+<div class="confirm-ov" id="confirmOv">
+  <div class="confirm-card">
+    <div style="font-size:28px;margin-bottom:12px">⚠️</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--re);margin-bottom:8px" id="confirmTitle">Confirmar exclusão</div>
+    <div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:18px" id="confirmDesc">Esta ação não pode ser desfeita.</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-g" style="flex:1" onclick="closeConfirm()">Cancelar</button>
+      <button class="btn btn-re" style="flex:1" id="confirmBtn">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GLOBAL SEARCH ══ -->
+<div class="gso" id="gso" onclick="if(event.target===this)closeGSearch()">
+  <div class="gsbox">
+    <div class="gsinput-row">
       <span style="font-size:16px;color:var(--t3)">🔍</span>
-      <input class="gsearch-input" id="gsearchInput" placeholder="Buscar contato, empresa, pipeline..." oninput="runGSearch(this.value)" autofocus>
-      <span class="hint-key">ESC</span>
+      <input class="gsinput" id="gsinput" placeholder="Buscar contato, empresa, deal..." oninput="runGSearch(this.value)">
+      <span class="hkey">ESC</span>
     </div>
-    <div class="gsearch-results" id="gsearchResults">
-      <div class="gsearch-empty">Digite para buscar em todos os contatos...</div>
-    </div>
-    <div class="gsearch-hint">
-      <span>↑↓ navegar · Enter abrir · ESC fechar</span>
-      <span><span class="hint-key">Ctrl</span> + <span class="hint-key">K</span> atalho</span>
-    </div>
+    <div class="gsresults" id="gsresults"><div class="gs-empty">Digite para buscar...</div></div>
+    <div class="gs-hint"><span>Enter para abrir · ESC para fechar</span><span><span class="hkey">Ctrl</span>+<span class="hkey">K</span></span></div>
   </div>
 </div>
 
-<!-- TOAST CONTAINER -->
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script>
@@ -510,23 +522,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4z3EG7RrtsVsKq6BQvBib0ws31EUAlXZbfMJ8FQ2LphmlyYnB6vMP7W67uc-V8c-gvA/exec';
 
 // ══ STATE ══
-// LOGIN DESATIVADO — fase de testes. v1.1 = login real.
-let currentUser = {
-  id:'USR-001', nome:'Bruno Camara',
-  email:'bruno.camara@gestao-online.com', perfil:'Manager'
-};
+const currentUser = { id:'USR-001', nome:'Bruno Camara', email:'bruno.camara@gestao-online.com', perfil:'Manager' };
 let allContatos = [];
+let allDeals = [];
+let allPipelines = {};  // { 'Novos Leads': [{etapa, cor, ordem},...] }
 let activeFilter = 'todos';
+let activeDealFilter = 'todos';
 let searchQuery = '';
+let dealSearchQ = '';
 let editingId = null;
-let pendingPayload = null;
-
-// ══ CORES POR PERFIL ══
-const PROFILE_COLORS = {
-  'Manager':'linear-gradient(135deg,#4f7cff,#8b5cf6)',
-  'Vendedor':'linear-gradient(135deg,#22d07a,#1ec8b0)',
-  'CEO':'linear-gradient(135deg,#f5b731,#f97340)',
-};
+let currentPipeTab = 'Novos Leads';
+let pipeContactId = null;
+let qlogDealData = null;
+let confirmCallback = null;
+let dragged = null;
 
 const SEG_COLORS = {
   'Tecnologia':'#4f7cff','Saúde':'#22d07a','Construção':'#f97340',
@@ -534,462 +543,603 @@ const SEG_COLORS = {
   'Jurídico':'#b06ef5','Educação':'#b06ef5','Agronegócio':'#22d07a',
   'Comércio':'#f97340','Outro':'#8fa3c4'
 };
+const PIPE_COLORS = {'Novos Leads':'#4f7cff','Reativação':'#f97340','Expansão':'#22d07a'};
 
-function startApp() {
-  document.getElementById('appWrap').classList.add('on');
-  const av = document.getElementById('userAv');
-  const initials = currentUser.nome.split(' ').map(n=>n[0]).slice(0,2).join('');
-  av.textContent = initials;
-  av.style.background = PROFILE_COLORS[currentUser.perfil] || PROFILE_COLORS['Manager'];
-  document.getElementById('userName').textContent = currentUser.nome;
-  document.getElementById('userRole').textContent = currentUser.perfil;
-  if (currentUser.perfil === 'Vendedor') {
-    document.getElementById('nav-config').style.display = 'none';
-  }
-  loadContatos();
-  showScr('contatos');
-}
-
-// Auto-iniciar sem login — fase de testes
-window.addEventListener('DOMContentLoaded', startApp);
+// ══ INIT ══
+document.getElementById('userAv').textContent = 'BR';
+document.getElementById('userName').textContent = currentUser.nome;
+document.getElementById('userRole').textContent = currentUser.perfil;
+syncAll();
 
 // ══ API ══
 async function apiPost(body) {
-  const res = await fetch(SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: { 'Content-Type': 'text/plain' }
-  });
+  const res = await fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(body), headers:{'Content-Type':'text/plain'} });
   return res.json();
 }
-
 async function apiGet(tabela) {
   const res = await fetch(`${SCRIPT_URL}?tabela=${tabela}`);
   return res.json();
 }
 
-// ══ CONTATOS ══
-async function loadContatos() {
+// ══ SYNC ALL ══
+async function syncAll() {
   const btn = document.getElementById('syncBtn');
-  btn.textContent = '🔄 ...';
-  btn.disabled = true;
-  document.getElementById('ctLoading').style.display = 'flex';
-  document.getElementById('ctEmpty').style.display = 'none';
-  document.getElementById('ctTableWrap').style.display = 'none';
-
+  btn.textContent = '🔄 ...'; btn.disabled = true;
   try {
-    const res = await apiGet('CONTATOS');
-    if (res.success) {
-      allContatos = res.data || [];
-      renderContatos();
-      toast('✅ ' + allContatos.length + ' contatos carregados', 'ok');
-    } else {
-      toast('❌ Erro ao carregar: ' + res.error, 'err');
+    const [ct, dl, pl] = await Promise.all([
+      apiGet('CONTATOS'), apiGet('DEALS'), apiGet('PIPELINES')
+    ]);
+    if (ct.success) allContatos = ct.data || [];
+    if (dl.success) allDeals = dl.data || [];
+    if (pl.success) {
+      allPipelines = {};
+      (pl.data || []).forEach(r => {
+        const pipe = r['Pipeline'];
+        if (!allPipelines[pipe]) allPipelines[pipe] = [];
+        if (String(r['Ativa']).toLowerCase() === 'sim') {
+          allPipelines[pipe].push({ etapa: r['Etapa'], cor: r['Cor'], ordem: Number(r['Ordem']) });
+        }
+      });
+      Object.keys(allPipelines).forEach(k => allPipelines[k].sort((a,b) => a.ordem - b.ordem));
     }
+    document.getElementById('ctCount').textContent = allContatos.length;
+    document.getElementById('dealCount').textContent = allDeals.filter(d => d['Status'] === 'Ativo').length;
+    renderContatos();
+    renderPipeTabs();
+    renderBoard();
+    toast(`✅ Sincronizado — ${allContatos.length} contatos, ${allDeals.length} deals`, 'ok');
   } catch(e) {
-    toast('❌ Erro de conexão com o servidor', 'err');
+    toast('❌ Erro de conexão', 'err');
   } finally {
-    btn.textContent = '🔄 Sincronizar';
-    btn.disabled = false;
-    document.getElementById('ctLoading').style.display = 'none';
+    btn.textContent = '🔄 Sincronizar'; btn.disabled = false;
   }
 }
 
+// ══ CONTATOS ══
 function renderContatos() {
   let data = [...allContatos];
-
-  // Filter
   if (activeFilter === 'lead') data = data.filter(c => c['Tipo'] === 'Lead Novo');
   else if (activeFilter === 'cliente') data = data.filter(c => c['Tipo'] === 'Cliente Ativo');
   else if (activeFilter === 'ni') data = data.filter(c => c['Atribuído Por'] === 'Nicolau');
   else if (activeFilter === 'followup') {
     const today = new Date(); today.setHours(0,0,0,0);
-    data = data.filter(c => {
-      if (!c['Próximo Follow-up']) return false;
-      const d = new Date(c['Próximo Follow-up']); d.setHours(0,0,0,0);
-      return d.getTime() <= today.getTime();
-    });
+    data = data.filter(c => { if(!c['Próximo Follow-up']) return false; const d=new Date(c['Próximo Follow-up']); d.setHours(0,0,0,0); return d<=today; });
   }
-
-  // Search
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
-    data = data.filter(c =>
-      (c['Empresa']||'').toLowerCase().includes(q) ||
-      (c['Nome Contato']||'').toLowerCase().includes(q) ||
-      (c['Telefone']||'').toLowerCase().includes(q) ||
-      (c['Segmento']||'').toLowerCase().includes(q) ||
-      (c['Email']||'').toLowerCase().includes(q)
-    );
+    data = data.filter(c => (c['Empresa']||'').toLowerCase().includes(q)||(c['Nome Contato']||'').toLowerCase().includes(q)||(c['Telefone']||'').includes(q));
   }
-
-  // Update count
-  const total = allContatos.length;
-  document.getElementById('ctCount').textContent = total;
-  document.getElementById('countPill').textContent = data.length + ' contato' + (data.length !== 1 ? 's' : '');
-
-  if (data.length === 0 && allContatos.length === 0) {
+  document.getElementById('ctCount').textContent = allContatos.length;
+  document.getElementById('countPill').textContent = data.length + ' contato' + (data.length!==1?'s':'');
+  document.getElementById('ctLoading').style.display = 'none';
+  if (!data.length && !allContatos.length) {
     document.getElementById('ctEmpty').style.display = 'flex';
     document.getElementById('ctTableWrap').style.display = 'none';
     return;
   }
-
   document.getElementById('ctEmpty').style.display = 'none';
   document.getElementById('ctTableWrap').style.display = 'block';
-
   const tbody = document.getElementById('ctBody');
   tbody.innerHTML = data.map(c => {
-    const seg = c['Segmento'] || '';
-    const cor = SEG_COLORS[seg] || '#8fa3c4';
+    const seg = c['Segmento']||''; const cor = SEG_COLORS[seg]||'#8fa3c4';
     const ic = (c['Empresa']||'?').substring(0,2).toUpperCase();
-    const tipo = c['Tipo'] || 'Lead Novo';
-    const prio = c['Prioridade'] || '🌡 Morno';
-    const resp = c['Responsável'] || '';
-    const atrib = c['Atribuído Por'] || '';
-    const followUp = c['Próximo Follow-up'];
-
-    const tipoBadge = tipo === 'Lead Novo' ? 'b-lead' :
-                      tipo === 'Cliente Ativo' ? 'b-cli' :
-                      tipo === 'Inativo — Reativar' ? 'b-reati' : 'b-inat';
-
-    const prioBadge = prio.includes('Quente') ? 'b-hot' :
-                      prio.includes('Morno') ? 'b-warm' : 'b-cold';
-
-    const respBadge = resp === 'Nicolau' ? 'b-ni' :
-                      resp === 'Samuel Mateus' ? 'b-sa' : 'b-br';
-
-    const atribBadge = atrib === 'Nicolau' ? '<span class="badge b-ni">🎯 Nicolau</span>' :
-                       atrib === 'Bruno Camara' ? '<span class="badge b-br">⚙️ Bruno</span>' :
-                       '<span class="badge" style="background:var(--s3);color:var(--t3)">Samuel</span>';
-
-    const flHtml = followUp ? flDate(followUp) : '<span class="fl-date fl-ok">—</span>';
-
+    const tipo = c['Tipo']||'Lead Novo'; const prio = c['Prioridade']||'🌡 Morno';
+    const resp = c['Responsável']||''; const atrib = c['Atribuído Por']||'';
+    const tipoBadge = tipo==='Lead Novo'?'b-lead':tipo==='Cliente Ativo'?'b-cli':tipo==='Inativo — Reativar'?'b-reati':'b-inat';
+    const prioBadge = prio.includes('Quente')?'b-hot':prio.includes('Morno')?'b-warm':'b-cold';
+    const respBadge = resp==='Nicolau'?'b-ni':resp==='Samuel Mateus'?'b-sa':'b-br';
+    const atribBadge = atrib==='Nicolau'?'<span class="badge b-ni">🎯 Nicolau</span>':atrib==='Bruno Camara'?'<span class="badge b-br">⚙️ Bruno</span>':'<span class="badge" style="background:var(--s3);color:var(--t3)">Samuel</span>';
+    const fu = c['Próximo Follow-up'];
     return `<tr onclick="openPanel('edit','${c['ID']}')">
-      <td>
-        <div class="co-cell">
-          <div class="co-ic" style="background:${cor}22;color:${cor}">${ic}</div>
-          <div><div class="co-nm">${c['Empresa'] || '—'}</div><div class="co-sg">${seg}</div></div>
-        </div>
-      </td>
-      <td style="color:var(--t2)">${c['Nome Contato'] || '—'}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--t3)">${c['Telefone'] || '—'}</td>
+      <td><div class="co-cell"><div class="co-ic" style="background:${cor}22;color:${cor}">${ic}</div><div><div class="co-nm">${c['Empresa']||'—'}</div><div class="co-sg">${seg}</div></div></div></td>
+      <td style="color:var(--t2)">${c['Nome Contato']||'—'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--t3)">${c['Telefone']||'—'}</td>
       <td><span class="badge ${tipoBadge}">${tipo}</span></td>
       <td><span class="badge ${prioBadge}">${prio}</span></td>
       <td><span class="badge ${respBadge}">${resp}</span></td>
       <td>${atribBadge}</td>
-      <td>${flHtml}</td>
-      <td>
-        <div class="acts">
-          <div class="act-btn" onclick="event.stopPropagation();openPanel('edit','${c['ID']}')" title="Editar">✏️</div>
-        </div>
-      </td>
+      <td>${fu?flDate(fu):'<span class="fl-date fl-ok">—</span>'}</td>
+      <td><div class="acts">
+        <div class="act-btn" onclick="event.stopPropagation();openPipeModalForContact('${c['ID']}','${(c['Empresa']||'').replace(/'/g,"\\'")}')">⚡</div>
+        <div class="act-btn" onclick="event.stopPropagation();openPanel('edit','${c['ID']}')">✏️</div>
+        <div class="act-btn del" onclick="event.stopPropagation();askDeleteContact('${c['ID']}','${(c['Empresa']||'').replace(/'/g,"\\'")}')">🗑</div>
+      </div></td>
     </tr>`;
   }).join('');
 }
 
-function flDate(dateStr) {
-  const today = new Date(); today.setHours(0,0,0,0);
-  const d = new Date(dateStr); d.setHours(0,0,0,0);
-  const diff = (d - today) / 86400000;
-  if (diff < 0) return `<span class="fl-date fl-urg">⚠ Atrasado</span>`;
-  if (diff === 0) return `<span class="fl-date fl-tod">📅 Hoje</span>`;
-  return `<span class="fl-date fl-ok">📅 ${d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</span>`;
+function flDate(d) {
+  const today=new Date();today.setHours(0,0,0,0);
+  const dt=new Date(d);dt.setHours(0,0,0,0);
+  const diff=(dt-today)/86400000;
+  if(diff<0) return `<span class="fl-date fl-urg">⚠ Atrasado</span>`;
+  if(diff===0) return `<span class="fl-date fl-tod">📅 Hoje</span>`;
+  return `<span class="fl-date fl-ok">📅 ${dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</span>`;
 }
 
-function setFilter(f, el) {
-  activeFilter = f;
-  document.querySelectorAll('.fcp').forEach(c => c.classList.remove('on'));
+function setFilter(f,el){activeFilter=f;document.querySelectorAll('.fcp').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderContatos();}
+function filterContatos(q){searchQuery=q;renderContatos();}
+
+// ══ PIPELINE KANBAN ══
+function renderPipeTabs() {
+  const pipes = ['Novos Leads','Reativação','Expansão'];
+  const container = document.getElementById('pipeTabs');
+  const dealsAtivos = allDeals.filter(d=>d['Status']==='Ativo');
+  let html = '';
+  pipes.forEach((pipe,i) => {
+    const pDeals = dealsAtivos.filter(d=>d['Pipeline']===pipe);
+    const total = pDeals.reduce((s,d)=>s+Number((d['Valor Estimado']||0)),0);
+    const fechados = allDeals.filter(d=>d['Pipeline']===pipe&&d['Status']==='Fechado — Ganho');
+    const todos = allDeals.filter(d=>d['Pipeline']===pipe);
+    const conv = todos.length?Math.round((fechados.length/todos.length)*100):0;
+    const cor = PIPE_COLORS[pipe]||'#4f7cff';
+    const on = pipe===currentPipeTab?' on':'';
+    if(i>0) html += '<div class="tdiv"></div>';
+    html += `<div class="ptab${on}" onclick="setPipeTab('${pipe}',this)">
+      <div class="ptab-dot" style="background:${cor}"></div>
+      ${pipe}
+      <span class="ptab-ct" style="background:${cor}22;color:${cor}">${pDeals.length}</span>
+      <span class="ptab-vl">${total>0?'R$'+Math.round(total/1000)+'k':''}</span>
+    </div>`;
+  });
+  html += `<div class="conv-area">
+    <div class="ci">Conversão: <span class="cv" id="convRate" style="color:${PIPE_COLORS[currentPipeTab]||'#4f7cff'}">
+      ${calcConv(currentPipeTab)}%
+    </span></div>
+  </div>`;
+  container.innerHTML = html;
+}
+
+function calcConv(pipe) {
+  const todos = allDeals.filter(d=>d['Pipeline']===pipe);
+  const fechados = allDeals.filter(d=>d['Pipeline']===pipe&&d['Status']==='Fechado — Ganho');
+  return todos.length?Math.round((fechados.length/todos.length)*100):0;
+}
+
+function setPipeTab(pipe,el){
+  currentPipeTab=pipe;
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('on'));
   el.classList.add('on');
-  renderContatos();
+  renderBoard();
+  renderPipeTabs();
 }
 
-function filterContatos(q) {
-  searchQuery = q;
-  renderContatos();
-}
+function setDealFilter(f,el){activeDealFilter=f;document.querySelectorAll('.fcp').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderBoard();}
+function filterDeals(q){dealSearchQ=q;renderBoard();}
 
-// ══ PANEL ══
-function openPanel(mode, id) {
-  clearForm();
-  editingId = null;
-  pendingPayload = null;
-
-  if (mode === 'edit' && id) {
-    const c = allContatos.find(x => x['ID'] === id);
-    if (!c) return;
-    editingId = id;
-    document.getElementById('panelTitle').textContent = c['Empresa'] || 'Editar Contato';
-    document.getElementById('saveBtn').textContent = '💾 Salvar alterações';
-    document.getElementById('editId').value = id;
-    document.getElementById('fEmpresa').value = c['Empresa'] || '';
-    document.getElementById('fCNPJ').value = c['CNPJ'] || '';
-    document.getElementById('fSegmento').value = c['Segmento'] || '';
-    document.getElementById('fICP').value = c['Papel ICP-Brasil'] || '';
-    document.getElementById('fNome').value = c['Nome Contato'] || '';
-    document.getElementById('fCargo').value = c['Cargo'] || '';
-    document.getElementById('fTelefone').value = c['Telefone'] || '';
-    document.getElementById('fEmail').value = c['Email'] || '';
-    document.getElementById('fTipo').value = c['Tipo'] || 'Lead Novo';
-    document.getElementById('fPrioridade').value = c['Prioridade'] || '🌡 Morno';
-    document.getElementById('fPotencial').value = c['Potencial'] || 'Médio';
-    document.getElementById('fOrigem').value = c['Origem'] || '';
-    document.getElementById('fResponsavel').value = c['Responsável'] || 'Samuel Mateus';
-    document.getElementById('fFollowup').value = c['Próximo Follow-up'] ? formatDateInput(c['Próximo Follow-up']) : '';
-    document.getElementById('fProdutos').value = c['Produtos GO Interesse'] || '';
-    document.getElementById('fObs').value = c['Observações'] || '';
-    document.getElementById('fContextoCEO').value = c['Contexto CEO'] || '';
-    document.getElementById('notifInfo').style.display = 'none';
-  } else {
-    document.getElementById('panelTitle').textContent = 'Novo Contato';
-    document.getElementById('saveBtn').textContent = '💾 Salvar e notificar Samuel';
-    document.getElementById('notifInfo').style.display = 'flex';
-    // Set default follow-up to tomorrow
-    const tmrw = new Date(); tmrw.setDate(tmrw.getDate() + 1);
-    document.getElementById('fFollowup').value = tmrw.toISOString().split('T')[0];
+function renderBoard() {
+  const pipe = currentPipeTab;
+  const stages = allPipelines[pipe] || [];
+  const pipeColor = PIPE_COLORS[pipe]||'#4f7cff';
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  let dealsForPipe = allDeals.filter(d=>d['Pipeline']===pipe&&d['Status']==='Ativo');
+  if(activeDealFilter==='hot') dealsForPipe=dealsForPipe.filter(d=>(d['Prioridade']||'').includes('Quente'));
+  else if(activeDealFilter==='ni') dealsForPipe=dealsForPipe.filter(d=>(d['Criado Por']||'').includes('Nicolau')||(allContatos.find(c=>c['ID']===d['ID Contato'])||{})['Atribuído Por']==='Nicolau');
+  else if(activeDealFilter==='atrasado'){
+    const today=new Date();today.setHours(0,0,0,0);
+    dealsForPipe=dealsForPipe.filter(d=>{if(!d['Próximo Follow-up'])return false;const dt=new Date(d['Próximo Follow-up']);dt.setHours(0,0,0,0);return dt<today;});
   }
+  if(dealSearchQ){
+    const q=dealSearchQ.toLowerCase();
+    dealsForPipe=dealsForPipe.filter(d=>(d['Empresa']||'').toLowerCase().includes(q));
+  }
+  stages.forEach(stage => {
+    const stageDeals = dealsForPipe.filter(d=>d['Etapa']===stage.etapa);
+    const totalV = stageDeals.reduce((s,d)=>s+Number(d['Valor Estimado']||0),0);
+    const col = document.createElement('div');
+    col.className='col';
+    col.innerHTML=`
+      <div class="ch">
+        <div class="cdot" style="background:${stage.cor}"></div>
+        <div class="ctitle">${stage.etapa}</div>
+        <div class="cn" id="cn-${stage.etapa.replace(/\s/g,'_')}">${stageDeals.length}</div>
+        <div class="cv2">${totalV>0?'R$'+Math.round(totalV/1000)+'k':''}</div>
+      </div>
+      <div class="cbody" id="cb-${stage.etapa.replace(/\s/g,'_')}"
+        ondragover="event.preventDefault();this.classList.add('dov')"
+        ondragleave="this.classList.remove('dov')"
+        ondrop="dropCard(event,'${stage.etapa}','${pipe}')">
+        ${stageDeals.map(d=>cardHTML(d,stage,pipeColor,stages)).join('')}
+      </div>
+      <div class="addbtn" onclick="openPipeModalForNewDeal('${pipe}','${stage.etapa}')">＋ Adicionar</div>`;
+    board.appendChild(col);
+  });
+}
 
+function cardHTML(d, stage, pipeColor, stages) {
+  const pc = (d['Prioridade']||'').includes('Quente')?'ph':(d['Prioridade']||'').includes('Morno')?'pw':'pc';
+  const today=new Date();today.setHours(0,0,0,0);
+  const fu = d['Próximo Follow-up'];
+  let flHtml = '<span class="cfl fl-ok2">—</span>';
+  if(fu){const fd=new Date(fu);fd.setHours(0,0,0,0);const diff=(fd-today)/86400000;flHtml=diff<0?`<span class="cfl fl-urg2">⚠ Atrasado</span>`:diff===0?`<span class="cfl fl-tod2">📅 Hoje</span>`:`<span class="cfl fl-ok2">📅 ${fd.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</span>`;}
+  const stageIdx = stages.findIndex(s=>s.etapa===stage.etapa);
+  const dots = stages.map((_,i)=>`<div class="pdot2" style="background:${i<=stageIdx?pipeColor:'var(--bd)'}"></div>`).join('');
+  const contato = allContatos.find(c=>c['ID']===d['ID Contato'])||{};
+  const ceoNote = contato['Contexto CEO']||d['Observações']||'';
+  const seg = contato['Segmento']||''; const cor = SEG_COLORS[seg]||'#8fa3c4';
+  const valor = d['Valor Estimado']?`R$ ${Number(d['Valor Estimado']).toLocaleString('pt-BR')}`:'—';
+  const resp = d['Responsável']||'Samuel';
+  const respIc = resp==='Nicolau'?'NI':resp==='Bruno Camara'?'BR':'SA';
+  const respCls = resp==='Nicolau'?'uav-ni':resp==='Bruno Camara'?'uav-br':'uav-sa';
+  return `<div class="card" draggable="true"
+    ondragstart="startDrag(event,this,'${d['ID']}')"
+    ondragend="this.style.opacity='1'"
+    onclick="openDealPanel('${d['ID']}')">
+    <div class="cstripe" style="background:${pipeColor}"></div>
+    <div class="chead">
+      <div class="ctoprow">
+        <div class="cco">${d['Empresa']||'—'}</div>
+        <div class="cprio ${pc}">${(d['Prioridade']||'').includes('Quente')?'🔥':(d['Prioridade']||'').includes('Morno')?'🌡':'❄️'}</div>
+      </div>
+      <div class="ccrow">
+        ${seg?`<div class="cseg" style="background:${cor}22;color:${cor}">${seg}</div>`:''}
+        <div class="ccn">${contato['Nome Contato']||d['Empresa']||''}</div>
+      </div>
+      <div class="cvrow">
+        <div class="cval">${valor}</div>
+        <div class="cvlb">estimado</div>
+      </div>
+      <div class="cprog">
+        <div class="pdrow">${dots}</div>
+        <div class="prlb">${stage.etapa} · etapa ${stageIdx+1}/${stages.length}</div>
+      </div>
+      ${ceoNote?`<div class="cnote"><div class="cni">🎯</div><div class="cnt">${ceoNote.substring(0,80)}${ceoNote.length>80?'...':''}</div></div>`:''}
+    </div>
+    <div class="cfoot">
+      <div class="cowrow"><div class="mav ${respCls}">${respIc}</div><div class="own">${resp.split(' ')[0]}</div></div>
+      ${flHtml}
+    </div>
+    <div class="cqact">
+      <div class="qa qa-c" onclick="event.stopPropagation();openQLog('${d['ID']}','${(d['Empresa']||'').replace(/'/g,"\\'")}')">📞 Ligar</div>
+      <div class="qa qa-e" onclick="event.stopPropagation();openDealPanel('${d['ID']}')">✏️ Editar</div>
+      <div class="qa qa-d" onclick="event.stopPropagation();askDeleteDeal('${d['ID']}','${(d['Empresa']||'').replace(/'/g,"\\'")}')">🗑</div>
+    </div>
+  </div>`;
+}
+
+// ══ DRAG ══
+function startDrag(e,el,id){dragged={el,id};setTimeout(()=>el.style.opacity='.4',0);}
+document.addEventListener('dragend',()=>{if(dragged){dragged.el.style.opacity='1';dragged=null;}});
+async function dropCard(e,etapa,pipe){
+  e.preventDefault();
+  document.querySelectorAll('.cbody').forEach(b=>b.classList.remove('dov'));
+  if(!dragged)return;
+  const deal=allDeals.find(d=>d['ID']===dragged.id);
+  if(!deal||deal['Etapa']===etapa)return;
+  try{
+    const res=await apiPost({action:'ATUALIZAR_DEAL',payload:{id:dragged.id,etapa},usuario:currentUser.nome});
+    if(res.success){
+      deal['Etapa']=etapa;
+      renderBoard();
+      renderPipeTabs();
+      toast(`✅ Movido para ${etapa}`,'ok');
+    }
+  }catch(e){toast('❌ Erro ao mover','err');}
+}
+
+// ══ DEAL PANEL ══
+function openDealPanel(id){
+  const d=allDeals.find(x=>x['ID']===id);
+  if(!d)return;
+  const c=allContatos.find(x=>x['ID']===d['ID Contato'])||{};
+  editingId=id;
+  document.getElementById('panelTitle').textContent=d['Empresa']||'Deal';
+  document.getElementById('fEmpresa').value=d['Empresa']||'';
+  document.getElementById('fCNPJ').value=c['CNPJ']||'';
+  document.getElementById('fSegmento').value=c['Segmento']||'';
+  document.getElementById('fICP').value=c['Papel ICP-Brasil']||'';
+  document.getElementById('fNome').value=c['Nome Contato']||'';
+  document.getElementById('fCargo').value=c['Cargo']||'';
+  document.getElementById('fTelefone').value=c['Telefone']||'';
+  document.getElementById('fEmail').value=c['Email']||'';
+  document.getElementById('fTipo').value=c['Tipo']||'Lead Novo';
+  document.getElementById('fPrioridade').value=d['Prioridade']||'🌡 Morno';
+  document.getElementById('fPotencial').value=c['Potencial']||'Médio';
+  document.getElementById('fOrigem').value=c['Origem']||'Prospecção Samuel';
+  document.getElementById('fResponsavel').value=d['Responsável']||'Samuel Mateus';
+  document.getElementById('fFollowup').value=d['Próximo Follow-up']?fmtDateInput(d['Próximo Follow-up']):'';
+  document.getElementById('fProdutos').value=c['Produtos GO Interesse']||'';
+  document.getElementById('fObs').value=d['Observações']||'';
+  document.getElementById('fContextoCEO').value=c['Contexto CEO']||'';
+  document.getElementById('saveBtn').textContent='💾 Salvar alterações';
+  document.getElementById('notifInfo').style.display='none';
+  document.getElementById('pipeInfo').style.display='none';
+  document.getElementById('deleteBtn').style.display='flex';
+  document.getElementById('pipeBtn').style.display='none';
   document.getElementById('panel').classList.add('open');
-  document.getElementById('overlayBg').classList.add('open');
+  document.getElementById('ovbg').classList.add('open');
+}
+
+// ══ CONTACT PANEL ══
+function openPanel(mode,id){
+  clearForm(); editingId=null; pipeContactId=null;
+  document.getElementById('deleteBtn').style.display='none';
+  document.getElementById('pipeBtn').style.display='none';
+  if(mode==='edit'&&id){
+    const c=allContatos.find(x=>x['ID']===id); if(!c)return;
+    editingId=id;
+    document.getElementById('panelTitle').textContent=c['Empresa']||'Editar';
+    document.getElementById('saveBtn').textContent='💾 Salvar alterações';
+    document.getElementById('editId').value=id;
+    document.getElementById('fEmpresa').value=c['Empresa']||'';
+    document.getElementById('fCNPJ').value=c['CNPJ']||'';
+    document.getElementById('fSegmento').value=c['Segmento']||'';
+    document.getElementById('fICP').value=c['Papel ICP-Brasil']||'';
+    document.getElementById('fNome').value=c['Nome Contato']||'';
+    document.getElementById('fCargo').value=c['Cargo']||'';
+    document.getElementById('fTelefone').value=c['Telefone']||'';
+    document.getElementById('fEmail').value=c['Email']||'';
+    document.getElementById('fTipo').value=c['Tipo']||'Lead Novo';
+    document.getElementById('fPrioridade').value=c['Prioridade']||'🌡 Morno';
+    document.getElementById('fPotencial').value=c['Potencial']||'Médio';
+    document.getElementById('fOrigem').value=c['Origem']||'Prospecção Samuel';
+    document.getElementById('fResponsavel').value=c['Responsável']||'Samuel Mateus';
+    document.getElementById('fFollowup').value=c['Próximo Follow-up']?fmtDateInput(c['Próximo Follow-up']):'';
+    document.getElementById('fProdutos').value=c['Produtos GO Interesse']||'';
+    document.getElementById('fObs').value=c['Observações']||'';
+    document.getElementById('fContextoCEO').value=c['Contexto CEO']||'';
+    document.getElementById('notifInfo').style.display='none';
+    document.getElementById('pipeInfo').style.display='flex';
+    document.getElementById('deleteBtn').style.display='flex';
+    document.getElementById('pipeBtn').style.display='flex';
+    pipeContactId=id;
+  } else {
+    document.getElementById('panelTitle').textContent='Novo Contato';
+    document.getElementById('saveBtn').textContent='💾 Salvar e notificar Samuel';
+    document.getElementById('notifInfo').style.display='flex';
+    document.getElementById('pipeInfo').style.display='none';
+    const tmrw=new Date();tmrw.setDate(tmrw.getDate()+1);
+    document.getElementById('fFollowup').value=tmrw.toISOString().split('T')[0];
+  }
+  document.getElementById('panel').classList.add('open');
+  document.getElementById('ovbg').classList.add('open');
   document.getElementById('fEmpresa').focus();
 }
 
-function closePanel() {
+function closePanel(){
   document.getElementById('panel').classList.remove('open');
-  document.getElementById('overlayBg').classList.remove('open');
+  document.getElementById('ovbg').classList.remove('open');
+  editingId=null; pipeContactId=null;
 }
 
-function clearForm() {
-  ['fEmpresa','fCNPJ','fNome','fCargo','fTelefone','fEmail','fProdutos','fObs','fContextoCEO','editId'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  ['fSegmento','fICP'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  ['fTipo','fPrioridade','fPotencial','fOrigem','fResponsavel'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.selectedIndex = 0;
-  });
-  ['errEmpresa','errNome','errTelefone'].forEach(id => {
-    document.getElementById(id).classList.remove('show');
-  });
-  ['fEmpresa','fNome','fTelefone'].forEach(id => {
-    document.getElementById(id).classList.remove('err');
-  });
+function clearForm(){
+  ['fEmpresa','fCNPJ','fNome','fCargo','fTelefone','fEmail','fProdutos','fObs','fContextoCEO','editId'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['fSegmento','fICP'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['fTipo','fPrioridade','fPotencial','fOrigem','fResponsavel'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
+  ['errEmpresa','errNome','errTelefone'].forEach(id=>document.getElementById(id).classList.remove('show'));
+  ['fEmpresa','fNome','fTelefone'].forEach(id=>document.getElementById(id).classList.remove('err'));
 }
 
-function formatDateInput(dateStr) {
-  try {
-    const d = new Date(dateStr);
-    return d.toISOString().split('T')[0];
-  } catch(e) { return ''; }
-}
+function fmtDateInput(d){try{return new Date(d).toISOString().split('T')[0];}catch(e){return '';}}
 
-function validate() {
-  let ok = true;
-  const required = [
-    { id: 'fEmpresa', err: 'errEmpresa' },
-    { id: 'fNome', err: 'errNome' },
-    { id: 'fTelefone', err: 'errTelefone' },
-  ];
-  required.forEach(({ id, err }) => {
-    const el = document.getElementById(id);
-    if (!el.value.trim()) {
-      el.classList.add('err');
-      document.getElementById(err).classList.add('show');
-      ok = false;
-    } else {
-      el.classList.remove('err');
-      document.getElementById(err).classList.remove('show');
-    }
+function validate(){
+  let ok=true;
+  [['fEmpresa','errEmpresa'],['fNome','errNome'],['fTelefone','errTelefone']].forEach(([fi,er])=>{
+    const el=document.getElementById(fi);
+    if(!el.value.trim()){el.classList.add('err');document.getElementById(er).classList.add('show');ok=false;}
+    else{el.classList.remove('err');document.getElementById(er).classList.remove('show');}
   });
   return ok;
 }
 
-async function saveContato() {
-  if (!validate()) return;
-
-  const btn = document.getElementById('saveBtn');
-  btn.disabled = true;
-  btn.textContent = 'Salvando...';
-
-  const payload = {
-    empresa: document.getElementById('fEmpresa').value.trim(),
-    cnpj: document.getElementById('fCNPJ').value.trim(),
-    segmento: document.getElementById('fSegmento').value,
-    papelICP: document.getElementById('fICP').value,
-    nomeContato: document.getElementById('fNome').value.trim(),
-    cargo: document.getElementById('fCargo').value.trim(),
-    telefone: document.getElementById('fTelefone').value.trim(),
-    email: document.getElementById('fEmail').value.trim(),
-    tipo: document.getElementById('fTipo').value,
-    prioridade: document.getElementById('fPrioridade').value,
-    potencial: document.getElementById('fPotencial').value,
-    origem: document.getElementById('fOrigem').value,
-    responsavel: document.getElementById('fResponsavel').value,
-    proximoFollowUp: document.getElementById('fFollowup').value,
-    produtosInteresse: document.getElementById('fProdutos').value.trim(),
-    observacoes: document.getElementById('fObs').value.trim(),
-    contextoCEO: document.getElementById('fContextoCEO').value.trim(),
-    atribuidoPor: currentUser.nome,
+async function saveContato(){
+  if(!validate())return;
+  const btn=document.getElementById('saveBtn');
+  btn.disabled=true;btn.textContent='Salvando...';
+  const payload={
+    empresa:document.getElementById('fEmpresa').value.trim(),
+    cnpj:document.getElementById('fCNPJ').value.trim(),
+    segmento:document.getElementById('fSegmento').value,
+    papelICP:document.getElementById('fICP').value,
+    nomeContato:document.getElementById('fNome').value.trim(),
+    cargo:document.getElementById('fCargo').value.trim(),
+    telefone:document.getElementById('fTelefone').value.trim(),
+    email:document.getElementById('fEmail').value.trim(),
+    tipo:document.getElementById('fTipo').value,
+    prioridade:document.getElementById('fPrioridade').value,
+    potencial:document.getElementById('fPotencial').value,
+    origem:document.getElementById('fOrigem').value,
+    responsavel:document.getElementById('fResponsavel').value,
+    proximoFollowUp:document.getElementById('fFollowup').value,
+    produtosInteresse:document.getElementById('fProdutos').value.trim(),
+    observacoes:document.getElementById('fObs').value.trim(),
+    contextoCEO:document.getElementById('fContextoCEO').value.trim(),
+    atribuidoPor:currentUser.nome,
   };
-
-  try {
+  try{
     let res;
-    if (editingId) {
-      payload.id = editingId;
-      res = await apiPost({ action: 'ATUALIZAR_CONTATO', payload, usuario: currentUser.nome });
+    if(editingId){
+      payload.id=editingId;
+      res=await apiPost({action:'ATUALIZAR_CONTATO',payload,usuario:currentUser.nome});
     } else {
-      res = await apiPost({ action: 'CRIAR_CONTATO', payload, usuario: currentUser.nome });
+      res=await apiPost({action:'CRIAR_CONTATO',payload,usuario:currentUser.nome});
     }
-
-    if (res.success) {
+    if(res.success){
       closePanel();
-      toast(editingId ? '✅ Contato atualizado!' : '✅ Contato criado! Samuel notificado por email.', 'ok');
-      await loadContatos();
-    } else if (res.error === 'DUPLICATA_CNPJ') {
-      pendingPayload = { payload, editingId };
-      showDupModal(`CNPJ já cadastrado para a empresa "${res.empresa}" (${res.id}). Deseja salvar mesmo assim?`);
-    } else if (res.error === 'DUPLICATA_TELEFONE') {
-      pendingPayload = { payload, editingId };
-      showDupModal(`Telefone já cadastrado para a empresa "${res.empresa}" (${res.id}). Deseja salvar mesmo assim?`);
+      toast(editingId?'✅ Contato atualizado!':'✅ Contato criado! Samuel notificado.','ok');
+      await syncAll();
+    } else if(res.error==='DUPLICATA_CNPJ'||res.error==='DUPLICATA_TELEFONE'){
+      toast(`⚠ Duplicata: ${res.empresa||''}. Verifique os dados.`,'warn');
     } else {
-      toast('❌ Erro: ' + res.error, 'err');
+      toast('❌ Erro: '+(res.error||'desconhecido'),'err');
     }
-  } catch(e) {
-    toast('❌ Erro de conexão. Tente novamente.', 'err');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = editingId ? '💾 Salvar alterações' : '💾 Salvar e notificar Samuel';
-  }
+  }catch(e){toast('❌ Erro de conexão','err');}
+  finally{btn.disabled=false;btn.textContent=editingId?'💾 Salvar alterações':'💾 Salvar e notificar Samuel';}
 }
 
-// ══ DUPLICATE ══
-function showDupModal(msg) {
-  document.getElementById('dupDesc').textContent = msg;
-  document.getElementById('dupModal').classList.add('open');
+// ══ PIPE MODAL ══
+function openPipeModalForContact(contactId, empresa){
+  pipeContactId=contactId;
+  document.getElementById('selValor').value='';
+  updateEtapas();
+  document.getElementById('pipeModal').classList.add('open');
 }
-function closeDupModal() {
-  document.getElementById('dupModal').classList.remove('open');
-  pendingPayload = null;
+function openPipeModalForNewDeal(pipe,etapa){
+  pipeContactId=null;
+  document.getElementById('selPipeline').value=pipe;
+  updateEtapas();
+  document.getElementById('selEtapa').value=etapa;
+  document.getElementById('pipeModal').classList.add('open');
 }
-async function forcarSalvar() {
-  closeDupModal();
-  if (!pendingPayload) return;
-  const { payload, editingId: eid } = pendingPayload;
-  // Force save — skip duplicate check by adding flag
-  payload._forceSave = true;
-  try {
-    const action = eid ? 'ATUALIZAR_CONTATO' : 'CRIAR_CONTATO';
-    if (eid) payload.id = eid;
-    const res = await apiPost({ action, payload, usuario: currentUser.nome });
-    if (res.success) {
+function openPipeModal(){
+  if(!pipeContactId)return;
+  updateEtapas();
+  document.getElementById('pipeModal').classList.add('open');
+}
+function closePipeModal(){document.getElementById('pipeModal').classList.remove('open');}
+
+function updateEtapas(){
+  const pipe=document.getElementById('selPipeline').value;
+  const sel=document.getElementById('selEtapa');
+  const stages=allPipelines[pipe]||[];
+  sel.innerHTML=stages.map(s=>`<option>${s.etapa}</option>`).join('');
+}
+
+async function createDeal(){
+  const pipe=document.getElementById('selPipeline').value;
+  const etapa=document.getElementById('selEtapa').value;
+  const valor=document.getElementById('selValor').value;
+  const prio=document.getElementById('selPrio').value;
+  const contactId=pipeContactId||editingId;
+  const contato=allContatos.find(c=>c['ID']===contactId)||{};
+  const payload={
+    idContato:contactId||'',
+    empresa:contato['Empresa']||document.getElementById('fEmpresa')?.value||'',
+    pipeline:pipe,
+    etapa,
+    valorEstimado:valor?Number(valor):0,
+    responsavel:contato['Responsável']||'Samuel Mateus',
+    prioridade:prio,
+    proximoFollowUp:contato['Próximo Follow-up']||'',
+    observacoes:contato['Contexto CEO']||'',
+  };
+  try{
+    const res=await apiPost({action:'CRIAR_DEAL',payload,usuario:currentUser.nome});
+    if(res.success){
+      closePipeModal();
       closePanel();
-      toast('✅ Contato salvo!', 'ok');
-      await loadContatos();
+      toast(`✅ Deal criado em ${pipe} — ${etapa}`,'ok');
+      await syncAll();
+      showScr('pipeline');
+      currentPipeTab=pipe;
+      renderBoard();
+      renderPipeTabs();
     } else {
-      toast('❌ Erro: ' + res.error, 'err');
+      toast('❌ Erro ao criar deal: '+(res.error||''),'err');
     }
-  } catch(e) {
-    toast('❌ Erro de conexão', 'err');
-  }
-  pendingPayload = null;
+  }catch(e){toast('❌ Erro de conexão','err');}
 }
+
+// ══ QUICK LOG ══
+function openQLog(dealId, empresa){
+  qlogDealData={id:dealId};
+  document.getElementById('qlogCompany').textContent=empresa;
+  document.getElementById('qlogDealId').value=dealId;
+  const tmrw=new Date();tmrw.setDate(tmrw.getDate()+1);
+  document.getElementById('qlogFollowup').value=tmrw.toISOString().split('T')[0];
+  document.getElementById('qlogNota').value='';
+  document.querySelectorAll('.cb').forEach(b=>b.className='cb');
+  document.getElementById('qlogOv').classList.add('open');
+}
+function closeQLog(){document.getElementById('qlogOv').classList.remove('open');qlogDealData=null;}
+function selCb(btn,t){document.querySelectorAll('.cb').forEach(b=>b.className='cb');btn.classList.add('sel-'+t);}
+
+async function saveQLog(){
+  const dealId=document.getElementById('qlogDealId').value;
+  const nota=document.getElementById('qlogNota').value.trim();
+  const fu=document.getElementById('qlogFollowup').value;
+  const selBtn=document.querySelector('.cb.sel-a,.cb.sel-n,.cb.sel-c,.cb.sel-e');
+  const statusMap={'sel-a':'✅ Atendeu','sel-n':'❌ Não atendeu','sel-c':'🔁 Callback agendado','sel-e':'✉️ Email enviado'};
+  const status=selBtn?statusMap[selBtn.classList[1]]||'Ligação':'Ligação';
+  const deal=allDeals.find(d=>d['ID']===dealId)||{};
+  try{
+    const res=await apiPost({action:'REGISTRAR_ATIVIDADE',payload:{idDeal:dealId,idContato:deal['ID Contato']||'',empresa:deal['Empresa']||'',tipo:'Ligação',statusLigacao:status,nota,proximoFollowUp:fu},usuario:currentUser.nome});
+    if(res.success){
+      closeQLog();
+      toast('✅ Ligação registrada!','ok');
+      if(fu){deal['Próximo Follow-up']=fu;renderBoard();}
+    } else {toast('❌ Erro: '+(res.error||''),'err');}
+  }catch(e){toast('❌ Erro de conexão','err');}
+}
+
+// ══ DELETE ══
+function askDeleteContact(id,empresa){
+  document.getElementById('confirmTitle').textContent='Excluir contato?';
+  document.getElementById('confirmDesc').textContent=`"${empresa}" será removido permanentemente. Deals associados não serão excluídos.`;
+  confirmCallback=async()=>{
+    try{
+      const res=await apiPost({action:'ATUALIZAR_CONTATO',payload:{id,status:'Arquivado'},usuario:currentUser.nome});
+      if(res.success){closeConfirm();closePanel();toast('✅ Contato arquivado!','ok');await syncAll();}
+      else toast('❌ Erro ao excluir','err');
+    }catch(e){toast('❌ Erro de conexão','err');}
+  };
+  document.getElementById('confirmBtn').onclick=confirmCallback;
+  document.getElementById('confirmOv').classList.add('open');
+}
+function askDeleteDeal(id,empresa){
+  document.getElementById('confirmTitle').textContent='Excluir deal?';
+  document.getElementById('confirmDesc').textContent=`O deal de "${empresa}" será marcado como perdido.`;
+  confirmCallback=async()=>{
+    try{
+      const res=await apiPost({action:'ATUALIZAR_DEAL',payload:{id,status:'Fechado — Perdido'},usuario:currentUser.nome});
+      if(res.success){closeConfirm();toast('✅ Deal removido!','ok');await syncAll();}
+      else toast('❌ Erro','err');
+    }catch(e){toast('❌ Erro de conexão','err');}
+  };
+  document.getElementById('confirmBtn').onclick=confirmCallback;
+  document.getElementById('confirmOv').classList.add('open');
+}
+function confirmDelete(){if(pipeContactId)askDeleteContact(pipeContactId,document.getElementById('fEmpresa').value);}
+function closeConfirm(){document.getElementById('confirmOv').classList.remove('open');confirmCallback=null;}
 
 // ══ GLOBAL SEARCH ══
-function openGSearch() {
-  document.getElementById('gsearchOverlay').classList.add('open');
-  setTimeout(() => document.getElementById('gsearchInput').focus(), 50);
-}
-function closeGSearch() {
-  document.getElementById('gsearchOverlay').classList.remove('open');
-  document.getElementById('gsearchInput').value = '';
-  document.getElementById('gsearchResults').innerHTML = '<div class="gsearch-empty">Digite para buscar em todos os contatos...</div>';
-}
-function runGSearch(q) {
-  const res = document.getElementById('gsearchResults');
-  if (!q.trim()) {
-    res.innerHTML = '<div class="gsearch-empty">Digite para buscar em todos os contatos...</div>';
-    return;
-  }
-  const filtered = allContatos.filter(c =>
-    (c['Empresa']||'').toLowerCase().includes(q.toLowerCase()) ||
-    (c['Nome Contato']||'').toLowerCase().includes(q.toLowerCase()) ||
-    (c['Telefone']||'').replace(/\D/g,'').includes(q.replace(/\D/g,'')) ||
-    (c['Email']||'').toLowerCase().includes(q.toLowerCase())
-  );
-  if (filtered.length === 0) {
-    res.innerHTML = '<div class="gsearch-empty">Nenhum resultado para "' + q + '"</div>';
-    return;
-  }
-  res.innerHTML = filtered.slice(0,8).map(c => {
-    const seg = c['Segmento'] || '';
-    const cor = SEG_COLORS[seg] || '#8fa3c4';
-    const ic = (c['Empresa']||'?').substring(0,2).toUpperCase();
-    return `<div class="gsr-item" onclick="closeGSearch();openPanel('edit','${c['ID']}')">
-      <div class="gsr-ic" style="background:${cor}22;color:${cor}">${ic}</div>
-      <div>
-        <div class="gsr-nm">${c['Empresa']}</div>
-        <div class="gsr-sub">${c['Nome Contato'] || ''} · ${c['Telefone'] || ''} · ${c['Tipo'] || ''}</div>
-      </div>
-    </div>`;
+function openGSearch(){document.getElementById('gso').classList.add('open');setTimeout(()=>document.getElementById('gsinput').focus(),50);}
+function closeGSearch(){document.getElementById('gso').classList.remove('open');document.getElementById('gsinput').value='';document.getElementById('gsresults').innerHTML='<div class="gs-empty">Digite para buscar...</div>';}
+function runGSearch(q){
+  const res=document.getElementById('gsresults');
+  if(!q.trim()){res.innerHTML='<div class="gs-empty">Digite para buscar...</div>';return;}
+  const filtered=[...allContatos.filter(c=>(c['Empresa']||'').toLowerCase().includes(q.toLowerCase())||(c['Nome Contato']||'').toLowerCase().includes(q.toLowerCase())||(c['Telefone']||'').includes(q)),...allDeals.filter(d=>(d['Empresa']||'').toLowerCase().includes(q.toLowerCase())&&d['Status']==='Ativo').map(d=>({...d,_isDeal:true}))].slice(0,8);
+  if(!filtered.length){res.innerHTML=`<div class="gs-empty">Nenhum resultado para "${q}"</div>`;return;}
+  res.innerHTML=filtered.map(item=>{
+    if(item._isDeal){const cor=PIPE_COLORS[item['Pipeline']]||'#4f7cff';return `<div class="gsr-item" onclick="closeGSearch();showScr('pipeline');currentPipeTab='${item['Pipeline']}';renderBoard();renderPipeTabs()"><div class="gsr-ic" style="background:${cor}22;color:${cor}">⚡</div><div><div class="gsr-nm">${item['Empresa']}</div><div class="gsr-sub">${item['Pipeline']} · ${item['Etapa']} · ${item['Prioridade']||''}</div></div></div>`;}
+    const seg=item['Segmento']||'';const cor=SEG_COLORS[seg]||'#8fa3c4';const ic=(item['Empresa']||'?').substring(0,2).toUpperCase();
+    return `<div class="gsr-item" onclick="closeGSearch();showScr('contatos');openPanel('edit','${item['ID']}')"><div class="gsr-ic" style="background:${cor}22;color:${cor}">${ic}</div><div><div class="gsr-nm">${item['Empresa']}</div><div class="gsr-sub">${item['Nome Contato']||''} · ${item['Telefone']||''} · ${item['Tipo']||''}</div></div></div>`;
   }).join('');
 }
 
 // ══ SCREENS ══
-function showScr(name) {
-  ['contatos','pipeline','followups','relatorios','produtos','config'].forEach(s => {
+function showScr(name){
+  ['contatos','pipeline','followups','relatorios','produtos','config'].forEach(s=>{
     document.getElementById('scr-'+s).classList.remove('on');
-    const nav = document.getElementById('nav-'+s);
-    if (nav) nav.classList.remove('on');
+    const nav=document.getElementById('nav-'+s);if(nav)nav.classList.remove('on');
   });
   document.getElementById('scr-'+name).classList.add('on');
-  const nav = document.getElementById('nav-'+name);
-  if (nav) nav.classList.add('on');
-
-  const titles = {
-    contatos:'Contatos', pipeline:'Pipeline',
-    followups:'Follow-ups', relatorios:'Relatórios',
-    produtos:'Produtos GO', config:'Configurações'
-  };
-  document.getElementById('mainTitle').textContent = titles[name] || name;
-
-  // Show/hide top buttons based on screen
-  document.getElementById('newBtn').style.display = name === 'contatos' ? 'flex' : 'none';
-  document.getElementById('syncBtn').style.display = name === 'contatos' ? 'flex' : 'none';
+  const nav=document.getElementById('nav-'+name);if(nav)nav.classList.add('on');
+  const titles={contatos:'Contatos',pipeline:'Pipeline de Vendas',followups:'Follow-ups',relatorios:'Relatórios',produtos:'Produtos GO',config:'Configurações'};
+  document.getElementById('mainTitle').textContent=titles[name]||name;
+  const showNew=name==='contatos';
+  document.getElementById('newBtn').style.display=showNew?'flex':'none';
+  document.getElementById('syncBtn').style.display='flex';
 }
 
 // ══ TOAST ══
-function toast(msg, type = 'info') {
-  const wrap = document.getElementById('toastWrap');
-  const t = document.createElement('div');
-  t.className = `toast toast-${type}`;
-  t.textContent = msg;
+function toast(msg,type='info'){
+  const wrap=document.getElementById('toastWrap');
+  const t=document.createElement('div');
+  t.className=`toast t-${type}`;t.textContent=msg;
   wrap.appendChild(t);
-  setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(()=>t.remove(),400); }, 3000);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .4s';setTimeout(()=>t.remove(),400);},3000);
 }
 
 // ══ KEYBOARD ══
-document.addEventListener('keydown', e => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-    e.preventDefault();
-    openGSearch();
-  }
-  if (e.key === 'Escape') {
-    closeGSearch();
-    closePanel();
-  }
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();openGSearch();}
+  if(e.key==='Escape'){closeGSearch();closePanel();closePipeModal();closeQLog();closeConfirm();}
 });
 
-// ══ INICIALIZAÇÃO — Auto-login Bruno (fase de testes) ══
-currentUser = {
-  id: 'USR-001',
-  nome: 'Bruno Camara',
-  email: 'bruno.camara@gestao-online.com',
-  perfil: 'Manager'
-};
-startApp();
+// ══ INITIAL RENDER ══
+updateEtapas();
 </script>
 </body>
 </html>
