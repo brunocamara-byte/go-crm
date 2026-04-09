@@ -1,4 +1,33 @@
 <!DOCTYPE html>
+<!--
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  GO CRM — Sistema Comercial Interno                                  ║
+  ║  Gestão Online Soluções em TI LTDA                                   ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  Projeto:    GO CRM                                                  ║
+  ║  Versão:     2.1 — Patch QA                                          ║
+  ║  Data:       Abril 2026                                              ║
+  ║  Autor:      Bruno Marães — Gerente de Projetos / PMO                ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  Stack:                                                              ║
+  ║    Frontend  → HTML/CSS/JS puro — hospedado no Vercel                ║
+  ║    Banco     → Google Sheets (CSV leitura + Apps Script escrita)     ║
+  ║    Email     → Gmail institucional via Google Apps Script            ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  Arquitetura preparada para migração futura para PostgreSQL          ║
+  ║  sem reescrita do frontend — apenas troca do endpoint de API.        ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  Fixes v2.1:                                                         ║
+  ║    [QA-01] Botão Excluir funcionando no painel de deal               ║
+  ║    [QA-02] Validação de deal duplicado antes de criar                ║
+  ║    [QA-03] CNPJ — validação de 14 dígitos                           ║
+  ║    [QA-04] Telefone — mínimo 8 dígitos                              ║
+  ║    [QA-05] Removido "Usuário Final PF/PJ" do campo ICP-Brasil        ║
+  ║    [QA-06] Adicionado Indicação Soluti e Indicação Prime na Origem   ║
+  ║    [UX-01] Cards do Kanban maiores com mais respiração               ║
+  ║    [UX-02] Filtro "👤 Meus" adicionado ao Kanban                    ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+-->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -154,37 +183,37 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
 .card:hover{border-color:var(--bd2);transform:translateY(-3px);box-shadow:var(--sh)}
 .card[draggable]:active{cursor:grabbing;opacity:.8;transform:scale(.97)}
 .cstripe{height:3px;width:100%}
-.chead{padding:11px 12px 0}
-.ctoprow{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px}
-.cco{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--tx);flex:1;line-height:1.2}
-.cprio{width:21px;height:21px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.chead{padding:14px 14px 0} /* cards maiores: padding aumentado */
+.ctoprow{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px}
+.cco{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--tx);flex:1;line-height:1.3}
+.cprio{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
 .ph{background:var(--rs);color:var(--re)}.pw{background:var(--ys);color:var(--ye)}.pc{background:var(--ts);color:var(--te)}
-.ccrow{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.ccrow{display:flex;align-items:center;gap:6px;margin-bottom:9px}
 .cseg{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600}
 .ccn{font-size:11.5px;color:var(--t2)}
-.cvrow{display:flex;align-items:baseline;gap:5px;margin-bottom:9px}
-.cval{font-family:'DM Mono',monospace;font-size:16px;font-weight:800;color:var(--gn)}
+.cvrow{display:flex;align-items:baseline;gap:5px;margin-bottom:11px}
+.cval{font-family:'DM Mono',monospace;font-size:17px;font-weight:800;color:var(--gn)}
 .cvlb{font-size:10.5px;color:var(--t3)}
-.cprog{margin-bottom:8px}
-.pdrow{display:flex;gap:3px;margin-bottom:3px}
-.pdot2{flex:1;height:3px;border-radius:3px}
+.cprog{margin-bottom:10px}
+.pdrow{display:flex;gap:3px;margin-bottom:4px}
+.pdot2{flex:1;height:4px;border-radius:3px} /* barra de progresso mais visível */
 .prlb{font-size:10px;color:var(--t3);font-family:'DM Mono',monospace}
-.cact{background:var(--s2);border-radius:6px;padding:7px 9px;margin-bottom:8px;display:flex;gap:6px;align-items:flex-start}
+.cact{background:var(--s2);border-radius:6px;padding:9px 10px;margin-bottom:10px;display:flex;gap:6px;align-items:flex-start}
 .cai{font-size:12px;flex-shrink:0;margin-top:1px}
-.cat2{font-size:11px;color:var(--t2);line-height:1.4;flex:1}
+.cat2{font-size:11.5px;color:var(--t2);line-height:1.4;flex:1}
 .catm{font-size:10px;color:var(--t3);font-family:'DM Mono',monospace;white-space:nowrap;flex-shrink:0}
-.cnote{margin:0 0 8px;background:rgba(245,183,49,.06);border:1px solid rgba(245,183,49,.18);border-radius:6px;padding:7px 9px;display:flex;gap:6px}
+.cnote{margin:0 0 10px;background:rgba(245,183,49,.06);border:1px solid rgba(245,183,49,.18);border-radius:6px;padding:9px 10px;display:flex;gap:6px}
 .cni{font-size:11px;flex-shrink:0;margin-top:1px}
 .cnt{font-size:11px;color:var(--ye);line-height:1.4;opacity:.9}
-.cfoot{padding:0 12px 10px;display:flex;align-items:center;justify-content:space-between}
+.cfoot{padding:0 14px 12px;display:flex;align-items:center;justify-content:space-between}
 .cowrow{display:flex;align-items:center;gap:5px}
-.mav{width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff}
+.mav{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff}
 .own{font-size:11px;color:var(--t2)}
 .cfl{font-size:11px;font-family:'DM Mono',monospace}
 .fl-urg2{color:var(--re)}.fl-tod2{color:var(--ye)}.fl-ok2{color:var(--t3)}
-.cqact{display:flex;gap:3px;padding:7px 10px;border-top:1px solid var(--bd);background:var(--s2);opacity:0;transition:opacity .15s;pointer-events:none}
+.cqact{display:flex;gap:3px;padding:8px 12px;border-top:1px solid var(--bd);background:var(--s2);opacity:0;transition:opacity .15s;pointer-events:none}
 .card:hover .cqact{opacity:1;pointer-events:all}
-.qa{display:flex;align-items:center;gap:4px;padding:5px 8px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--sf);color:var(--t2);transition:all .12s;flex:1;justify-content:center}
+.qa{display:flex;align-items:center;gap:4px;padding:6px 8px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--sf);color:var(--t2);transition:all .12s;flex:1;justify-content:center}
 .qa:hover{background:var(--s3);color:var(--tx)}
 .qa-c:hover{background:var(--gs);border-color:var(--gn);color:var(--gn)}
 .qa-e:hover{background:var(--as);border-color:var(--ac);color:var(--ac)}
@@ -371,6 +400,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
       <div class="fcp" onclick="setDealFilter('hot',this)">🔥 Quentes</div>
       <div class="fcp" onclick="setDealFilter('ni',this)">🎯 Nicolau</div>
       <div class="fcp" onclick="setDealFilter('atrasado',this)">⚠ Atrasados</div>
+      <div class="fcp" onclick="setDealFilter('meus',this)">👤 Meus</div>
     </div>
     <div class="bwrap"><div class="bscroll"><div class="board" id="board"></div></div></div>
   </div>
@@ -397,7 +427,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
         <div class="ff"><label class="fl">Nome da empresa *</label><input class="fi" id="fEmpresa" placeholder="Ex: Construtora Vitória LTDA"><div class="freq" id="errEmpresa">Campo obrigatório</div></div>
         <div><label class="fl">CNPJ</label><input class="fi" id="fCNPJ" placeholder="00.000.000/0001-00"></div>
         <div><label class="fl">Segmento</label><select class="fse" id="fSegmento"><option value="">Selecionar...</option><option>Contabilidade</option><option>Jurídico</option><option>Saúde</option><option>Indústria</option><option>Construção</option><option>Comércio</option><option>Tecnologia</option><option>Educação</option><option>Logística</option><option>Agronegócio</option><option>Outro</option></select></div>
-        <div><label class="fl">Papel ICP-Brasil</label><select class="fse" id="fICP"><option value="">Selecionar...</option><option>AR — Autoridade de Registro</option><option>AC2 — 2º nível</option><option>AC — 1º nível</option><option>AR Virtual</option><option>Usuário Final (PF/PJ)</option><option>Não se aplica</option></select></div>
+        <div><label class="fl">Papel ICP-Brasil</label><select class="fse" id="fICP"><option value="">Selecionar...</option><option>AR — Autoridade de Registro</option><option>AC2 — 2º nível</option><option>AC — 1º nível</option><option>AR Virtual</option><option>Não se aplica</option></select></div>
       </div>
     </div>
     <div class="fsec">
@@ -415,7 +445,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
         <div><label class="fl">Tipo</label><select class="fse" id="fTipo"><option>Lead Novo</option><option>Cliente Ativo</option><option>Inativo — Reativar</option></select></div>
         <div><label class="fl">Prioridade</label><select class="fse" id="fPrioridade"><option>🌡 Morno</option><option>🔥 Quente</option><option>❄️ Frio</option></select></div>
         <div><label class="fl">Potencial</label><select class="fse" id="fPotencial"><option>Médio</option><option>Alto</option><option>Baixo</option></select></div>
-        <div><label class="fl">Origem</label><select class="fse" id="fOrigem"><option>Prospecção Samuel</option><option>Indicação — Nicolau</option><option>Site</option><option>WhatsApp</option><option>LinkedIn</option><option>Outro</option></select></div>
+        <div><label class="fl">Origem</label><select class="fse" id="fOrigem"><option>Prospecção Samuel</option><option>Indicação — Nicolau</option><option>Indicação — Soluti</option><option>Indicação — Prime</option><option>Site</option><option>WhatsApp</option><option>LinkedIn</option><option>Outro</option></select></div>
         <div><label class="fl">Responsável</label><select class="fse" id="fResponsavel"><option>Samuel Mateus</option><option>Nicolau</option><option>Bruno Camara</option></select></div>
         <div><label class="fl">Próximo follow-up</label><input class="fi" id="fFollowup" type="date"></div>
         <div class="ff"><label class="fl">Produtos GO de interesse</label><input class="fi" id="fProdutos" placeholder="Ex: Módulo NF-e, Certificado A3..."></div>
@@ -533,6 +563,7 @@ let dealSearchQ = '';
 let editingId = null;
 let currentPipeTab = 'Novos Leads';
 let pipeContactId = null;
+let isDealPanel = false; // Fix Bug 3: diferencia painel de deal vs contato
 let qlogDealData = null;
 let confirmCallback = null;
 let dragged = null;
@@ -716,6 +747,7 @@ function renderBoard() {
   let dealsForPipe = allDeals.filter(d=>d['Pipeline']===pipe&&d['Status']==='Ativo');
   if(activeDealFilter==='hot') dealsForPipe=dealsForPipe.filter(d=>(d['Prioridade']||'').includes('Quente'));
   else if(activeDealFilter==='ni') dealsForPipe=dealsForPipe.filter(d=>(d['Criado Por']||'').includes('Nicolau')||(allContatos.find(c=>c['ID']===d['ID Contato'])||{})['Atribuído Por']==='Nicolau');
+  else if(activeDealFilter==='meus') dealsForPipe=dealsForPipe.filter(d=>(d['Responsável']||'').includes(currentUser.nome.split(' ')[0]));
   else if(activeDealFilter==='atrasado'){
     const today=new Date();today.setHours(0,0,0,0);
     dealsForPipe=dealsForPipe.filter(d=>{if(!d['Próximo Follow-up'])return false;const dt=new Date(d['Próximo Follow-up']);dt.setHours(0,0,0,0);return dt<today;});
@@ -838,6 +870,8 @@ function openDealPanel(id){
   if(!d)return;
   const c=allContatos.find(x=>x['ID']===d['ID Contato'])||{};
   editingId=id;
+  isDealPanel=true; // Fix Bug 3: sinaliza que estamos no painel de deal
+  pipeContactId=null;
   document.getElementById('panelTitle').textContent=d['Empresa']||'Deal';
   document.getElementById('fEmpresa').value=d['Empresa']||'';
   document.getElementById('fCNPJ').value=c['CNPJ']||'';
@@ -868,6 +902,7 @@ function openDealPanel(id){
 // ══ CONTACT PANEL ══
 function openPanel(mode,id){
   clearForm(); editingId=null; pipeContactId=null;
+  isDealPanel=false; // Reset — painel de contato
   document.getElementById('deleteBtn').style.display='none';
   document.getElementById('pipeBtn').style.display='none';
   if(mode==='edit'&&id){
@@ -929,11 +964,31 @@ function fmtDateInput(d){try{return new Date(d).toISOString().split('T')[0];}cat
 
 function validate(){
   let ok=true;
+  // Campos obrigatórios básicos
   [['fEmpresa','errEmpresa'],['fNome','errNome'],['fTelefone','errTelefone']].forEach(([fi,er])=>{
     const el=document.getElementById(fi);
     if(!el.value.trim()){el.classList.add('err');document.getElementById(er).classList.add('show');ok=false;}
     else{el.classList.remove('err');document.getElementById(er).classList.remove('show');}
   });
+  // Fix Bug 5: Validação mínima de telefone — pelo menos 8 dígitos
+  const tel=document.getElementById('fTelefone');
+  const telDigits=(tel.value||'').replace(/\D/g,'');
+  if(tel.value.trim() && telDigits.length < 8){
+    tel.classList.add('err');
+    document.getElementById('errTelefone').textContent='Mínimo 8 dígitos';
+    document.getElementById('errTelefone').classList.add('show');
+    ok=false;
+  }
+  // Fix Bug 4: Validação básica de CNPJ — se preenchido, deve ter 14 dígitos
+  const cnpj=document.getElementById('fCNPJ');
+  if(cnpj.value.trim()){
+    const digits=(cnpj.value||'').replace(/\D/g,'');
+    if(digits.length>0 && digits.length!==14){
+      cnpj.classList.add('err');
+      toast('⚠ CNPJ deve ter 14 dígitos (ex: 00.000.000/0001-00)','warn');
+      ok=false;
+    } else { cnpj.classList.remove('err'); }
+  }
   return ok;
 }
 
@@ -1017,6 +1072,21 @@ async function createDeal(){
   const prio=document.getElementById('selPrio').value;
   const contactId=pipeContactId||editingId;
   const contato=allContatos.find(c=>c['ID']===contactId)||{};
+
+  // Fix Bug 1: Validar deal duplicado — mesmo contato + mesmo pipeline + status Ativo
+  if(contactId){
+    const dealExistente=allDeals.find(d=>
+      d['ID Contato']===contactId &&
+      d['Pipeline']===pipe &&
+      d['Status']==='Ativo'
+    );
+    if(dealExistente){
+      toast(`⚠ Já existe um deal ativo para este contato em "${pipe}" — etapa: ${dealExistente['Etapa']}`,'warn');
+      closePipeModal();
+      return;
+    }
+  }
+
   const payload={
     idContato:contactId||'',
     empresa:contato['Empresa']||document.getElementById('fEmpresa')?.value||'',
@@ -1113,7 +1183,14 @@ function askDeleteDeal(id,empresa){
   document.getElementById('confirmBtn').onclick=confirmCallback;
   document.getElementById('confirmOv').classList.add('open');
 }
-function confirmDelete(){if(pipeContactId)askDeleteContact(pipeContactId,document.getElementById('fEmpresa').value);}
+// Fix Bug 3: Excluir funciona tanto no painel de deal quanto no de contato
+function confirmDelete(){
+  if(isDealPanel && editingId){
+    askDeleteDeal(editingId, document.getElementById('fEmpresa').value);
+  } else if(pipeContactId){
+    askDeleteContact(pipeContactId, document.getElementById('fEmpresa').value);
+  }
+}
 function closeConfirm(){document.getElementById('confirmOv').classList.remove('open');confirmCallback=null;}
 
 // ══ GLOBAL SEARCH ══
