@@ -161,6 +161,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
 .cv{font-family:'DM Mono',monospace;font-weight:700;font-size:12px}
 .bwrap{flex:1;overflow:hidden;display:flex;flex-direction:column}
 .bscroll{flex:1;overflow-x:auto;overflow-y:hidden;padding:14px 18px}
+
+/* ══ BARRA DE ETAPAS ESTILO BITRIX ══ */
+.stage-bar{display:flex;gap:0;padding:0 18px;background:var(--s2);border-bottom:1px solid var(--bd);overflow-x:auto;flex-shrink:0}
+.stage-bar::-webkit-scrollbar{height:3px}
+.stage-bar::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+.sb-step{display:flex;align-items:center;flex:1;min-width:120px;position:relative;cursor:pointer;transition:filter .15s}
+.sb-step:hover{filter:brightness(1.15)}
+.sb-inner{display:flex;flex-direction:column;padding:9px 14px 9px 20px;flex:1;min-width:0}
+.sb-step:first-child .sb-inner{padding-left:14px}
+.sb-name{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.02em;margin-bottom:2px}
+.sb-meta{font-size:10px;color:rgba(255,255,255,.7);font-family:'DM Mono',monospace;white-space:nowrap}
+.sb-arrow{position:absolute;right:-10px;top:0;bottom:0;width:20px;z-index:2;overflow:hidden;flex-shrink:0}
+.sb-arrow svg{width:20px;height:100%}
 .board{display:flex;gap:11px;height:100%;min-width:max-content}
 
 /* ══ COLUMN ══ */
@@ -402,6 +415,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
       <div class="fcp" onclick="setDealFilter('atrasado',this)">⚠ Atrasados</div>
       <div class="fcp" onclick="setDealFilter('meus',this)">👤 Meus</div>
     </div>
+    <!-- Barra de etapas estilo Bitrix — setas horizontais com total por coluna -->
+    <div class="stage-bar" id="stageBar"></div>
     <div class="bwrap"><div class="bscroll"><div class="board" id="board"></div></div></div>
   </div>
 
@@ -567,6 +582,7 @@ let isDealPanel = false; // Fix Bug 3: diferencia painel de deal vs contato
 let qlogDealData = null;
 let confirmCallback = null;
 let dragged = null;
+let isProcessing = false; // Guard: bloqueia múltiplas requisições simultâneas
 
 const SEG_COLORS = {
   'Tecnologia':'#4f7cff','Saúde':'#22d07a','Construção':'#f97340',
@@ -738,6 +754,33 @@ function setPipeTab(pipe,el){
 function setDealFilter(f,el){activeDealFilter=f;document.querySelectorAll('.fcp').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderBoard();}
 function filterDeals(q){dealSearchQ=q;renderBoard();}
 
+// ══ BARRA DE ETAPAS ESTILO BITRIX ══
+// Renderiza setas horizontais acima do kanban com nome, count e total por etapa
+function renderStageBar(stages, dealsForPipe, pipeColor){
+  const bar=document.getElementById('stageBar');
+  if(!bar)return;
+  // Paleta de cores progressiva para as setas
+  const baseColors=['#334155','#374151','#3b3f6e','#3b5998','#2563eb','#1d4ed8'];
+  bar.innerHTML=stages.map((stage,i)=>{
+    const stageDeals=dealsForPipe.filter(d=>d['Etapa']===stage.etapa);
+    const total=stageDeals.reduce((s,d)=>s+Number(d['Valor Estimado']||0),0);
+    const color=stage.cor||baseColors[i%baseColors.length]||pipeColor;
+    const isLast=i===stages.length-1;
+    return `
+      <div class="sb-step" title="${stage.etapa}" onclick="">
+        <div class="sb-inner" style="background:${color}">
+          <div class="sb-name">${stage.etapa} (${stageDeals.length})</div>
+          <div class="sb-meta">${total>0?'R$ '+total.toLocaleString('pt-BR'):'—'}</div>
+        </div>
+        ${!isLast?`<div class="sb-arrow">
+          <svg viewBox="0 0 20 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="0,0 20,20 0,40" fill="${color}"/>
+          </svg>
+        </div>`:''}
+      </div>`;
+  }).join('');
+}
+
 function renderBoard() {
   const pipe = currentPipeTab;
   const stages = allPipelines[pipe] || [];
@@ -756,6 +799,10 @@ function renderBoard() {
     const q=dealSearchQ.toLowerCase();
     dealsForPipe=dealsForPipe.filter(d=>(d['Empresa']||'').toLowerCase().includes(q));
   }
+
+  // Renderiza a barra de etapas estilo Bitrix acima do kanban
+  renderStageBar(stages, dealsForPipe, pipeColor);
+
   stages.forEach(stage => {
     const stageDeals = dealsForPipe.filter(d=>d['Etapa']===stage.etapa);
     const totalV = stageDeals.reduce((s,d)=>s+Number(d['Valor Estimado']||0),0);
@@ -1066,14 +1113,18 @@ function updateEtapas(){
 }
 
 async function createDeal(){
+  // Guard: impede múltiplos cliques durante processamento
+  if(isProcessing)return;
+
   const pipe=document.getElementById('selPipeline').value;
   const etapa=document.getElementById('selEtapa').value;
   const valor=document.getElementById('selValor').value;
   const prio=document.getElementById('selPrio').value;
   const contactId=pipeContactId||editingId;
   const contato=allContatos.find(c=>c['ID']===contactId)||{};
+  const empresa=contato['Empresa']||document.getElementById('fEmpresa')?.value||'';
 
-  // Fix Bug 1: Validar deal duplicado — mesmo contato + mesmo pipeline + status Ativo
+  // Validar deal duplicado — mesmo contato + mesmo pipeline + status Ativo
   if(contactId){
     const dealExistente=allDeals.find(d=>
       d['ID Contato']===contactId &&
@@ -1081,17 +1132,36 @@ async function createDeal(){
       d['Status']==='Ativo'
     );
     if(dealExistente){
-      toast(`⚠ Já existe um deal ativo para este contato em "${pipe}" — etapa: ${dealExistente['Etapa']}`,'warn');
+      toast(`⚠ Já existe deal ativo em "${pipe}" — etapa: ${dealExistente['Etapa']}`,'warn');
       closePipeModal();
       return;
     }
   }
 
+  // Optimistic UI — mostra card imediatamente sem esperar a API
+  const tempId='temp_'+Date.now();
+  const tempDeal={
+    'ID':tempId,'ID Contato':contactId||'','Empresa':empresa,
+    'Pipeline':pipe,'Etapa':etapa,'Status':'Ativo',
+    'Prioridade':prio,'Valor Estimado':valor?Number(valor):0,
+    'Responsável':contato['Responsável']||'Samuel Mateus',
+    'Próximo Follow-up':contato['Próximo Follow-up']||'',
+    'Observações':contato['Contexto CEO']||'',
+    '_temp':true
+  };
+  allDeals.push(tempDeal);
+  closePipeModal();
+  closePanel();
+  showScr('pipeline');
+  currentPipeTab=pipe;
+  renderBoard();
+  renderPipeTabs();
+  toast(`✅ Deal criado em ${pipe} — ${etapa}`,'ok');
+
+  // Grava no Sheets em segundo plano
+  isProcessing=true;
   const payload={
-    idContato:contactId||'',
-    empresa:contato['Empresa']||document.getElementById('fEmpresa')?.value||'',
-    pipeline:pipe,
-    etapa,
+    idContato:contactId||'',empresa,pipeline:pipe,etapa,
     valorEstimado:valor?Number(valor):0,
     responsavel:contato['Responsável']||'Samuel Mateus',
     prioridade:prio,
@@ -1101,18 +1171,20 @@ async function createDeal(){
   try{
     const res=await apiPost({action:'CRIAR_DEAL',payload,usuario:currentUser.nome});
     if(res.success){
-      closePipeModal();
-      closePanel();
-      toast(`✅ Deal criado em ${pipe} — ${etapa}`,'ok');
-      await syncAll();
-      showScr('pipeline');
-      currentPipeTab=pipe;
-      renderBoard();
-      renderPipeTabs();
+      // Substitui card temporário pelo registro real com ID do Sheets
+      allDeals=allDeals.filter(d=>d['ID']!==tempId);
+      await syncAll();renderBoard();renderPipeTabs();
     } else {
-      toast('❌ Erro ao criar deal: '+(res.error||''),'err');
+      // Reverte — remove card temporário e avisa
+      allDeals=allDeals.filter(d=>d['ID']!==tempId);
+      renderBoard();renderPipeTabs();
+      toast('❌ Erro ao salvar — deal revertido','err');
     }
-  }catch(e){toast('❌ Erro de conexão','err');}
+  }catch(e){
+    allDeals=allDeals.filter(d=>d['ID']!==tempId);
+    renderBoard();renderPipeTabs();
+    toast('❌ Sem conexão — deal revertido','err');
+  }finally{isProcessing=false;}
 }
 
 // ══ QUICK LOG ══
@@ -1159,28 +1231,42 @@ async function saveQLog(){
 // ══ DELETE ══
 function askDeleteContact(id,empresa){
   document.getElementById('confirmTitle').textContent='Excluir contato?';
-  document.getElementById('confirmDesc').textContent=`"${empresa}" será removido permanentemente. Deals associados não serão excluídos.`;
+  document.getElementById('confirmDesc').textContent=`"${empresa}" será removido permanentemente.`;
+  const btn=document.getElementById('confirmBtn');
+  btn.textContent='Excluir'; btn.disabled=false;
   confirmCallback=async()=>{
+    // Guard: impede múltiplos cliques durante o processamento
+    if(isProcessing)return;
+    isProcessing=true;
+    btn.disabled=true; btn.textContent='⏳ Processando...';
     try{
       const res=await apiPost({action:'ATUALIZAR_CONTATO',payload:{id,status:'Arquivado'},usuario:currentUser.nome});
       if(res.success){closeConfirm();closePanel();toast('✅ Contato arquivado!','ok');await syncAll();}
-      else toast('❌ Erro ao excluir','err');
-    }catch(e){toast('❌ Erro de conexão','err');}
+      else{toast('❌ Erro ao excluir','err');btn.disabled=false;btn.textContent='Excluir';}
+    }catch(e){toast('❌ Erro de conexão','err');btn.disabled=false;btn.textContent='Excluir';}
+    finally{isProcessing=false;}
   };
-  document.getElementById('confirmBtn').onclick=confirmCallback;
+  btn.onclick=confirmCallback;
   document.getElementById('confirmOv').classList.add('open');
 }
 function askDeleteDeal(id,empresa){
   document.getElementById('confirmTitle').textContent='Excluir deal?';
   document.getElementById('confirmDesc').textContent=`O deal de "${empresa}" será marcado como perdido.`;
+  const btn=document.getElementById('confirmBtn');
+  btn.textContent='Excluir'; btn.disabled=false;
   confirmCallback=async()=>{
+    // Guard: impede múltiplos cliques durante o processamento
+    if(isProcessing)return;
+    isProcessing=true;
+    btn.disabled=true; btn.textContent='⏳ Processando...';
     try{
       const res=await apiPost({action:'ATUALIZAR_DEAL',payload:{id,status:'Fechado — Perdido'},usuario:currentUser.nome});
       if(res.success){closeConfirm();toast('✅ Deal removido!','ok');await syncAll();}
-      else toast('❌ Erro','err');
-    }catch(e){toast('❌ Erro de conexão','err');}
+      else{toast('❌ Erro','err');btn.disabled=false;btn.textContent='Excluir';}
+    }catch(e){toast('❌ Erro de conexão','err');btn.disabled=false;btn.textContent='Excluir';}
+    finally{isProcessing=false;}
   };
-  document.getElementById('confirmBtn').onclick=confirmCallback;
+  btn.onclick=confirmCallback;
   document.getElementById('confirmOv').classList.add('open');
 }
 // Fix Bug 3: Excluir funciona tanto no painel de deal quanto no de contato
