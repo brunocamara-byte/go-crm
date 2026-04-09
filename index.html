@@ -169,17 +169,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
 .bscroll::-webkit-scrollbar-thumb:hover{background:var(--t3)}
 
 /* ══ BARRA DE ETAPAS ESTILO BITRIX ══ */
-.stage-bar{display:flex;gap:0;padding:0 18px;background:var(--s2);border-bottom:1px solid var(--bd);overflow-x:auto;flex-shrink:0}
-.stage-bar::-webkit-scrollbar{height:3px}
-.stage-bar::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
-.sb-step{display:flex;align-items:center;flex:1;min-width:120px;position:relative;cursor:pointer;transition:filter .15s}
-.sb-step:hover{filter:brightness(1.15)}
-.sb-inner{display:flex;flex-direction:column;padding:9px 14px 9px 20px;flex:1;min-width:0}
-.sb-step:first-child .sb-inner{padding-left:14px}
+.stage-bar{display:flex;gap:11px;margin-bottom:10px;min-width:max-content}
+.sb-step{display:flex;align-items:stretch;width:300px;flex-shrink:0;border-radius:var(--rsm);overflow:hidden;cursor:pointer;transition:filter .15s}
+.sb-step:hover{filter:brightness(1.2)}
+.sb-inner{display:flex;flex-direction:column;padding:9px 14px;flex:1;border-radius:var(--rsm)}
 .sb-name{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.02em;margin-bottom:2px}
-.sb-meta{font-size:10px;color:rgba(255,255,255,.7);font-family:'DM Mono',monospace;white-space:nowrap}
-.sb-arrow{position:absolute;right:-10px;top:0;bottom:0;width:20px;z-index:2;overflow:hidden;flex-shrink:0}
-.sb-arrow svg{width:20px;height:100%}
+.sb-meta{font-size:10px;color:rgba(255,255,255,.75);font-family:'DM Mono',monospace;white-space:nowrap}
 .board{display:flex;gap:11px;height:100%;min-width:max-content}
 
 /* ══ COLUMN ══ */
@@ -423,9 +418,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
       <div class="fcp" onclick="setDealFilter('atrasado',this)">⚠ Atrasados</div>
       <div class="fcp" onclick="setDealFilter('meus',this)">👤 Meus</div>
     </div>
-    <!-- Barra de etapas estilo Bitrix — setas horizontais com total por coluna -->
-    <div class="stage-bar" id="stageBar"></div>
-    <div class="bwrap"><div class="bscroll"><div class="board" id="board"></div></div></div>
+    <div class="bwrap">
+      <div class="bscroll">
+        <!-- Barra de etapas — DENTRO do scroll para alinhar com as colunas -->
+        <div class="stage-bar" id="stageBar"></div>
+        <div class="board" id="board"></div>
+      </div>
+    </div>
   </div>
 
   <!-- PLACEHOLDER SCREENS -->
@@ -775,16 +774,11 @@ function renderStageBar(stages, dealsForPipe, pipeColor){
     const color=stage.cor||baseColors[i%baseColors.length]||pipeColor;
     const isLast=i===stages.length-1;
     return `
-      <div class="sb-step" title="${stage.etapa}" onclick="">
+      <div class="sb-step" title="${stage.etapa}">
         <div class="sb-inner" style="background:${color}">
           <div class="sb-name">${stage.etapa} (${stageDeals.length})</div>
           <div class="sb-meta">${total>0?'R$ '+total.toLocaleString('pt-BR'):'—'}</div>
         </div>
-        ${!isLast?`<div class="sb-arrow">
-          <svg viewBox="0 0 20 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="0,0 20,20 0,40" fill="${color}"/>
-          </svg>
-        </div>`:''}
       </div>`;
   }).join('');
 }
