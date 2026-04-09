@@ -87,7 +87,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
 .btn-g:hover{background:var(--s2);color:var(--tx)}
 .btn-gn{background:var(--gs);color:var(--gn);border:1px solid rgba(34,208,122,.25)}
 .btn-re{background:var(--rs);color:var(--re);border:1px solid rgba(240,84,84,.2)}
-.btn-re:hover{background:rgba(240,84,84,.2)} 
+.btn-re:hover{background:rgba(240,84,84,.2)}
 
 /* ══ SCREENS ══ */
 .scr{flex:1;display:none;flex-direction:column;overflow:hidden}
@@ -246,6 +246,44 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
 .p-foot{padding:13px 20px;border-top:1px solid var(--bd);display:flex;gap:7px;position:sticky;bottom:0;background:var(--sf);flex-wrap:wrap}
 .ovbg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190;display:none}
 .ovbg.open{display:block}
+
+/* ══ PRODUTOS GO ══ */
+.prod-grid-wrap{flex:1;overflow-y:auto;padding:16px 18px}
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.prod-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:0;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.prod-card:hover{border-color:var(--bd2);transform:translateY(-2px);box-shadow:var(--sh)}
+.prod-inativo{opacity:.5}
+.prod-card-stripe{height:3px;width:100%;flex-shrink:0}
+.prod-card-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 6px}
+.prod-tipo-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px}
+.prod-status-dot{width:8px;height:8px;border-radius:50%}
+.ps-ativo{background:var(--gn)}
+.ps-inativo{background:var(--t3)}
+.prod-nome{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--tx);padding:0 14px 4px;line-height:1.3}
+.prod-cat{font-size:11px;color:var(--t3);padding:0 14px 8px}
+.prod-subs{padding:0 14px 10px;display:flex;flex-direction:column;gap:2px;flex:1}
+.prod-sub{font-size:11.5px;color:var(--t2)}
+.prod-footer{padding:10px 14px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:6px;margin-top:auto}
+.prod-preco{display:flex;align-items:center;gap:8px}
+.prod-modelo{font-size:11px;color:var(--t3);background:var(--s2);padding:2px 7px;border-radius:4px}
+.prod-valor{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:var(--gn)}
+.prod-tags{display:flex;gap:6px;flex-wrap:wrap}
+.prod-tag{font-size:10.5px;padding:2px 7px;border-radius:4px;font-weight:600}
+.pt-impl{background:rgba(79,124,255,.1);color:var(--ac)}
+.pt-trein{background:rgba(245,183,49,.1);color:var(--ye)}
+/* Produto panel */
+.prod-panel-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190;display:none}
+.prod-panel-ov.open{display:block}
+.prod-panel{position:fixed;right:0;top:0;bottom:0;width:480px;background:var(--sf);border-left:1px solid var(--bd2);z-index:200;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);overflow-y:auto;box-shadow:var(--sh2);display:flex;flex-direction:column}
+.prod-panel.open{transform:translateX(0)}
+.prod-panel::-webkit-scrollbar{width:5px}
+.prod-panel::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px}
+.fsect{margin-bottom:18px}
+.fsect-lbl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.fsect-lbl::after{content:'';flex:1;height:1px;background:var(--bd)}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ffull{grid-column:1/-1}
+.sub-helper{font-size:11.5px;color:var(--t3);margin-bottom:8px;line-height:1.4}
 
 /* ══ FORM ══ */
 .fsec{margin-bottom:18px}
@@ -430,8 +468,124 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
   <!-- PLACEHOLDER SCREENS -->
   <div class="scr" id="scr-followups"><div class="empty"><div class="empty-icon">📅</div><div class="empty-title">Follow-ups — Sprint 3</div><div class="empty-sub">Agenda do Samuel com follow-ups do dia.</div></div></div>
   <div class="scr" id="scr-relatorios"><div class="empty"><div class="empty-icon">📊</div><div class="empty-title">Relatórios — Sprint 4</div><div class="empty-sub">Dashboard executivo do Nicolau.</div></div></div>
-  <div class="scr" id="scr-produtos"><div class="empty"><div class="empty-icon">📦</div><div class="empty-title">Produtos GO — em breve</div></div></div>
+  <div class="scr" id="scr-produtos">
+    <!-- Toolbar Produtos -->
+    <div class="tbar">
+      <div class="srch"><span style="color:var(--t3);font-size:13px">🔍</span><input type="text" placeholder="Buscar produto..." id="prodSearch" oninput="filterProdutos(this.value)"></div>
+      <div class="fcp on" onclick="setProdFilter('todos',this)">Todos</div>
+      <div class="fcp" onclick="setProdFilter('Módulo',this)">📦 Módulos</div>
+      <div class="fcp" onclick="setProdFilter('App',this)">⚡ Apps</div>
+      <div class="fcp" onclick="setProdFilter('Extensão',this)">🔌 Extensões</div>
+      <div class="fcp" onclick="setProdFilter('Utilidade',this)">🛠 Utilidades</div>
+      <div class="count-pill" id="prodCount">0 produtos</div>
+    </div>
+    <!-- Loading / Empty -->
+    <div class="loading" id="prodLoading" style="display:none"><div class="spinner"></div><div class="loading-text">Carregando...</div></div>
+    <div class="empty" id="prodEmpty" style="display:none">
+      <div class="empty-icon">📦</div>
+      <div class="empty-title">Nenhum produto cadastrado</div>
+      <div class="empty-sub">Clique em "+ Novo Produto" para começar.</div>
+    </div>
+    <!-- Grid de produtos -->
+    <div class="prod-grid-wrap" id="prodGridWrap">
+      <div class="prod-grid" id="prodGrid"></div>
+    </div>
+  </div>
   <div class="scr" id="scr-config"><div class="empty"><div class="empty-icon">⚙️</div><div class="empty-title">Configurações — em breve</div></div></div>
+</div>
+
+<!-- ══ PRODUTOS PANEL ══ -->
+<div class="prod-panel-ov" id="prodPanelOv" onclick="closeProdPanel()"></div>
+<div class="prod-panel" id="prodPanel">
+  <div class="p-head">
+    <div class="p-title" id="prodPanelTitle">Novo Produto</div>
+    <button class="btn btn-g" onclick="closeProdPanel()" style="padding:6px;font-size:14px">✕</button>
+  </div>
+  <div class="p-body">
+
+    <div class="fsect">
+      <div class="fsect-lbl">Identificação</div>
+      <div class="fgrid">
+        <div class="ffull"><label class="fl">Nome do produto *</label><input class="fi" id="ppNome" placeholder="Ex: Módulo Básico, GO Signer, GO-Consulta..."></div>
+        <div><label class="fl">Tipo</label>
+          <select class="fse" id="ppTipo">
+            <option>Módulo</option><option>App</option><option>Extensão</option>
+            <option>Utilidade</option><option>Certificado</option>
+            <option>Dev Avulso</option><option>Pacote Mensal</option><option>Serviço</option>
+          </select>
+        </div>
+        <div><label class="fl">Categoria</label>
+          <select class="fse" id="ppCategoria">
+            <option value="">Selecionar...</option>
+            <option>Produtividade</option><option>Financeira</option><option>Comercial</option>
+            <option>Fiscal</option><option>Portal</option><option>Logística</option>
+            <option>Documentos</option><option>Marketing</option><option>Soluti</option><option>Outro</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="fsect">
+      <div class="fsect-lbl">Precificação</div>
+      <div class="fgrid">
+        <div><label class="fl">Modelo de preço</label>
+          <select class="fse" id="ppModeloPreco">
+            <option>Negociável</option><option>Tabelado</option>
+            <option>Por hora</option><option>Recorrente mensal</option>
+          </select>
+        </div>
+        <div><label class="fl">Valor de referência (R$)</label><input class="fi" id="ppValorBase" type="number" placeholder="0,00"></div>
+        <div><label class="fl">Valor hora (R$)</label><input class="fi" id="ppValorHora" type="number" placeholder="Ex: 200"></div>
+      </div>
+    </div>
+
+    <div class="fsect">
+      <div class="fsect-lbl">Implantação & Treinamento</div>
+      <div class="fgrid">
+        <div><label class="fl">Tem implantação?</label>
+          <select class="fse" id="ppTemImpl" onchange="toggleProdFields()">
+            <option>Não</option><option>Sim</option>
+          </select>
+        </div>
+        <div id="ppImplRow" style="display:none">
+          <label class="fl">Horas de implantação</label>
+          <input class="fi" id="ppHorasImpl" type="number" placeholder="Ex: 20">
+        </div>
+        <div><label class="fl">Tem treinamento?</label>
+          <select class="fse" id="ppTemTrein" onchange="toggleProdFields()">
+            <option>Não</option><option>Sim</option>
+          </select>
+        </div>
+        <div id="ppTreinRow" style="display:none">
+          <label class="fl">Horas de treinamento</label>
+          <input class="fi" id="ppHorasTrein" type="number" placeholder="Ex: 3">
+        </div>
+      </div>
+    </div>
+
+    <div class="fsect">
+      <div class="fsect-lbl">Sub-Funcionalidades</div>
+      <div class="sub-helper">Uma funcionalidade por linha. Aparecem no briefing do Matheus e na proposta.</div>
+      <textarea class="fi fta" id="ppSubs" rows="6" placeholder="Usuários ilimitados&#10;Cadastro de clientes&#10;Módulo de vendas&#10;Gerador de voucher&#10;Link de pagamento GOPAG"></textarea>
+    </div>
+
+    <div class="fsect">
+      <div class="fsect-lbl">Detalhes</div>
+      <div class="fgrid">
+        <div><label class="fl">Status</label>
+          <select class="fse" id="ppStatus"><option>Ativo</option><option>Inativo</option></select>
+        </div>
+        <div class="ffull"><label class="fl">Descrição curta</label>
+          <input class="fi" id="ppDescricao" placeholder="Para o Samuel entender o que vende...">
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="p-foot">
+    <button class="btn btn-g" style="flex:1" onclick="toggleProdStatus()" id="toggleProdBtn">🔄 Ativar/Inativar</button>
+    <button class="btn btn-p" style="flex:2" onclick="saveProduto()" id="saveProdBtn">💾 Salvar produto</button>
+  </div>
 </div>
 
 <!-- ══ CONTACT PANEL ══ -->
@@ -1306,9 +1460,13 @@ function showScr(name){
   const nav=document.getElementById('nav-'+name);if(nav)nav.classList.add('on');
   const titles={contatos:'Contatos',pipeline:'Pipeline de Vendas',followups:'Follow-ups',relatorios:'Relatórios',produtos:'Produtos GO',config:'Configurações'};
   document.getElementById('mainTitle').textContent=titles[name]||name;
-  const showNew=name==='contatos';
-  document.getElementById('newBtn').style.display=showNew?'flex':'none';
+  // Botão contextual por tela
+  const newBtn=document.getElementById('newBtn');
+  if(name==='contatos'){newBtn.style.display='flex';newBtn.textContent='+ Novo Contato';newBtn.onclick=()=>openPanel('new');}
+  else if(name==='produtos'){newBtn.style.display='flex';newBtn.textContent='+ Novo Produto';newBtn.onclick=()=>openProdPanel(null);}
+  else{newBtn.style.display='none';}
   document.getElementById('syncBtn').style.display='flex';
+  if(name==='produtos') renderProdutos();
 }
 
 // ══ TOAST ══
@@ -1326,8 +1484,211 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeGSearch();closePanel();closePipeModal();closeQLog();closeConfirm();}
 });
 
+// ══ PRODUTOS GO ══════════════════════════════════════════════
+// Estado
+let allProdutos = [];
+let prodFilter = 'todos';
+let prodSearchQ = '';
+let editingProdId = null;
+
+// Carrega produtos do Sheets via syncAll ou chamada direta
+async function loadProdutos() {
+  try {
+    const res = await apiGet('PRODUTOS');
+    if (res.success) allProdutos = res.data || [];
+    renderProdutos();
+  } catch(e) { toast('❌ Erro ao carregar produtos','err'); }
+}
+
+// Filtros
+function setProdFilter(f, el) {
+  prodFilter = f;
+  document.querySelectorAll('#scr-produtos .fcp').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderProdutos();
+}
+function filterProdutos(q) { prodSearchQ = q; renderProdutos(); }
+
+// Renderiza grid de produtos
+function renderProdutos() {
+  let data = [...allProdutos];
+  if (prodFilter !== 'todos') data = data.filter(p => p['Tipo'] === prodFilter);
+  if (prodSearchQ) {
+    const q = prodSearchQ.toLowerCase();
+    data = data.filter(p => (p['Nome']||'').toLowerCase().includes(q) || (p['Descrição']||'').toLowerCase().includes(q) || (p['Categoria']||'').toLowerCase().includes(q));
+  }
+
+  const grid = document.getElementById('prodGrid');
+  const empty = document.getElementById('prodEmpty');
+  const wrap = document.getElementById('prodGridWrap');
+  document.getElementById('prodCount').textContent = data.length + ' produto(s)';
+
+  if (data.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'flex';
+    wrap.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  wrap.style.display = 'block';
+
+  const TIPO_COLORS = {
+    'Módulo':'#4f7cff','App':'#22d07a','Extensão':'#f97340',
+    'Utilidade':'#b06ef5','Certificado':'#f5b731',
+    'Dev Avulso':'#1ec8b0','Pacote Mensal':'#f05454','Serviço':'#8fa3c4'
+  };
+
+  grid.innerHTML = data.map(p => {
+    const cor = TIPO_COLORS[p['Tipo']] || '#8fa3c4';
+    const ativo = String(p['Status']).toLowerCase() === 'ativo';
+    const subs = p['Sub-Funcionalidades'] ? String(p['Sub-Funcionalidades']).split('|').filter(s=>s.trim()).slice(0,4) : [];
+    const temImpl = p['Tem Implantação'] === 'Sim';
+    const temTrein = p['Tem Treinamento'] === 'Sim';
+    const modeloPreco = p['Modelo Preço'] || '';
+    const valorBase = p['Valor Base'] ? `R$ ${Number(p['Valor Base']).toLocaleString('pt-BR')}` : '';
+
+    return `
+      <div class="prod-card ${ativo?'':'prod-inativo'}" onclick="openProdPanel('${p['ID']}')">
+        <div class="prod-card-stripe" style="background:${cor}"></div>
+        <div class="prod-card-head">
+          <div class="prod-tipo-badge" style="background:${cor}22;color:${cor}">${p['Tipo']||'—'}</div>
+          <div class="prod-status-dot ${ativo?'ps-ativo':'ps-inativo'}" title="${ativo?'Ativo':'Inativo'}"></div>
+        </div>
+        <div class="prod-nome">${p['Nome']||'—'}</div>
+        ${p['Categoria']?`<div class="prod-cat">${p['Categoria']}</div>`:''}
+        ${subs.length>0?`<div class="prod-subs">${subs.map(s=>`<div class="prod-sub">→ ${s.trim()}</div>`).join('')}${p['Sub-Funcionalidades']&&String(p['Sub-Funcionalidades']).split('|').length>4?`<div class="prod-sub" style="color:var(--t3)">+${String(p['Sub-Funcionalidades']).split('|').length-4} funcionalidades</div>`:''}</div>`:''}
+        <div class="prod-footer">
+          <div class="prod-preco">
+            <span class="prod-modelo">${modeloPreco}</span>
+            ${valorBase?`<span class="prod-valor">${valorBase}</span>`:''}
+          </div>
+          <div class="prod-tags">
+            ${temImpl?`<span class="prod-tag pt-impl">⏱ ${p['Horas Implantação']||'?'}h impl</span>`:''}
+            ${temTrein?`<span class="prod-tag pt-trein">🎓 ${p['Valor Treinamento']||'?'}h trein</span>`:''}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// Abre painel de criar/editar produto
+function openProdPanel(id) {
+  editingProdId = id;
+  const prod = id ? allProdutos.find(p => p['ID'] === id) : null;
+
+  document.getElementById('prodPanelTitle').textContent = prod ? 'Editar Produto' : 'Novo Produto';
+  document.getElementById('ppNome').value = prod ? (prod['Nome']||'') : '';
+  document.getElementById('ppTipo').value = prod ? (prod['Tipo']||'Módulo') : 'Módulo';
+  document.getElementById('ppCategoria').value = prod ? (prod['Categoria']||'') : '';
+  document.getElementById('ppModeloPreco').value = prod ? (prod['Modelo Preço']||'Negociável') : 'Negociável';
+  document.getElementById('ppValorBase').value = prod ? (prod['Valor Base']||'') : '';
+  document.getElementById('ppValorHora').value = prod ? (prod['Valor Hora']||'') : '';
+  document.getElementById('ppTemImpl').value = prod ? (prod['Tem Implantação']||'Não') : 'Não';
+  document.getElementById('ppHorasImpl').value = prod ? (prod['Horas Implantação']||'') : '';
+  document.getElementById('ppTemTrein').value = prod ? (prod['Tem Treinamento']||'Não') : 'Não';
+  document.getElementById('ppHorasTrein').value = prod ? (prod['Valor Treinamento']||'') : '';
+  document.getElementById('ppDescricao').value = prod ? (prod['Descrição']||'') : '';
+  document.getElementById('ppStatus').value = prod ? (prod['Status']||'Ativo') : 'Ativo';
+
+  // Sub-funcionalidades — converte | para linhas
+  const subs = prod && prod['Sub-Funcionalidades'] ? String(prod['Sub-Funcionalidades']).split('|').join('\n') : '';
+  document.getElementById('ppSubs').value = subs;
+
+  // Mostra/esconde campos de implantação e treinamento
+  toggleProdFields();
+
+  document.getElementById('prodPanel').classList.add('open');
+  document.getElementById('prodPanelOv').classList.add('open');
+}
+
+function closeProdPanel() {
+  document.getElementById('prodPanel').classList.remove('open');
+  document.getElementById('prodPanelOv').classList.remove('open');
+  editingProdId = null;
+}
+
+function toggleProdFields() {
+  const impl = document.getElementById('ppTemImpl').value === 'Sim';
+  const trein = document.getElementById('ppTemTrein').value === 'Sim';
+  document.getElementById('ppImplRow').style.display = impl ? 'block' : 'none';
+  document.getElementById('ppTreinRow').style.display = trein ? 'block' : 'none';
+}
+
+async function saveProduto() {
+  if(isProcessing) return;
+  const nome = document.getElementById('ppNome').value.trim();
+  if (!nome) { toast('⚠ Nome do produto é obrigatório','warn'); return; }
+
+  // Sub-funcionalidades — converte linhas para |
+  const subsRaw = document.getElementById('ppSubs').value;
+  const subs = subsRaw.split('\n').map(s=>s.trim()).filter(s=>s).join('|');
+
+  const payload = {
+    nome,
+    tipo:               document.getElementById('ppTipo').value,
+    categoria:          document.getElementById('ppCategoria').value,
+    modeloPreco:        document.getElementById('ppModeloPreco').value,
+    valorBase:          document.getElementById('ppValorBase').value,
+    valorHora:          document.getElementById('ppValorHora').value,
+    temImplantacao:     document.getElementById('ppTemImpl').value,
+    horasImplantacao:   document.getElementById('ppHorasImpl').value,
+    temTreinamento:     document.getElementById('ppTemTrein').value,
+    valorTreinamento:   document.getElementById('ppHorasTrein').value,
+    descricao:          document.getElementById('ppDescricao').value.trim(),
+    status:             document.getElementById('ppStatus').value,
+    subFuncionalidades: subs,
+  };
+
+  const btn = document.getElementById('saveProdBtn');
+  btn.disabled = true; btn.textContent = '⏳ Salvando...';
+  isProcessing = true;
+
+  try {
+    let res;
+    if (editingProdId) {
+      payload.id = editingProdId;
+      res = await apiPost({ action:'ATUALIZAR_PRODUTO', payload, usuario: currentUser.nome });
+    } else {
+      res = await apiPost({ action:'CRIAR_PRODUTO', payload, usuario: currentUser.nome });
+    }
+
+    if (res.success) {
+      toast(editingProdId ? '✅ Produto atualizado!' : '✅ Produto criado!', 'ok');
+      closeProdPanel();
+      await loadProdutos();
+    } else {
+      toast('❌ Erro: ' + (res.error||''), 'err');
+    }
+  } catch(e) {
+    toast('❌ Erro de conexão', 'err');
+  } finally {
+    isProcessing = false;
+    btn.disabled = false;
+    btn.textContent = '💾 Salvar produto';
+  }
+}
+
+// Inativar produto direto do painel
+async function toggleProdStatus() {
+  if (!editingProdId || isProcessing) return;
+  const prod = allProdutos.find(p => p['ID'] === editingProdId);
+  if (!prod) return;
+  const novoStatus = prod['Status'] === 'Ativo' ? 'Inativo' : 'Ativo';
+  isProcessing = true;
+  try {
+    const res = await apiPost({ action:'ATUALIZAR_PRODUTO', payload:{ id: editingProdId, status: novoStatus }, usuario: currentUser.nome });
+    if (res.success) {
+      toast(`✅ Produto ${novoStatus.toLowerCase()}!`, 'ok');
+      closeProdPanel();
+      await loadProdutos();
+    }
+  } catch(e) { toast('❌ Erro','err'); }
+  finally { isProcessing = false; }
+}
+
 // ══ INITIAL RENDER ══
 updateEtapas();
+loadProdutos(); // Carrega produtos na inicialização
 </script>
 </body>
 </html>
