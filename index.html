@@ -160,7 +160,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
 .ci{font-size:11px;color:var(--t2);display:flex;align-items:center;gap:5px;white-space:nowrap}
 .cv{font-family:'DM Mono',monospace;font-weight:700;font-size:12px}
 .bwrap{flex:1;overflow:hidden;display:flex;flex-direction:column}
-.bscroll{flex:1;overflow-x:auto;overflow-y:hidden;padding:14px 18px}
+.bscroll{flex:1;overflow-x:auto;overflow-y:hidden;padding:14px 18px 6px}
+
+/* Scrollbar do Kanban — sempre visível, fácil de encontrar */
+.bscroll::-webkit-scrollbar{height:8px}
+.bscroll::-webkit-scrollbar-track{background:var(--s2);border-radius:4px;margin:0 18px}
+.bscroll::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px;border:1px solid var(--bd)}
+.bscroll::-webkit-scrollbar-thumb:hover{background:var(--t3)}
 
 /* ══ BARRA DE ETAPAS ESTILO BITRIX ══ */
 .stage-bar{display:flex;gap:0;padding:0 18px;background:var(--s2);border-bottom:1px solid var(--bd);overflow-x:auto;flex-shrink:0}
@@ -185,8 +191,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
 .cv2{font-size:10px;color:var(--t3);font-family:'DM Mono',monospace}
 .cbody{flex:1;background:rgba(255,255,255,.013);border:1px solid var(--bd);border-radius:var(--r);padding:6px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;min-height:120px;transition:all .15s}
 .cbody.dov{background:var(--as);border-color:var(--ac)}
-.cbody::-webkit-scrollbar{width:3px}
-.cbody::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+.cbody::-webkit-scrollbar{width:5px}
+.cbody::-webkit-scrollbar-track{background:transparent}
+.cbody::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px}
+.cbody::-webkit-scrollbar-thumb:hover{background:var(--t3)}
 .addbtn{display:flex;align-items:center;gap:5px;padding:7px 9px;border-radius:var(--rsm);color:var(--t3);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;margin-top:3px;flex-shrink:0}
 .addbtn:hover{background:var(--s2);color:var(--tx)}
 
