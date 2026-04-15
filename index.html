@@ -448,7 +448,34 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
 .sd-valor{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--gn);flex-shrink:0}
 .sd-comissao{font-size:11px;color:var(--ac);font-family:'DM Mono',monospace;text-align:right}
 
-/* ══ CONFIG ══ */
+/* ══ DEAL PANEL DEDICADO ══ */
+.deal-info-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;padding:12px 14px;background:var(--s2);border-radius:var(--r);border:1px solid var(--bd)}
+.deal-info-chip{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:5px}
+.deal-info-chip strong{color:var(--tx)}
+.deal-entrada-result{font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--gn);padding:8px 0}
+/* Seletor de produtos */
+.prod-selector{border:1px solid var(--bd);border-radius:var(--rsm);overflow:hidden;margin-bottom:10px}
+.prod-sel-search{padding:8px}
+.prod-sel-lista{max-height:160px;overflow-y:auto;border-top:1px solid var(--bd)}
+.prod-sel-item{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--bd)}
+.prod-sel-item:last-child{border-bottom:none}
+.prod-sel-item:hover{background:var(--s2)}
+.prod-sel-item-nome{flex:1;font-size:13px;color:var(--tx)}
+.prod-sel-item-tipo{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700}
+.prod-sel-item-add{font-size:18px;color:var(--ac);font-weight:700;flex-shrink:0}
+.prod-sel-empty{padding:12px;text-align:center;font-size:12px;color:var(--t3)}
+/* Produtos selecionados */
+.prod-sel-selecionados{border:1px solid var(--bd);border-radius:var(--rsm);min-height:60px}
+.prod-sel-card{padding:10px 12px;border-bottom:1px solid var(--bd)}
+.prod-sel-card:last-child{border-bottom:none}
+.prod-sel-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.prod-sel-card-nome{font-size:13px;font-weight:700;color:var(--tx)}
+.prod-sel-card-rem{font-size:11px;color:var(--re);cursor:pointer;padding:2px 6px;border-radius:3px}
+.prod-sel-card-rem:hover{background:var(--rs)}
+.prod-sel-fields{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.prod-sel-field label{font-size:10px;color:var(--t3);display:block;margin-bottom:2px}
+.prod-sel-field input{background:var(--s2);border:1px solid var(--bd);border-radius:4px;padding:5px 8px;font-size:12px;color:var(--tx);width:100%;outline:none}
+.prod-sel-field input:focus{border-color:var(--ac)}
 .cfg-helper{font-size:12.5px;color:var(--t3);margin-bottom:16px;line-height:1.5}
 .cfg-form{display:flex;flex-direction:column;gap:12px}
 .cfg-row{display:flex;flex-direction:column;gap:5px}
@@ -1096,6 +1123,94 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
   </div>
 </div>
 
+<!-- ══ DEAL PANEL DEDICADO ══ -->
+<div class="prod-panel-ov" id="dealPanelOv" onclick="closeDealPanel()"></div>
+<div class="prod-panel" id="dealPanel">
+  <div class="p-head">
+    <div>
+      <div class="p-title" id="dealPanelTitle">Oportunidade</div>
+      <div id="dealPanelMeta" style="font-size:11px;color:var(--t3);margin-top:2px"></div>
+    </div>
+    <button class="btn btn-g" onclick="closeDealPanel()" style="padding:6px;font-size:14px">✕</button>
+  </div>
+  <div class="p-body">
+    <input type="hidden" id="dealEditId">
+
+    <!-- INFO READONLY DO DEAL -->
+    <div class="deal-info-row" id="dealInfoRow"></div>
+
+    <!-- VALOR E ENTRADA -->
+    <div class="fsect">
+      <div class="fsect-lbl">Valor da venda</div>
+      <div class="fgrid">
+        <div>
+          <label class="fl">Valor total (R$)</label>
+          <input class="fi" id="dpValorTotal" type="number" placeholder="Ex: 7800" oninput="calcEntrada()">
+        </div>
+        <div>
+          <label class="fl">Prioridade</label>
+          <select class="fse" id="dpPrioridade">
+            <option>🌡 Morno</option><option>🔥 Quente</option><option>❄️ Frio</option>
+          </select>
+        </div>
+        <div>
+          <label class="fl">Entrada</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <select class="fse" id="dpEntradaTipo" onchange="calcEntrada()" style="width:72px;flex-shrink:0">
+              <option value="pct">%</option>
+              <option value="fixo">R$</option>
+            </select>
+            <input class="fi" id="dpEntradaVal" type="number" placeholder="30" oninput="calcEntrada()">
+          </div>
+        </div>
+        <div>
+          <label class="fl">Entrada calculada</label>
+          <div class="deal-entrada-result" id="dpEntradaResult">R$ —</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUTOS SELECIONADOS -->
+    <div class="fsect">
+      <div class="fsect-lbl">Produtos contratados</div>
+      <div class="prod-selector">
+        <div class="prod-sel-search">
+          <input class="fi" id="dpProdSearch" placeholder="Buscar produto do catálogo..." oninput="filtrarProdSel(this.value)">
+        </div>
+        <div class="prod-sel-lista" id="dpProdLista"></div>
+      </div>
+      <div class="prod-sel-selecionados" id="dpProdSelecionados">
+        <div style="font-size:12px;color:var(--t3);text-align:center;padding:12px">Nenhum produto selecionado ainda</div>
+      </div>
+    </div>
+
+    <!-- FOLLOW-UP COM HORÁRIO -->
+    <div class="fsect">
+      <div class="fsect-lbl">Acompanhamento</div>
+      <div class="fgrid">
+        <div>
+          <label class="fl">Próximo follow-up</label>
+          <input class="fi" id="dpFollowupData" type="date">
+        </div>
+        <div>
+          <label class="fl">Horário</label>
+          <input class="fi" id="dpFollowupHora" type="time" placeholder="09:00">
+        </div>
+        <div class="ffull">
+          <label class="fl">Observações</label>
+          <textarea class="fi fta" id="dpObs" rows="3" placeholder="Contexto do negócio, objeções, próximos passos..."></textarea>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="p-foot">
+    <button class="btn btn-re" id="dpDeleteBtn" onclick="askDeleteDealDirect()">🗑 Excluir</button>
+    <button class="btn btn-g" onclick="closeDealPanel()">Cancelar</button>
+    <button class="btn btn-p" style="flex:2" onclick="saveDealPanel()" id="dpSaveBtn">💾 Salvar oportunidade</button>
+  </div>
+</div>
+
 <!-- ══ PIPE MODAL ══ -->
 <div class="modal-ov" id="pipeModal" onclick="if(event.target===this)closePipeModal()">
   <div class="modal">
@@ -1138,7 +1253,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
       <button class="cb" onclick="selCb(this,'e')">✉️ Email</button>
     </div>
     <div style="margin-bottom:10px"><input class="fi" id="qlogNota" placeholder="Nota rápida (opcional)..."></div>
-    <div><label class="fl">Próximo follow-up</label><input class="fi" id="qlogFollowup" type="date" style="margin-top:4px"></div>
+    <div class="fgrid" style="margin-bottom:0">
+      <div><label class="fl">Próximo follow-up</label><input class="fi" id="qlogFollowup" type="date" style="margin-top:4px"></div>
+      <div><label class="fl">Horário</label><input class="fi" id="qlogHora" type="time" style="margin-top:4px" value="09:00" placeholder="09:00"></div>
+    </div>
     <div style="display:flex;gap:8px;margin-top:14px">
       <button class="btn btn-g" style="flex:1" onclick="closeQLog()">Cancelar</button>
       <button class="btn btn-gn" style="flex:2" onclick="saveQLog()">💾 Salvar ligação</button>
@@ -1516,38 +1634,259 @@ async function dropCard(e,etapa,pipe){
 }
 
 // ══ DEAL PANEL ══
-function openDealPanel(id){
-  const d=allDeals.find(x=>x['ID']===id);
-  if(!d)return;
-  const c=allContatos.find(x=>x['ID']===d['ID Contato'])||{};
-  editingId=id;
-  isDealPanel=true; // Fix Bug 3: sinaliza que estamos no painel de deal
-  pipeContactId=null;
-  document.getElementById('panelTitle').textContent=d['Empresa']||'Oportunidade';
-  document.getElementById('fEmpresa').value=d['Empresa']||'';
-  document.getElementById('fCNPJ').value=c['CNPJ']||'';
-  document.getElementById('fSegmento').value=c['Segmento']||'';
-  document.getElementById('fICP').value=c['Papel ICP-Brasil']||'';
-  document.getElementById('fNome').value=c['Nome Contato']||'';
-  document.getElementById('fCargo').value=c['Cargo']||'';
-  document.getElementById('fTelefone').value=c['Telefone']||'';
-  document.getElementById('fEmail').value=c['Email']||'';
-  document.getElementById('fTipo').value=c['Tipo']||'Lead Novo';
-  document.getElementById('fPrioridade').value=d['Prioridade']||'🌡 Morno';
-  document.getElementById('fPotencial').value=c['Potencial']||'Médio';
-  document.getElementById('fOrigem').value=c['Origem']||'Prospecção Samuel';
-  document.getElementById('fResponsavel').value=d['Responsável']||'Samuel Mateus';
-  document.getElementById('fFollowup').value=d['Próximo Follow-up']?fmtDateInput(d['Próximo Follow-up']):'';
-  document.getElementById('fProdutos').value=c['Produtos GO Interesse']||'';
-  document.getElementById('fObs').value=d['Observações']||'';
-  document.getElementById('fContextoCEO').value=c['Contexto CEO']||'';
-  document.getElementById('saveBtn').textContent='💾 Salvar alterações';
-  document.getElementById('notifInfo').style.display='none';
-  document.getElementById('pipeInfo').style.display='none';
-  document.getElementById('deleteBtn').style.display='flex';
-  document.getElementById('pipeBtn').style.display='none';
-  document.getElementById('panel').classList.add('open');
-  document.getElementById('ovbg').classList.add('open');
+// ══ DEAL PANEL DEDICADO ════════════════════════════════════
+let dealProdutosSelecionados = []; // [{id, nome, tipo, modeloPreco, valorNeg, horasImpl, horasTrein}]
+
+function openDealPanel(id) {
+  const d = allDeals.find(x => x['ID'] === id);
+  if (!d) return;
+  const c = allContatos.find(x => x['ID'] === d['ID Contato']) || {};
+  editingId = id;
+
+  // Header
+  document.getElementById('dealPanelTitle').textContent = d['Empresa'] || 'Oportunidade';
+  const cor = (PIPE_COLORS[d['Pipeline']] || '#4f7cff');
+  document.getElementById('dealPanelMeta').innerHTML =
+    `<span style="background:${cor}22;color:${cor};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">${d['Pipeline'] || '—'}</span>
+     <span style="margin-left:6px">${d['Etapa'] || '—'}</span>`;
+
+  // Info row (readonly — contexto)
+  const nomeContato = c['Nome Contato'] || '—';
+  const tel = c['Telefone'] || '—';
+  const responsavel = d['Responsável'] || '—';
+  document.getElementById('dealInfoRow').innerHTML = `
+    <div class="deal-info-chip">👤 <strong>${nomeContato}</strong></div>
+    <div class="deal-info-chip">📞 <strong>${tel}</strong></div>
+    <div class="deal-info-chip">👤 Resp: <strong>${responsavel}</strong></div>
+    ${c['Contexto CEO'] ? `<div class="deal-info-chip" style="color:var(--ye)">🎯 ${c['Contexto CEO'].substring(0,50)}...</div>` : ''}
+  `;
+
+  // Valores
+  const valorTotal = d['Valor Estimado'] || '';
+  document.getElementById('dpValorTotal').value = valorTotal;
+  document.getElementById('dpPrioridade').value = d['Prioridade'] || '🌡 Morno';
+  document.getElementById('dpEntradaTipo').value = 'pct';
+  document.getElementById('dpEntradaVal').value = '30';
+  calcEntrada();
+
+  // Produtos — parse do campo Produtos Selecionados
+  dealProdutosSelecionados = [];
+  const prodStr = d['Produtos Selecionados'] || '';
+  if (prodStr) {
+    prodStr.split('||').forEach(item => {
+      const parts = item.split('::');
+      if (parts[0]) dealProdutosSelecionados.push({
+        id:        parts[0] || '',
+        nome:      parts[1] || parts[0],
+        tipo:      parts[2] || 'Módulo',
+        modeloPreco: parts[3] || 'Negociável',
+        valorNeg:  parts[4] || '',
+        horasImpl: parts[5] || '',
+        horasTrein:parts[6] || '',
+      });
+    });
+  }
+
+  // Follow-up com horário
+  const fu = d['Próximo Follow-up'] || '';
+  if (fu) {
+    const [datePart, timePart] = fu.includes('T') ? fu.split('T') : [fu, ''];
+    document.getElementById('dpFollowupData').value = datePart;
+    document.getElementById('dpFollowupHora').value = timePart ? timePart.substring(0,5) : '';
+  } else {
+    const tmrw = new Date(); tmrw.setDate(tmrw.getDate() + 1);
+    document.getElementById('dpFollowupData').value = tmrw.toISOString().split('T')[0];
+    document.getElementById('dpFollowupHora').value = '09:00';
+  }
+
+  document.getElementById('dpObs').value = d['Observações'] || '';
+
+  // Renderiza lista de produtos e selecionados
+  renderProdSel('');
+  renderProdSelecionados();
+
+  document.getElementById('dealPanel').classList.add('open');
+  document.getElementById('dealPanelOv').classList.add('open');
+}
+
+function closeDealPanel() {
+  document.getElementById('dealPanel').classList.remove('open');
+  document.getElementById('dealPanelOv').classList.remove('open');
+  editingId = null;
+  dealProdutosSelecionados = [];
+}
+
+// Cálculo automático da entrada
+function calcEntrada() {
+  const total = Number(document.getElementById('dpValorTotal').value) || 0;
+  const tipo  = document.getElementById('dpEntradaTipo').value;
+  const val   = Number(document.getElementById('dpEntradaVal').value) || 0;
+  let resultado = 0;
+  if (tipo === 'pct') resultado = total * (val / 100);
+  else resultado = val;
+  document.getElementById('dpEntradaResult').textContent =
+    resultado > 0 ? 'R$ ' + resultado.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}) : 'R$ —';
+}
+
+// Filtra produtos do catálogo no seletor
+function filtrarProdSel(q) { renderProdSel(q); }
+
+function renderProdSel(q) {
+  const lista = document.getElementById('dpProdLista');
+  const selecionadosIds = dealProdutosSelecionados.map(p => p.id || p.nome);
+  let prods = allProdutos.filter(p => String(p['Status']).toLowerCase() === 'ativo');
+  if (q) prods = prods.filter(p => (p['Nome']||'').toLowerCase().includes(q.toLowerCase()));
+
+  const TIPO_COLORS = {
+    'Módulo':'#4f7cff','App':'#22d07a','Extensão':'#f97340',
+    'Utilidade':'#b06ef5','Certificado':'#f5b731','Serviço':'#8fa3c4'
+  };
+
+  if (prods.length === 0) {
+    lista.innerHTML = '<div class="prod-sel-empty">Nenhum produto encontrado</div>';
+    return;
+  }
+
+  lista.innerHTML = prods.map(p => {
+    const jaSelecionado = selecionadosIds.includes(p['ID']) || selecionadosIds.includes(p['Nome']);
+    const cor = TIPO_COLORS[p['Tipo']] || '#8fa3c4';
+    return `<div class="prod-sel-item" onclick="${jaSelecionado ? '' : `adicionarProd('${p['ID']}','${(p['Nome']||'').replace(/'/g,"\\'")}','${p['Tipo']||''}','${p['Modelo Preço']||''}')`}" style="${jaSelecionado ? 'opacity:.4;cursor:default' : ''}">
+      <div class="prod-sel-item-nome">${p['Nome']||'—'}</div>
+      <span class="prod-sel-item-tipo" style="background:${cor}22;color:${cor}">${p['Tipo']||''}</span>
+      <div class="prod-sel-item-add">${jaSelecionado ? '✓' : '+'}</div>
+    </div>`;
+  }).join('');
+}
+
+function adicionarProd(id, nome, tipo, modeloPreco) {
+  const jaExiste = dealProdutosSelecionados.find(p => p.id === id || p.nome === nome);
+  if (jaExiste) return;
+  // Busca dados completos no catálogo
+  const prod = allProdutos.find(p => p['ID'] === id) || {};
+  dealProdutosSelecionados.push({
+    id, nome, tipo, modeloPreco,
+    valorNeg:  modeloPreco === 'Tabelado' ? (prod['Valor Base'] || '') : '',
+    horasImpl: prod['Horas Implantação'] || '',
+    horasTrein:prod['Valor Treinamento'] || '',
+  });
+  renderProdSelecionados();
+  renderProdSel(document.getElementById('dpProdSearch').value);
+  toast(`+ ${nome}`,'ok');
+}
+
+function removerProd(idx) {
+  dealProdutosSelecionados.splice(idx, 1);
+  renderProdSelecionados();
+  renderProdSel(document.getElementById('dpProdSearch').value);
+}
+
+function renderProdSelecionados() {
+  const wrap = document.getElementById('dpProdSelecionados');
+  if (dealProdutosSelecionados.length === 0) {
+    wrap.innerHTML = '<div style="font-size:12px;color:var(--t3);text-align:center;padding:12px">Nenhum produto selecionado ainda</div>';
+    return;
+  }
+  const TIPO_COLORS = {'Módulo':'#4f7cff','App':'#22d07a','Extensão':'#f97340','Utilidade':'#b06ef5','Certificado':'#f5b731','Serviço':'#8fa3c4'};
+  wrap.innerHTML = dealProdutosSelecionados.map((p, i) => {
+    const cor = TIPO_COLORS[p.tipo] || '#8fa3c4';
+    const isFixo = p.modeloPreco === 'Tabelado';
+    return `<div class="prod-sel-card">
+      <div class="prod-sel-card-head">
+        <div>
+          <span class="prod-sel-card-nome">${p.nome}</span>
+          <span style="margin-left:6px;font-size:10px;background:${cor}22;color:${cor};padding:1px 6px;border-radius:3px;font-weight:700">${p.tipo}</span>
+          ${isFixo ? '<span style="margin-left:4px;font-size:10px;color:var(--t3)">Tabelado</span>' : ''}
+        </div>
+        <span class="prod-sel-card-rem" onclick="removerProd(${i})">✕ Remover</span>
+      </div>
+      <div class="prod-sel-fields">
+        <div class="prod-sel-field">
+          <label>${isFixo ? 'Valor fixo (R$)' : 'Valor negociado (R$)'}</label>
+          <input type="number" value="${p.valorNeg}" ${isFixo ? 'readonly style="opacity:.6"' : ''}
+            oninput="dealProdutosSelecionados[${i}].valorNeg=this.value" placeholder="0">
+        </div>
+        <div class="prod-sel-field">
+          <label>Horas de implantação</label>
+          <input type="number" value="${p.horasImpl}"
+            oninput="dealProdutosSelecionados[${i}].horasImpl=this.value" placeholder="0">
+        </div>
+        <div class="prod-sel-field">
+          <label>Horas de treinamento</label>
+          <input type="number" value="${p.horasTrein}"
+            oninput="dealProdutosSelecionados[${i}].horasTrein=this.value" placeholder="0">
+        </div>
+        <div class="prod-sel-field">
+          <label>Observação do produto</label>
+          <input type="text" value="${p.obs||''}"
+            oninput="dealProdutosSelecionados[${i}].obs=this.value" placeholder="Ex: versão A3">
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Serializa produtos para salvar no Sheets
+// Formato: id::nome::tipo::modeloPreco::valorNeg::horasImpl::horasTrein || próximo
+function serializarProdutos() {
+  return dealProdutosSelecionados.map(p =>
+    [p.id, p.nome, p.tipo, p.modeloPreco, p.valorNeg, p.horasImpl, p.horasTrein].join('::')
+  ).join('||');
+}
+
+async function saveDealPanel() {
+  if (isProcessing) return;
+  const btn = document.getElementById('dpSaveBtn');
+  btn.disabled = true; btn.textContent = '⏳ Salvando...';
+  isProcessing = true;
+
+  const data = document.getElementById('dpFollowupData').value;
+  const hora = document.getElementById('dpFollowupHora').value;
+  const followUp = data ? (hora ? `${data}T${hora}` : data) : '';
+
+  const payload = {
+    id:                  editingId,
+    valorEstimado:       Number(document.getElementById('dpValorTotal').value) || 0,
+    prioridade:          document.getElementById('dpPrioridade').value,
+    produtosSelecionados:serializarProdutos(),
+    proximoFollowUp:     followUp,
+    observacoes:         document.getElementById('dpObs').value.trim(),
+  };
+
+  // Salva valor da entrada nas observações se preenchido
+  const entradaResult = document.getElementById('dpEntradaResult').textContent;
+  if (entradaResult !== 'R$ —') {
+    const tipo = document.getElementById('dpEntradaTipo').value;
+    const val  = document.getElementById('dpEntradaVal').value;
+    payload.observacoes = `[Entrada: ${tipo==='pct'?val+'%':''} ${entradaResult}] ${payload.observacoes}`.trim();
+  }
+
+  try {
+    const res = await apiPost({ action:'ATUALIZAR_DEAL', payload, usuario: currentUser.nome });
+    if (res.success) {
+      // Atualiza local
+      const deal = allDeals.find(d => d['ID'] === editingId);
+      if (deal) {
+        deal['Valor Estimado']        = payload.valorEstimado;
+        deal['Prioridade']            = payload.prioridade;
+        deal['Produtos Selecionados'] = payload.produtosSelecionados;
+        deal['Próximo Follow-up']     = payload.proximoFollowUp;
+        deal['Observações']           = payload.observacoes;
+      }
+      toast('✅ Oportunidade atualizada!', 'ok');
+      closeDealPanel();
+      renderBoard(); renderAgenda();
+    } else {
+      toast('❌ Erro: ' + (res.error||''), 'err');
+    }
+  } catch(e) { toast('❌ Erro de conexão', 'err'); }
+  finally { isProcessing = false; btn.disabled = false; btn.textContent = '💾 Salvar oportunidade'; }
+}
+
+function askDeleteDealDirect() {
+  if (!editingId) return;
+  const empresa = document.getElementById('dealPanelTitle').textContent;
+  askDeleteDeal(editingId, empresa);
+  closeDealPanel();
 }
 
 // ══ CONTACT PANEL ══
@@ -1808,24 +2147,24 @@ function selCb(btn,t){document.querySelectorAll('.cb').forEach(b=>b.className='c
 async function saveQLog(){
   const dealId=document.getElementById('qlogDealId').value;
   const nota=document.getElementById('qlogNota').value.trim();
-  const fu=document.getElementById('qlogFollowup').value;
+  const fuData=document.getElementById('qlogFollowup').value;
+  const fuHora=document.getElementById('qlogHora').value;
+  const fu = fuData ? (fuHora ? `${fuData}T${fuHora}` : fuData) : fuData;
   const selBtn=document.querySelector('.cb.sel-a,.cb.sel-n,.cb.sel-c,.cb.sel-e');
   const statusMap={'sel-a':'✅ Atendeu','sel-n':'❌ Não atendeu','sel-c':'🔁 Callback agendado','sel-e':'✉️ Email enviado'};
   const status=selBtn?statusMap[selBtn.classList[1]]||'Ligação':'Ligação';
   const deal=allDeals.find(d=>d['ID']===dealId)||{};
 
-  // OPTIMISTIC UI — fecha modal imediatamente
+  // OPTIMISTIC UI
   const fuAnterior=deal['Próximo Follow-up'];
   if(fu) deal['Próximo Follow-up']=fu;
   closeQLog();
   toast('✅ Ligação registrada!','ok');
-  renderBoard();
+  renderBoard(); renderAgenda();
 
-  // Grava em segundo plano
   try{
     await apiPost({action:'REGISTRAR_ATIVIDADE',payload:{idDeal:dealId,idContato:deal['ID Contato']||'',empresa:deal['Empresa']||'',tipo:'Ligação',statusLigacao:status,nota,proximoFollowUp:fu},usuario:currentUser.nome});
   }catch(e){
-    // Reverte follow-up se falhou
     deal['Próximo Follow-up']=fuAnterior;
     renderBoard();
     toast('⚠ Ligação não salva — sem conexão','warn');
@@ -2150,37 +2489,42 @@ function setAgendaFilter(f, el) {
 
 function renderAgenda() {
   const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const em3dias = new Date(hoje); em3dias.setDate(hoje.getDate()+3);
+  const agora = new Date();
 
   // Classifica cada deal ativo com follow-up
   const deals = allDeals.filter(d => d['Status']==='Ativo' && d['Próximo Follow-up']);
 
   const classificados = deals.map(d => {
-    const fu = new Date(d['Próximo Follow-up']); fu.setHours(0,0,0,0);
-    const diff = Math.floor((fu-hoje)/(1000*60*60*24));
+    const fuRaw = d['Próximo Follow-up'];
+    // Suporta tanto data simples quanto datetime com horário
+    const fuFull = new Date(fuRaw.includes('T') ? fuRaw : fuRaw + 'T00:00:00');
+    const fuSoData = new Date(fuFull); fuSoData.setHours(0,0,0,0);
+    const diff = Math.floor((fuSoData-hoje)/(1000*60*60*24));
+    const temHora = fuRaw.includes('T') && fuRaw.split('T')[1] && fuRaw.split('T')[1] !== '00:00';
+    const horaLabel = temHora ? fuFull.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '';
     let prioridade, grupo, dataLabel, dataClass;
 
     if (diff < 0) {
-      // Atrasado — prioridade máxima
       const diasAtraso = Math.abs(diff);
-      prioridade = 1000 + diasAtraso; // mais atrasado = mais urgente
+      prioridade = 1000 + diasAtraso;
       grupo = 'atrasado';
       dataLabel = `⚠ Atrasado ${diasAtraso > 1 ? diasAtraso+'d' : 'ontem'}`;
       dataClass = 'fu-data-red';
     } else if (diff === 0) {
       grupo = 'hoje';
-      dataLabel = '📅 Hoje';
+      dataLabel = horaLabel ? `Hoje às ${horaLabel}` : 'Hoje';
       dataClass = 'fu-data-yellow';
-      // Quente tem prioridade sobre morno
-      prioridade = (d['Prioridade']||'').includes('Quente') ? 200 : 100;
+      // Ordena por horário dentro do mesmo dia
+      const minutos = temHora ? fuFull.getHours()*60 + fuFull.getMinutes() : 9999;
+      prioridade = (d['Prioridade']||'').includes('Quente') ? 200 - minutos/100 : 100 - minutos/100;
     } else if (diff <= 3) {
       grupo = 'proximos';
-      dataLabel = `🔜 Em ${diff}d`;
+      dataLabel = horaLabel ? `Em ${diff}d às ${horaLabel}` : `Em ${diff}d`;
       dataClass = 'fu-data-blue';
       prioridade = diff * 10;
     } else {
       grupo = 'futuro';
-      dataLabel = fu.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+      dataLabel = fuSoData.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) + (horaLabel ? ` ${horaLabel}` : '');
       dataClass = '';
       prioridade = diff * 5;
     }
