@@ -453,6 +453,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
 .deal-info-chip{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:5px}
 .deal-info-chip strong{color:var(--tx)}
 .deal-entrada-result{font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--gn);padding:8px 0}
+.deal-total-calc{font-family:'DM Mono',monospace;font-size:20px;font-weight:800;color:var(--tx);padding:8px 0;border-bottom:2px solid var(--ac)}
 /* Seletor de produtos */
 .prod-selector{border:1px solid var(--bd);border-radius:var(--rsm);overflow:hidden;margin-bottom:10px}
 .prod-sel-search{padding:8px}
@@ -649,7 +650,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
     <div class="tb-r" id="tbRight">
       <button class="btn btn-g" onclick="openGSearch()" title="Ctrl+K">🔍 Ctrl+K</button>
       <button class="btn btn-g" id="syncBtn" onclick="syncAll()">🔄 Sincronizar</button>
-      <button class="btn btn-g" id="benchBtn" onclick="injetarDadosTeste()" title="Inserir dados de teste" style="font-size:11px;opacity:.6">🧪 Teste</button>
       <button class="btn btn-p" id="newBtn" onclick="openPanel('new')">+ Novo Contato</button>
     </div>
   </div>
@@ -1102,7 +1102,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
         <div><label class="fl">Origem</label><select class="fse" id="fOrigem"><option>Prospecção Samuel</option><option>Indicação — Nicolau</option><option>Indicação — Soluti</option><option>Indicação — Prime</option><option>Site</option><option>WhatsApp</option><option>LinkedIn</option><option>Outro</option></select></div>
         <div><label class="fl">Responsável</label><select class="fse" id="fResponsavel"><option>Samuel Mateus</option><option>Nicolau</option><option>Bruno Camara</option></select></div>
         <div><label class="fl">Próximo follow-up</label><input class="fi" id="fFollowup" type="date"></div>
-        <div class="ff"><label class="fl">Produtos GO de interesse</label><input class="fi" id="fProdutos" placeholder="Ex: Módulo NF-e, Certificado A3..."></div>
         <div class="ff"><label class="fl">Observações</label><textarea class="fta" id="fObs" placeholder="Contexto do lead..."></textarea></div>
       </div>
     </div>
@@ -1144,8 +1143,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
       <div class="fsect-lbl">Valor da venda</div>
       <div class="fgrid">
         <div>
-          <label class="fl">Valor total (R$)</label>
-          <input class="fi" id="dpValorTotal" type="number" placeholder="Ex: 7800" oninput="calcEntrada()">
+          <label class="fl">Total calculado dos produtos</label>
+          <div class="deal-total-calc" id="dpTotalCalc">R$ 0,00</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:3px">Soma automática dos produtos abaixo</div>
         </div>
         <div>
           <label class="fl">Prioridade</label>
@@ -1563,6 +1563,12 @@ function cardHTML(d, stage, pipeColor, stages) {
   const resp = d['Responsável']||'Samuel';
   const respIc = resp==='Nicolau'?'NI':resp==='Bruno Camara'?'BR':'SA';
   const respCls = resp==='Nicolau'?'uav-ni':resp==='Bruno Camara'?'uav-br':'uav-sa';
+
+  // Badge de entrada pendente — deal fechado aguardando confirmação
+  const entradaPendente = (d['Etapa']==='Fechado' || d['Status']==='Fechado — Ganho') && !d['Entrada Confirmada'];
+  const entradaBadge = entradaPendente
+    ? `<div style="font-size:10px;font-weight:700;color:var(--ye);background:var(--ys);padding:2px 7px;border-radius:4px;margin-top:4px;display:inline-block">⏳ Entrada pendente</div>`
+    : '';
   return `<div class="card" draggable="true"
     ondragstart="startDrag(event,this,'${d['ID']}')"
     ondragend="this.style.opacity='1'"
@@ -1581,6 +1587,7 @@ function cardHTML(d, stage, pipeColor, stages) {
         <div class="cval">${valor}</div>
         <div class="cvlb">estimado</div>
       </div>
+      ${entradaBadge}
       <div class="cprog">
         <div class="pdrow">${dots}</div>
         <div class="prlb">${stage.etapa} · etapa ${stageIdx+1}/${stages.length}</div>
@@ -1663,10 +1670,12 @@ function openDealPanel(id) {
 
   // Valores
   const valorTotal = d['Valor Estimado'] || '';
-  document.getElementById('dpValorTotal').value = valorTotal;
   document.getElementById('dpPrioridade').value = d['Prioridade'] || '🌡 Morno';
-  document.getElementById('dpEntradaTipo').value = 'pct';
-  document.getElementById('dpEntradaVal').value = '30';
+  // Carrega entrada salva — ou padrão 30%
+  const entTipo = d['Entrada Tipo'] || 'pct';
+  const entVal  = d['Entrada Valor'] || '30';
+  document.getElementById('dpEntradaTipo').value = entTipo;
+  document.getElementById('dpEntradaVal').value  = entVal;
   calcEntrada();
 
   // Produtos — parse do campo Produtos Selecionados
@@ -1716,16 +1725,26 @@ function closeDealPanel() {
   dealProdutosSelecionados = [];
 }
 
-// Cálculo automático da entrada
+// Calcula total automaticamente a partir dos produtos selecionados
+function calcTotal() {
+  const total = dealProdutosSelecionados.reduce((s, p) => s + (Number(p.valorNeg) || 0), 0);
+  const totalEl = document.getElementById('dpTotalCalc');
+  if (totalEl) totalEl.textContent = 'R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  calcEntrada();
+  return total;
+}
+
 function calcEntrada() {
-  const total = Number(document.getElementById('dpValorTotal').value) || 0;
-  const tipo  = document.getElementById('dpEntradaTipo').value;
-  const val   = Number(document.getElementById('dpEntradaVal').value) || 0;
+  const total = dealProdutosSelecionados.reduce((s, p) => s + (Number(p.valorNeg) || 0), 0);
+  const tipo  = document.getElementById('dpEntradaTipo')?.value || 'pct';
+  const val   = Number(document.getElementById('dpEntradaVal')?.value) || 0;
   let resultado = 0;
   if (tipo === 'pct') resultado = total * (val / 100);
   else resultado = val;
-  document.getElementById('dpEntradaResult').textContent =
-    resultado > 0 ? 'R$ ' + resultado.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}) : 'R$ —';
+  const el = document.getElementById('dpEntradaResult');
+  if (el) el.textContent = resultado > 0
+    ? 'R$ ' + resultado.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})
+    : 'R$ —';
 }
 
 // Filtra produtos do catálogo no seletor
@@ -1784,6 +1803,7 @@ function renderProdSelecionados() {
   const wrap = document.getElementById('dpProdSelecionados');
   if (dealProdutosSelecionados.length === 0) {
     wrap.innerHTML = '<div style="font-size:12px;color:var(--t3);text-align:center;padding:12px">Nenhum produto selecionado ainda</div>';
+    calcTotal();
     return;
   }
   const TIPO_COLORS = {'Módulo':'#4f7cff','App':'#22d07a','Extensão':'#f97340','Utilidade':'#b06ef5','Certificado':'#f5b731','Serviço':'#8fa3c4'};
@@ -1801,9 +1821,9 @@ function renderProdSelecionados() {
       </div>
       <div class="prod-sel-fields">
         <div class="prod-sel-field">
-          <label>${isFixo ? 'Valor fixo (R$)' : 'Valor negociado (R$)'}</label>
+          <label>${isFixo ? 'Valor fixo (R$)' : 'Valor negociado (R$) *'}</label>
           <input type="number" value="${p.valorNeg}" ${isFixo ? 'readonly style="opacity:.6"' : ''}
-            oninput="dealProdutosSelecionados[${i}].valorNeg=this.value" placeholder="0">
+            oninput="dealProdutosSelecionados[${i}].valorNeg=this.value;calcTotal()" placeholder="0">
         </div>
         <div class="prod-sel-field">
           <label>Horas de implantação</label>
@@ -1823,6 +1843,7 @@ function renderProdSelecionados() {
       </div>
     </div>`;
   }).join('');
+  calcTotal();
 }
 
 // Serializa produtos para salvar no Sheets
@@ -1843,22 +1864,17 @@ async function saveDealPanel() {
   const hora = document.getElementById('dpFollowupHora').value;
   const followUp = data ? (hora ? `${data}T${hora}` : data) : '';
 
+  // Total = soma automática dos valores dos produtos
+  const valorEstimado = dealProdutosSelecionados.reduce((s, p) => s + (Number(p.valorNeg)||0), 0);
+
   const payload = {
     id:                  editingId,
-    valorEstimado:       Number(document.getElementById('dpValorTotal').value) || 0,
+    valorEstimado,
     prioridade:          document.getElementById('dpPrioridade').value,
     produtosSelecionados:serializarProdutos(),
     proximoFollowUp:     followUp,
     observacoes:         document.getElementById('dpObs').value.trim(),
   };
-
-  // Salva valor da entrada nas observações se preenchido
-  const entradaResult = document.getElementById('dpEntradaResult').textContent;
-  if (entradaResult !== 'R$ —') {
-    const tipo = document.getElementById('dpEntradaTipo').value;
-    const val  = document.getElementById('dpEntradaVal').value;
-    payload.observacoes = `[Entrada: ${tipo==='pct'?val+'%':''} ${entradaResult}] ${payload.observacoes}`.trim();
-  }
 
   try {
     const res = await apiPost({ action:'ATUALIZAR_DEAL', payload, usuario: currentUser.nome });
@@ -1871,6 +1887,8 @@ async function saveDealPanel() {
         deal['Produtos Selecionados'] = payload.produtosSelecionados;
         deal['Próximo Follow-up']     = payload.proximoFollowUp;
         deal['Observações']           = payload.observacoes;
+        deal['Entrada Tipo']          = payload.entradaTipo;
+        deal['Entrada Valor']         = payload.entradaValor;
       }
       toast('✅ Oportunidade atualizada!', 'ok');
       closeDealPanel();
@@ -1915,7 +1933,6 @@ function openPanel(mode,id){
     document.getElementById('fOrigem').value=c['Origem']||'Prospecção Samuel';
     document.getElementById('fResponsavel').value=c['Responsável']||'Samuel Mateus';
     document.getElementById('fFollowup').value=c['Próximo Follow-up']?fmtDateInput(c['Próximo Follow-up']):'';
-    document.getElementById('fProdutos').value=c['Produtos GO Interesse']||'';
     document.getElementById('fObs').value=c['Observações']||'';
     document.getElementById('fContextoCEO').value=c['Contexto CEO']||'';
     document.getElementById('notifInfo').style.display='none';
@@ -1943,7 +1960,7 @@ function closePanel(){
 }
 
 function clearForm(){
-  ['fEmpresa','fCNPJ','fNome','fCargo','fTelefone','fEmail','fProdutos','fObs','fContextoCEO','editId'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['fEmpresa','fCNPJ','fNome','fCargo','fTelefone','fEmail','fObs','fContextoCEO','editId'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['fSegmento','fICP'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['fTipo','fPrioridade','fPotencial','fOrigem','fResponsavel'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
   ['errEmpresa','errNome','errTelefone'].forEach(id=>document.getElementById(id).classList.remove('show'));
@@ -2001,7 +2018,6 @@ async function saveContato(){
     origem:document.getElementById('fOrigem').value,
     responsavel:document.getElementById('fResponsavel').value,
     proximoFollowUp:document.getElementById('fFollowup').value,
-    produtosInteresse:document.getElementById('fProdutos').value.trim(),
     observacoes:document.getElementById('fObs').value.trim(),
     contextoCEO:document.getElementById('fContextoCEO').value.trim(),
     atribuidoPor:currentUser.nome,
@@ -2651,7 +2667,7 @@ function fuCardHTML(deal) {
     ${ultimaHtml}
     <div class="fu-actions">
       <div class="fu-btn fu-btn-call" onclick="abrirQLogAgenda('${deal['ID']}','${(deal['Empresa']||'').replace(/'/g,"\\'")}')">📞 Registrar ligação</div>
-      <div class="fu-btn fu-btn-deal" onclick="openDealPanel('${deal['ID']}')">✏️ Ver deal</div>
+      <div class="fu-btn fu-btn-deal" onclick="openDealPanel('${deal['ID']}')">✏️ Abrir oportunidade</div>
     </div>
   </div>`;
 }
@@ -2745,26 +2761,32 @@ function renderNicolau() {
     return fu < hoje;
   }).length;
 
-  const veredicto = ligacoesSem >= 10 ? ['sv-green','✅ Sim — Samuel está ligando bem esta semana.'] :
-                    ligacoesSem >= 5  ? ['sv-yellow','⚠ Moderado — Samuel fez algumas ligações, mas pode melhorar.'] :
-                                        ['sv-red','❌ Atenção — poucas ligações registradas esta semana.'];
+  const veredicto = ligacoesSem >= 10 ? ['sv-green', '✅ Atividade boa — mais de 10 ligações registradas esta semana.'] :
+                    ligacoesSem >= 5  ? ['sv-yellow', '⚠ Atividade moderada — entre 5 e 9 ligações. Meta sugerida: 10/semana.'] :
+                    ligacoesSem >= 1  ? ['sv-red', '❌ Atividade baixa — menos de 5 ligações. Pode ser falta de registro no sistema.'] :
+                                        ['sv-red', '❌ Nenhuma ligação registrada esta semana. Verifique se o Samuel está usando o sistema.'];
 
   document.getElementById('dashSamuelAtividade').innerHTML = `
     <div class="samuel-stats">
       <div class="sstat sstat-ok">
         <div class="sstat-val">${ligacoesSem}</div>
-        <div class="sstat-lbl">Ligações esta semana</div>
+        <div class="sstat-lbl">Ligações registradas</div>
       </div>
       <div class="sstat sstat-info">
         <div class="sstat-val">${atendeuSem}</div>
-        <div class="sstat-lbl">Atendidos</div>
+        <div class="sstat-lbl">Contatos atendidos</div>
       </div>
       <div class="sstat sstat-warn">
         <div class="sstat-val">${atrasados}</div>
         <div class="sstat-lbl">Follow-ups atrasados</div>
       </div>
     </div>
-    <div class="samuel-veredicto ${veredicto[0]}">${veredicto[1]}</div>`;
+    <div class="samuel-veredicto ${veredicto[0]}">${veredicto[1]}</div>
+    <div style="font-size:11px;color:var(--t3);margin-top:10px;padding:8px 12px;background:var(--s2);border-radius:var(--rsm);line-height:1.5">
+      <strong style="color:var(--t2)">KPI:</strong> Meta sugerida de 10 ligações/semana.
+      Numero baixo pode indicar falta de registro — verifique com o vendedor antes de concluir.
+      Follow-ups atrasados = leads sem contato na data combinada.
+    </div>`;
 
   // ── Pergunta 3: Leads quentes ──
   const quentes = dealsAtivos
