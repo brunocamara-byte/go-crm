@@ -2364,11 +2364,13 @@ function showScr(name){
   if(name==='contatos'){
     newBtn.style.display='flex';newBtn.textContent='+ Novo Contato';newBtn.onclick=()=>openPanel('new');
     document.getElementById('importLeadsBtn').style.display='flex';
+  } else if(name==='produtos'){
+    newBtn.style.display='flex';newBtn.textContent='+ Novo Produto';newBtn.onclick=()=>openProdPanel(null);
+    document.getElementById('importLeadsBtn').style.display='none';
   } else {
+    newBtn.style.display='none';
     document.getElementById('importLeadsBtn').style.display='none';
   }
-  else if(name==='produtos'){newBtn.style.display='flex';newBtn.textContent='+ Novo Produto';newBtn.onclick=()=>openProdPanel(null);}
-  else{newBtn.style.display='none';}
   document.getElementById('syncBtn').style.display='flex';
   if(name==='produtos') renderProdutos();
   if(name==='followups') renderAgenda();
