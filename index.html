@@ -479,6 +479,47 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
 .prod-sel-field label{font-size:10px;color:var(--t3);display:block;margin-bottom:2px}
 .prod-sel-field input{background:var(--s2);border:1px solid var(--bd);border-radius:4px;padding:5px 8px;font-size:12px;color:var(--tx);width:100%;outline:none}
 .prod-sel-field input:focus{border-color:var(--ac)}
+/* ══ IMPLANTAÇÃO ══ */
+.impl-grid-wrap{flex:1;overflow-y:auto;padding:16px 18px}
+.impl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.impl-card{background:var(--sf);border:0.5px solid var(--bd);border-radius:var(--r);overflow:hidden;transition:all .15s}
+.impl-card:hover{border-color:var(--bd2);transform:translateY(-2px);box-shadow:var(--sh)}
+.impl-stripe{height:5px;width:100%}
+.impl-head{padding:12px 14px 10px}
+.impl-empresa{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:4px}
+.impl-etapa-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:6px}
+.impl-contato{font-size:11.5px;color:var(--t2);margin-bottom:2px}
+.impl-divider{height:1px;background:var(--bd);margin:0 0 10px}
+.impl-section{padding:0 14px}
+.impl-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.impl-modulos{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.impl-mod{font-size:10.5px;padding:2px 7px;border-radius:4px;background:var(--s2);color:var(--t2);border:1px solid var(--bd)}
+.impl-aulas-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.impl-dots{display:flex;gap:4px}
+.impl-dot{height:7px;border-radius:3px;min-width:18px;flex:1}
+.impl-dot-done{background:var(--gn)}
+.impl-dot-curr{background:var(--ac)}
+.impl-dot-pend{background:var(--bd2)}
+.impl-aulas-txt{font-size:11px;color:var(--t3)}
+.impl-nps-row{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.impl-nps-txt{font-size:11px;color:var(--t3)}
+.impl-sla-wrap{margin-bottom:10px}
+.impl-sla-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.impl-sla-lbl{font-size:11px;color:var(--t3)}
+.impl-sla-dias{font-size:11px;font-weight:700;font-family:'DM Mono',monospace}
+.impl-sla-bar{height:7px;background:var(--s3);border-radius:4px;overflow:hidden}
+.impl-sla-fill{height:100%;border-radius:4px;transition:width .5s}
+.impl-proxima{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:11.5px;color:var(--t2)}
+.impl-proxima-badge{background:var(--ys);color:var(--ye);font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap}
+.impl-chamado{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.impl-ch-ok{background:var(--gs);color:var(--gn);font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:4px}
+.impl-ch-wait{background:var(--ys);color:var(--ye);font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:4px}
+.impl-actions{padding:10px 14px;border-top:1px solid var(--bd);display:flex;gap:6px}
+.impl-btn-aula{flex:1;padding:7px 0;border-radius:var(--rsm);font-size:12px;font-weight:700;text-align:center;cursor:pointer;background:var(--as);color:var(--ac);border:1px solid rgba(79,124,255,.3)}
+.impl-btn-aula:hover{background:var(--ac);color:#fff}
+.impl-btn-ver{flex:1;padding:7px 0;border-radius:var(--rsm);font-size:12px;font-weight:600;text-align:center;cursor:pointer;background:var(--s2);color:var(--t2);border:1px solid var(--bd)}
+.impl-btn-ver:hover{background:var(--s3);color:var(--tx)}
+/* ══ CONFIG ══ */
 .cfg-helper{font-size:12.5px;color:var(--t3);margin-bottom:16px;line-height:1.5}
 .cfg-form{display:flex;flex-direction:column;gap:12px}
 .cfg-row{display:flex;flex-direction:column;gap:5px}
@@ -665,6 +706,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
     <div class="nv on" id="nav-contatos" onclick="showScr('contatos')"><span>👥</span><span>Contatos</span><span class="nb" id="ctCount">0</span></div>
     <div class="nv" id="nav-followups" onclick="showScr('followups')"><span>📅</span><span>Agenda de Hoje</span></div>
     <div class="nv" id="nav-relatorios" onclick="showScr('relatorios')"><span>📊</span><span>Relatórios</span></div>
+    <div class="nv" id="nav-implantacao" onclick="showScr('implantacao')"><span>🚀</span><span>Implantação</span><span class="nb" id="implCount">0</span></div>
     <div class="sb-lb" style="margin-top:6px">Sistema</div>
     <div class="nv" id="nav-produtos" onclick="showScr('produtos')"><span>📦</span><span>Produtos GO</span></div>
     <div class="nv" id="nav-config" onclick="showScr('config')"><span>⚙️</span><span>Config</span></div>
@@ -871,6 +913,30 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
       <div class="prod-grid" id="prodGrid"></div>
     </div>
   </div>
+  <div class="scr" id="scr-implantacao">
+    <!-- Abas por etapa -->
+    <div class="rel-tabs" id="implTabs">
+      <div class="rel-tab on" id="itab-todos"    onclick="setImplTab('todos')">Todos</div>
+      <div class="rel-tab" id="itab-briefing"   onclick="setImplTab('briefing')">📥 Briefing</div>
+      <div class="rel-tab" id="itab-dados"      onclick="setImplTab('dados')">📋 Aguard. Dados</div>
+      <div class="rel-tab" id="itab-config"     onclick="setImplTab('config')">⚙️ Configuração</div>
+      <div class="rel-tab" id="itab-kickoff"    onclick="setImplTab('kickoff')">🤝 Kickoff</div>
+      <div class="rel-tab" id="itab-treinamento" onclick="setImplTab('treinamento')">🎓 Treinamento</div>
+      <div class="rel-tab" id="itab-finais"     onclick="setImplTab('finais')">💬 Consid. Finais</div>
+      <div class="rel-tab" id="itab-golive"     onclick="setImplTab('golive')">🚀 Go-live</div>
+      <div class="rel-tab" id="itab-concluido"  onclick="setImplTab('concluido')">✅ Concluído</div>
+    </div>
+    <!-- Grid de projetos -->
+    <div class="empty" id="implEmpty" style="display:none">
+      <div class="empty-icon">🚀</div>
+      <div class="empty-title">Nenhum projeto de implantação</div>
+      <div class="empty-sub">Os projetos aparecem aqui quando um deal é fechado e o sinal é confirmado.</div>
+    </div>
+    <div class="impl-grid-wrap" id="implGridWrap">
+      <div class="impl-grid" id="implGrid"></div>
+    </div>
+  </div>
+
   <div class="scr" id="scr-config">
     <!-- Abas de config -->
     <div class="rel-tabs">
@@ -1009,6 +1075,70 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
 </div>
 
 <!-- ══ PRODUTOS PANEL ══ -->
+<!-- ══ MODAL REGISTRAR AULA ══ -->
+<div class="import-ov" id="aulaOv" onclick="if(event.target===this)closeAulaModal()">
+  <div class="import-modal" style="max-width:500px">
+    <div class="import-head">
+      <div class="p-title">🎓 Registrar aula concluída</div>
+      <button class="btn btn-g" onclick="closeAulaModal()" style="padding:6px;font-size:14px">✕</button>
+    </div>
+    <div class="import-body">
+      <input type="hidden" id="aulaImplId">
+      <div class="impl-aula-empresa" id="aulaEmpresa" style="background:var(--s2);border-radius:var(--rsm);padding:10px 14px;font-size:13px;font-weight:700;color:var(--tx);margin-bottom:16px"></div>
+      <div class="cfg-form">
+        <div class="cfg-row">
+          <label class="cfg-lbl">Tipo da aula</label>
+          <select class="fse" id="aulaTipo">
+            <option>Kickoff</option>
+            <option>Treinamento Operacional</option>
+            <option>Treinamento Comercial</option>
+            <option>Treinamento Financeiro</option>
+            <option>Treinamento Módulo AC</option>
+            <option>Considerações Finais</option>
+          </select>
+        </div>
+        <div class="cfg-row">
+          <label class="cfg-lbl">Link do vídeo gravado</label>
+          <input class="fi" id="aulaVideo" placeholder="https://drive.google.com/...">
+        </div>
+        <div class="cfg-row">
+          <label class="cfg-lbl">Resumo da aula (cole o resumo gerado pela IA)</label>
+          <textarea class="fi fta" id="aulaResumo" rows="6" placeholder="Cole aqui o resumo gerado pela IA após a gravação..."></textarea>
+        </div>
+        <div class="fgrid">
+          <div class="cfg-row">
+            <label class="cfg-lbl">Data da próxima aula</label>
+            <input class="fi" id="aulaProxData" type="date">
+          </div>
+          <div class="cfg-row">
+            <label class="cfg-lbl">Horário</label>
+            <input class="fi" id="aulaProxHora" type="time" value="08:30">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="import-foot">
+      <button class="btn btn-g" style="flex:1" onclick="closeAulaModal()">Cancelar</button>
+      <button class="btn btn-p" style="flex:2" onclick="saveAula()" id="aulaSaveBtn">
+        📧 Salvar e enviar resumo ao cliente
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAINEL DETALHE DO PROJETO ══ -->
+<div class="prod-panel-ov" id="implPanelOv" onclick="closeImplPanel()"></div>
+<div class="prod-panel" id="implPanel">
+  <div class="p-head">
+    <div>
+      <div class="p-title" id="implPanelTitle">Projeto</div>
+      <div id="implPanelMeta" style="font-size:11px;color:var(--t3);margin-top:2px"></div>
+    </div>
+    <button class="btn btn-g" onclick="closeImplPanel()" style="padding:6px;font-size:14px">✕</button>
+  </div>
+  <div class="p-body" id="implPanelBody"></div>
+</div>
+
 <div class="prod-panel-ov" id="prodPanelOv" onclick="closeProdPanel()"></div>
 <div class="prod-panel" id="prodPanel">
   <div class="p-head">
@@ -2353,13 +2483,13 @@ function runGSearch(q){
 
 // ══ SCREENS ══
 function showScr(name){
-  ['contatos','pipeline','followups','relatorios','produtos','config'].forEach(s=>{
+  ['contatos','pipeline','followups','relatorios','produtos','config','implantacao'].forEach(s=>{
     document.getElementById('scr-'+s).classList.remove('on');
     const nav=document.getElementById('nav-'+s);if(nav)nav.classList.remove('on');
   });
   document.getElementById('scr-'+name).classList.add('on');
   const nav=document.getElementById('nav-'+name);if(nav)nav.classList.add('on');
-  const titles={contatos:'Contatos',pipeline:'Pipeline de Vendas',followups:'Agenda de Hoje',relatorios:'Relatórios',produtos:'Produtos GO',config:'Configurações'};
+  const titles={contatos:'Contatos',pipeline:'Pipeline de Vendas',followups:'Agenda de Hoje',relatorios:'Relatórios',produtos:'Produtos GO',config:'Configurações',implantacao:'Implantação'};
   document.getElementById('mainTitle').textContent=titles[name]||name;
   // Botão contextual por tela
   const newBtn=document.getElementById('newBtn');
@@ -2378,6 +2508,7 @@ function showScr(name){
   if(name==='followups') renderAgenda();
   if(name==='relatorios') renderDashboard();
   if(name==='config') loadConfig();
+  if(name==='implantacao') loadImplantacoes();
 }
 
 // ══ TOAST ══
@@ -3428,6 +3559,299 @@ async function executarImport() {
   toast(`✅ ${ok} lead(s) importado(s)${erros > 0 ? ` · ${erros} erro(s)` : ''}`, ok > 0 ? 'ok' : 'err');
   closeImport();
   await syncAll();
+}
+
+// ══ IMPLANTAÇÃO ════════════════════════════════════════════
+let allImplantacoes = [];
+let implTab = 'todos';
+
+const IMPL_ETAPAS = {
+  'briefing':    { label:'Briefing Recebido',     cor:'#64748b', sla:1 },
+  'dados':       { label:'Aguardando Dados',       cor:'#f59e0b', sla:3 },
+  'config':      { label:'Configuração',           cor:'#3b82f6', sla:10 },
+  'kickoff':     { label:'Kickoff Realizado',      cor:'#8b5cf6', sla:null },
+  'treinamento': { label:'Em Treinamento',         cor:'#1D9E75', sla:null },
+  'finais':      { label:'Considerações Finais',   cor:'#f97316', sla:null },
+  'golive':      { label:'Go-live',                cor:'#22c55e', sla:30 },
+  'concluido':   { label:'Concluído',              cor:'#94a3b8', sla:null },
+};
+
+function setImplTab(tab) {
+  implTab = tab;
+  document.querySelectorAll('#implTabs .rel-tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('itab-'+tab)?.classList.add('on');
+  renderImplantacao();
+}
+
+async function loadImplantacoes() {
+  try {
+    const res = await apiGet('IMPLANTACAO');
+    if (res.success) allImplantacoes = res.data || [];
+    document.getElementById('implCount').textContent = allImplantacoes.filter(i=>i['Etapa']!=='concluido').length;
+    renderImplantacao();
+  } catch(e) { console.log('Sem dados de implantação ainda'); }
+}
+
+function renderImplantacao() {
+  let data = [...allImplantacoes];
+  if (implTab !== 'todos') data = data.filter(i => i['Etapa'] === implTab);
+  else data = data.filter(i => i['Etapa'] !== 'concluido'); // padrão: esconde concluídos
+
+  const grid   = document.getElementById('implGrid');
+  const empty  = document.getElementById('implEmpty');
+  const wrap   = document.getElementById('implGridWrap');
+
+  if (data.length === 0) {
+    grid.innerHTML = ''; empty.style.display='flex'; wrap.style.display='none'; return;
+  }
+  empty.style.display='none'; wrap.style.display='block';
+  grid.innerHTML = data.map(impl => implCardHTML(impl)).join('');
+}
+
+function implCardHTML(impl) {
+  const etapaKey  = impl['Etapa'] || 'briefing';
+  const etapaInfo = IMPL_ETAPAS[etapaKey] || IMPL_ETAPAS['briefing'];
+  const cor       = etapaInfo.cor;
+
+  // Dados básicos
+  const empresa    = impl['Cliente'] || impl['Empresa'] || '—';
+  const contato    = impl['Contato'] || '—';
+  const telefone   = impl['Telefone'] || '';
+  const idDeal     = impl['ID Deal'] || '';
+
+  // Busca dados do deal/contato
+  const deal    = allDeals.find(d=>d['ID']===idDeal) || {};
+  const contObj = allContatos.find(c=>c['ID']===deal['ID Contato']) || {};
+  const tel     = telefone || contObj['Telefone'] || '—';
+  const nomeC   = contato !== '—' ? contato : (contObj['Nome Contato'] || '—');
+  const email   = contObj['Email'] || '—';
+
+  // Módulos do deal
+  const prodStr  = deal['Produtos Selecionados'] || impl['Módulos'] || '';
+  const modulos  = prodStr ? prodStr.split('||').map(p=>p.split('::')[1]||p.split('::')[0]).filter(Boolean) : [];
+
+  // Aulas
+  const aulasTotal = Number(impl['Qtd Aulas Previstas']) || 2;
+  const aulasFeitas= Number(impl['Qtd Aulas Realizadas']) || 0;
+  const dotsHtml   = Array.from({length: aulasTotal+1}, (_,i) => {
+    if (i === 0) return ''; // kickoff separado
+    const cls = i < aulasFeitas ? 'impl-dot-done' : i === aulasFeitas ? 'impl-dot-curr' : 'impl-dot-pend';
+    return `<div class="impl-dot ${cls}"></div>`;
+  }).join('');
+
+  // NPS
+  const nps     = Number(impl['NPS Médio']) || 0;
+  const npsResp = Number(impl['Total Pesquisas']) || 0;
+  const starsHtml = nps > 0 ? Array.from({length:5},(_,i)=>
+    `<span style="color:${i<Math.round(nps)?'#f59e0b':'var(--bd2)'}">★</span>`).join('') : '';
+
+  // SLA
+  const slaHtml = (() => {
+    if (!etapaInfo.sla) return '';
+    const inicio = impl['Data Início'] ? new Date(impl['Data Início']) : null;
+    if (!inicio) return '';
+    const hoje     = new Date(); hoje.setHours(0,0,0,0);
+    const diasTotal = etapaInfo.sla;
+    const diasPass  = Math.floor((hoje-inicio)/(1000*60*60*24));
+    const diasRest  = Math.max(diasTotal-diasPass, 0);
+    const pct       = Math.min(Math.round((diasPass/diasTotal)*100),100);
+    const corSla    = diasRest<=2?'var(--re)':diasRest<=5?'var(--ye)':'var(--ac)';
+    return `<div class="impl-sla-wrap">
+      <div class="impl-sla-row">
+        <span class="impl-sla-lbl">SLA ${etapaKey==='golive'?'suporte':'configuração'}</span>
+        <span class="impl-sla-dias" style="color:${corSla}">${diasRest}d restantes</span>
+      </div>
+      <div class="impl-sla-bar"><div class="impl-sla-fill" style="width:${pct}%;background:${corSla}"></div></div>
+    </div>`;
+  })();
+
+  // Próxima aula
+  const proxAula = impl['Próxima Aula'] || '';
+  const proxHtml = proxAula ? `<div class="impl-proxima">
+    <span class="impl-proxima-badge">${proxAula}</span>
+    <span>${impl['Tipo Próxima Aula']||'Treinamento'}</span>
+  </div>` : '';
+
+  // Chamado Felipe
+  const chamado = impl['Chamado Felipe'] || 'pendente';
+  const chamadoHtml = `<div class="impl-chamado">
+    <span class="${chamado==='liberado'?'impl-ch-ok':'impl-ch-wait'}">
+      ${chamado==='liberado'?'✓ Acesso liberado':'⏳ Chamado Felipe pendente'}
+    </span>
+  </div>`;
+
+  return `<div class="impl-card" id="implcard-${impl['ID']}">
+    <div class="impl-stripe" style="background:${cor}"></div>
+    <div class="impl-head">
+      <div class="impl-empresa">${empresa}</div>
+      <span class="impl-etapa-badge" style="background:${cor}22;color:${cor}">${etapaInfo.label}</span>
+      <div class="impl-contato">${nomeC} · ${tel}</div>
+      <div class="impl-contato" style="font-size:11px">${email}</div>
+    </div>
+    <div class="impl-divider"></div>
+    <div class="impl-section">
+      ${modulos.length>0?`<div class="impl-lbl">Módulos</div>
+      <div class="impl-modulos">${modulos.slice(0,3).map(m=>`<span class="impl-mod">${m}</span>`).join('')}${modulos.length>3?`<span class="impl-mod">+${modulos.length-3}</span>`:''}</div>`:''}
+      <div class="impl-lbl">Aulas</div>
+      <div class="impl-aulas-row">
+        <div class="impl-dots" style="flex:1">${dotsHtml}</div>
+        <span class="impl-aulas-txt">${aulasFeitas}/${aulasTotal} concluídas</span>
+      </div>
+      ${nps>0?`<div class="impl-lbl">Satisfação</div>
+      <div class="impl-nps-row">
+        <span style="font-size:13px">${starsHtml}</span>
+        <span class="impl-nps-txt">${nps.toFixed(1)} · ${npsResp} pesquisa(s)</span>
+      </div>`:''}
+      ${slaHtml}
+      ${proxHtml}
+      ${chamadoHtml}
+    </div>
+    <div class="impl-actions">
+      <div class="impl-btn-aula" onclick="openAulaModal('${impl['ID']}','${empresa.replace(/'/g,"\\'")}')">+ Registrar aula</div>
+      <div class="impl-btn-ver" onclick="openImplPanel('${impl['ID']}')">Ver projeto</div>
+    </div>
+  </div>`;
+}
+
+// ── Modal registrar aula ──
+function openAulaModal(implId, empresa) {
+  document.getElementById('aulaImplId').value = implId;
+  document.getElementById('aulaEmpresa').textContent = empresa;
+  document.getElementById('aulaVideo').value = '';
+  document.getElementById('aulaResumo').value = '';
+  document.getElementById('aulaProxData').value = '';
+  document.getElementById('aulaProxHora').value = '08:30';
+  document.getElementById('aulaOv').classList.add('open');
+}
+function closeAulaModal() { document.getElementById('aulaOv').classList.remove('open'); }
+
+async function saveAula() {
+  if (isProcessing) return;
+  const implId  = document.getElementById('aulaImplId').value;
+  const tipo    = document.getElementById('aulaTipo').value;
+  const video   = document.getElementById('aulaVideo').value.trim();
+  const resumo  = document.getElementById('aulaResumo').value.trim();
+  const proxData= document.getElementById('aulaProxData').value;
+  const proxHora= document.getElementById('aulaProxHora').value;
+
+  if (!resumo) { toast('⚠ Cole o resumo da aula antes de salvar','warn'); return; }
+
+  const btn = document.getElementById('aulaSaveBtn');
+  btn.disabled=true; btn.textContent='⏳ Salvando...';
+  isProcessing=true;
+
+  const proxAula = proxData ? `${proxData.split('-').reverse().join('/')}${proxHora?' às '+proxHora:''}` : '';
+
+  try {
+    const res = await apiPost({
+      action:'REGISTRAR_AULA',
+      payload:{ implId, tipo, video, resumo, proxAula, tipoProx: tipo },
+      usuario: currentUser.nome
+    });
+    if (res.success) {
+      toast('✅ Aula registrada! Resumo enviado ao cliente.','ok');
+      closeAulaModal();
+      await loadImplantacoes();
+    } else { toast('❌ Erro: '+(res.error||''),'err'); }
+  } catch(e) { toast('❌ Erro de conexão','err'); }
+  finally { isProcessing=false; btn.disabled=false; btn.textContent='📧 Salvar e enviar resumo ao cliente'; }
+}
+
+// ── Painel detalhe do projeto ──
+function openImplPanel(id) {
+  const impl = allImplantacoes.find(i=>i['ID']===id); if(!impl) return;
+  const etapaInfo = IMPL_ETAPAS[impl['Etapa']] || IMPL_ETAPAS['briefing'];
+  document.getElementById('implPanelTitle').textContent = impl['Cliente']||impl['Empresa']||'Projeto';
+  document.getElementById('implPanelMeta').innerHTML =
+    `<span style="background:${etapaInfo.cor}22;color:${etapaInfo.cor};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">${etapaInfo.label}</span>`;
+
+  const deal   = allDeals.find(d=>d['ID']===impl['ID Deal'])||{};
+  const contato= allContatos.find(c=>c['ID']===deal['ID Contato'])||{};
+
+  document.getElementById('implPanelBody').innerHTML = `
+    <div class="fsect">
+      <div class="fsect-lbl">Cliente</div>
+      <div style="background:var(--s2);border-radius:var(--rsm);padding:12px 14px;font-size:13px">
+        <div style="font-weight:700;color:var(--tx);margin-bottom:4px">${impl['Cliente']||'—'}</div>
+        <div style="color:var(--t2)">${contato['Nome Contato']||'—'} · ${contato['Telefone']||'—'}</div>
+        <div style="color:var(--t2)">${contato['Email']||'—'}</div>
+      </div>
+    </div>
+    <div class="fsect">
+      <div class="fsect-lbl">Avançar etapa</div>
+      <select class="fse" id="implEtapaSelect" style="margin-bottom:10px">
+        ${Object.entries(IMPL_ETAPAS).map(([k,v])=>`<option value="${k}" ${k===impl['Etapa']?'selected':''}>${v.label}</option>`).join('')}
+      </select>
+      <button class="btn btn-p" style="width:100%" onclick="avancarEtapaImpl('${id}')">Salvar etapa</button>
+    </div>
+    <div class="fsect">
+      <div class="fsect-lbl">Chamado Felipe</div>
+      <select class="fse" id="implChamadoSelect" style="margin-bottom:10px">
+        <option value="pendente" ${(impl['Chamado Felipe']||'pendente')==='pendente'?'selected':''}>⏳ Aguardando</option>
+        <option value="aberto"   ${impl['Chamado Felipe']==='aberto'?'selected':''}>📋 Aberto no TomTicket</option>
+        <option value="liberado" ${impl['Chamado Felipe']==='liberado'?'selected':''}>✓ Acesso liberado</option>
+      </select>
+      <button class="btn btn-g" style="width:100%" onclick="salvarChamadoImpl('${id}')">Atualizar chamado</button>
+    </div>
+    <div class="fsect">
+      <div class="fsect-lbl">Configuração de aulas</div>
+      <div class="fgrid">
+        <div><label class="fl">Aulas previstas</label>
+          <input class="fi" id="implAulasTotal" type="number" value="${impl['Qtd Aulas Previstas']||2}" min="1" max="10">
+        </div>
+        <div><label class="fl">Aulas realizadas</label>
+          <input class="fi" id="implAulasFeitas" type="number" value="${impl['Qtd Aulas Realizadas']||0}" min="0" max="10">
+        </div>
+      </div>
+      <button class="btn btn-g" style="width:100%;margin-top:10px" onclick="salvarAulasImpl('${id}')">Salvar configuração</button>
+    </div>
+    <div class="fsect">
+      <div class="fsect-lbl">Observações</div>
+      <textarea class="fi fta" id="implObs" rows="3">${impl['Observações']||''}</textarea>
+      <button class="btn btn-g" style="width:100%;margin-top:8px" onclick="salvarObsImpl('${id}')">Salvar obs.</button>
+    </div>`;
+
+  document.getElementById('implPanel').classList.add('open');
+  document.getElementById('implPanelOv').classList.add('open');
+}
+
+function closeImplPanel() {
+  document.getElementById('implPanel').classList.remove('open');
+  document.getElementById('implPanelOv').classList.remove('open');
+}
+
+async function avancarEtapaImpl(id) {
+  const etapa = document.getElementById('implEtapaSelect').value;
+  try {
+    const res = await apiPost({action:'ATUALIZAR_IMPLANTACAO',payload:{id,etapa},usuario:currentUser.nome});
+    if(res.success){toast('✅ Etapa atualizada!','ok');closeImplPanel();await loadImplantacoes();}
+    else toast('❌ Erro','err');
+  } catch(e){toast('❌ Erro de conexão','err');}
+}
+
+async function salvarChamadoImpl(id) {
+  const chamado = document.getElementById('implChamadoSelect').value;
+  try {
+    const res = await apiPost({action:'ATUALIZAR_IMPLANTACAO',payload:{id,chamadoFelipe:chamado},usuario:currentUser.nome});
+    if(res.success){toast('✅ Chamado atualizado!','ok');closeImplPanel();await loadImplantacoes();}
+  } catch(e){toast('❌ Erro','err');}
+}
+
+async function salvarAulasImpl(id) {
+  const qtdTotal  = document.getElementById('implAulasTotal').value;
+  const qtdFeitas = document.getElementById('implAulasFeitas').value;
+  try {
+    const res = await apiPost({action:'ATUALIZAR_IMPLANTACAO',payload:{id,qtdAulasPrevistas:qtdTotal,qtdAulasRealizadas:qtdFeitas},usuario:currentUser.nome});
+    if(res.success){toast('✅ Aulas atualizadas!','ok');closeImplPanel();await loadImplantacoes();}
+  } catch(e){toast('❌ Erro','err');}
+}
+
+async function salvarObsImpl(id) {
+  const obs = document.getElementById('implObs').value;
+  try {
+    const res = await apiPost({action:'ATUALIZAR_IMPLANTACAO',payload:{id,observacoes:obs},usuario:currentUser.nome});
+    if(res.success) toast('✅ Observações salvas!','ok');
+  } catch(e){toast('❌ Erro','err');}
 }
 
 // ══ INITIAL RENDER ══
