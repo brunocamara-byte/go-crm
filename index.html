@@ -3466,6 +3466,27 @@ function processarCSV(file) {
   if (!file.name.endsWith('.csv')) {
     toast('Arquivo deve ser .csv', 'err'); return;
   }
+
+  // Normaliza prioridade — aceita qualquer variação de texto
+  const normalizarPrioridade = (val) => {
+    const v = (val||'').toLowerCase().trim().replace(/[^a-z]/g,'');
+    if (v.includes('quente') || v === 'q' || v === 'hot')  return '🔥 Quente';
+    if (v.includes('frio')   || v === 'f' || v === 'cold') return '❄️ Frio';
+    return '🌡 Morno'; // padrão
+  };
+
+  // Normaliza origem — aceita texto parcial sem acento
+  const normalizarOrigem = (val) => {
+    const v = (val||'').toLowerCase().trim();
+    if (v.includes('nicolau'))              return 'Indicação — Nicolau';
+    if (v.includes('soluti'))               return 'Indicação — Soluti';
+    if (v.includes('prime'))                return 'Indicação — Prime';
+    if (v.includes('site'))                 return 'Site';
+    if (v.includes('whats') || v.includes('zap')) return 'WhatsApp';
+    if (v.includes('linked'))               return 'LinkedIn';
+    if (v.includes('prospe') || v.includes('samuel')) return 'Prospecção Samuel';
+    return val || 'Indicação — Nicolau'; // mantém original se não reconhecer
+  };
   const reader = new FileReader();
   reader.onload = e => {
     const texto = e.target.result;
@@ -3497,8 +3518,8 @@ function processarCSV(file) {
         nomeContato:  cols[2] || '',
         telefone:     cols[3] || '',
         email:        cols[4] || '',
-        origem:       cols[5] || 'Indicação — Nicolau',
-        prioridade:   cols[6] || '🌡 Morno',
+        origem:       normalizarOrigem(cols[5]),
+        prioridade:   normalizarPrioridade(cols[6]),
         observacoes:  cols[7] || '',
         responsavel:  'Samuel Mateus',
         atribuidoPor: currentUser.nome,
