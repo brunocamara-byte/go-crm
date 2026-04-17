@@ -2858,7 +2858,7 @@ function runGSearch(q){
 // ══ SCREENS ══
 function showScr(name){
   if(!podeVerTela(name)){const home=PERFIL_HOME[currentUser.perfil]||'pipeline';if(name!==home){showScr(home);return;}}
-  ['contatos','pipeline','followups','relatorios','produtos','config','implantacao','agenda-impl'].forEach(s=>{
+  ['contatos','pipeline','followups','relatorios','produtos','config','implantacao','agenda-impl','dash-impl'].forEach(s=>{
     const scr=document.getElementById('scr-'+s);if(scr)scr.classList.remove('on');
     const nav=document.getElementById('nav-'+s);if(nav)nav.classList.remove('on');
   });
