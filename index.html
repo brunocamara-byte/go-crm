@@ -870,6 +870,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
           </div>
         </div>
 
+        <!-- Bloco Implantação -->
+        <div class="dash-card">
+          <div class="dash-card-title">🚀 Projetos de Implantação</div>
+          <div id="dashImplantacao"></div>
+        </div>
+
       </div>
     </div>
 
@@ -3217,6 +3223,93 @@ function renderNicolau() {
           <div class="origem-pct">${pct}%</div>
         </div>`;
       }).join('');
+
+  // Bloco implantação
+  renderDashImplantacao();
+}
+
+function renderDashImplantacao() {
+  const el = document.getElementById('dashImplantacao');
+  if (!el) return;
+
+  const ativos = (allImplantacoes||[]).filter(i => i['Etapa'] !== 'concluido' && i['Status'] !== 'Cancelado');
+
+  if (ativos.length === 0) {
+    el.innerHTML = '<div style="color:var(--t3);font-size:13px;text-align:center;padding:16px">Nenhum projeto ativo no momento.</div>';
+    return;
+  }
+
+  // Métricas gerais
+  const npsTotal = ativos.filter(i=>Number(i['NPS Médio'])>0);
+  const npsMedia = npsTotal.length > 0
+    ? (npsTotal.reduce((s,i)=>s+Number(i['NPS Médio']),0)/npsTotal.length).toFixed(1)
+    : '—';
+
+  const emRisco = ativos.filter(i => {
+    if (!i['Data Início'] || !IMPL_ETAPAS[i['Etapa']]?.sla) return false;
+    const inicio = new Date(i['Data Início']);
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const dias = Math.floor((hoje-inicio)/(1000*60*60*24));
+    const sla = IMPL_ETAPAS[i['Etapa']].sla;
+    return sla && (sla - dias) <= 2;
+  }).length;
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+      <div style="background:var(--s2);border-radius:var(--rsm);padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:800;color:var(--ac)">${ativos.length}</div>
+        <div style="font-size:11px;color:var(--t3)">Projetos ativos</div>
+      </div>
+      <div style="background:var(--s2);border-radius:var(--rsm);padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:800;color:var(--gn)">${npsMedia}</div>
+        <div style="font-size:11px;color:var(--t3)">NPS médio</div>
+      </div>
+      <div style="background:var(--s2);border-radius:var(--rsm);padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:800;color:${emRisco>0?'var(--re)':'var(--gn)'}">${emRisco}</div>
+        <div style="font-size:11px;color:var(--t3)">SLA em risco</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${ativos.map(impl => {
+        const etapaInfo = IMPL_ETAPAS[impl['Etapa']] || IMPL_ETAPAS['briefing'];
+        const cor = etapaInfo.cor;
+        const aulasFeitas = Number(impl['Qtd Aulas Realizadas'])||0;
+        const aulasTotal  = Number(impl['Qtd Aulas Previstas'])||2;
+        const pctAulas = aulasTotal > 0 ? Math.round((aulasFeitas/aulasTotal)*100) : 0;
+        const nps = Number(impl['NPS Médio'])||0;
+        const stars = nps>0 ? Array.from({length:5},(_,i)=>
+          `<span style="color:${i<Math.round(nps)?'#f59e0b':'var(--bd2)'}">★</span>`).join('') : '';
+
+        // SLA
+        let slaHtml = '';
+        if (impl['Data Início'] && etapaInfo.sla) {
+          const inicio = new Date(impl['Data Início']);
+          const hoje = new Date(); hoje.setHours(0,0,0,0);
+          const diasPass = Math.floor((hoje-inicio)/(1000*60*60*24));
+          const diasRest = Math.max(etapaInfo.sla - diasPass, 0);
+          const corSla = diasRest<=2?'var(--re)':diasRest<=5?'var(--ye)':'var(--t3)';
+          slaHtml = `<span style="font-size:11px;color:${corSla};font-weight:700">${diasRest}d SLA</span>`;
+        }
+
+        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;
+          background:var(--s2);border-radius:var(--rsm);border-left:3px solid ${cor}">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:3px">${impl['Cliente']||'—'}</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;background:${cor}22;color:${cor}">${etapaInfo.label}</span>
+              ${stars ? `<span style="font-size:11px">${stars}</span>` : ''}
+              ${slaHtml}
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:11px;color:var(--t3);margin-bottom:4px">${aulasFeitas}/${aulasTotal} aulas</div>
+            <div style="width:80px;height:5px;background:var(--s3);border-radius:3px;overflow:hidden">
+              <div style="height:100%;width:${pctAulas}%;background:${cor};border-radius:3px"></div>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
 }
 
 // ── VISÃO SAMUEL ─────────────────────────────────────────────
