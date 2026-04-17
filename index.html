@@ -704,9 +704,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
     <div class="sb-lb">Principal</div>
     <div class="nv" id="nav-pipeline" onclick="showScr('pipeline')"><span>⚡</span><span>Pipeline</span><span class="nb" id="dealCount">0</span></div>
     <div class="nv on" id="nav-contatos" onclick="showScr('contatos')"><span>👥</span><span>Contatos</span><span class="nb" id="ctCount">0</span></div>
-    <div class="nv" id="nav-followups" onclick="showScr('followups')"><span>📅</span><span>Agenda de Hoje</span></div>
+    <div class="nv" id="nav-followups" onclick="showScr('followups')"><span>📅</span><span>Agenda Comercial</span></div>
     <div class="nv" id="nav-relatorios" onclick="showScr('relatorios')"><span>📊</span><span>Relatórios</span></div>
     <div class="nv" id="nav-implantacao" onclick="showScr('implantacao')"><span>🚀</span><span>Implantação</span><span class="nb" id="implCount">0</span></div>
+    <div class="nv" id="nav-agenda-impl" onclick="showScr('agenda-impl')"><span>📆</span><span>Agenda Implantação</span></div>
     <div class="sb-lb" style="margin-top:6px">Sistema</div>
     <div class="nv" id="nav-produtos" onclick="showScr('produtos')"><span>📦</span><span>Produtos GO</span></div>
     <div class="nv" id="nav-config" onclick="showScr('config')"><span>⚙️</span><span>Config</span></div>
@@ -727,6 +728,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
     <div class="tb-r" id="tbRight">
       <button class="btn btn-g" onclick="openGSearch()" title="Ctrl+K">🔍 Ctrl+K</button>
       <button class="btn btn-g" id="syncBtn" onclick="syncAll()">🔄 Sincronizar</button>
+      <button class="btn btn-g" id="benchBtn" onclick="injetarDadosTeste()" title="Inserir 10 cards de teste" style="font-size:11px;opacity:.5">📊 Demo</button>
       <button class="btn btn-g" id="importLeadsBtn" onclick="openImport()" style="display:none">📥 Importar</button>
       <button class="btn btn-p" id="newBtn" onclick="openPanel('new')">+ Novo Contato</button>
     </div>
@@ -934,6 +936,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
     </div>
     <div class="impl-grid-wrap" id="implGridWrap">
       <div class="impl-grid" id="implGrid"></div>
+    </div>
+  </div>
+
+  <!-- ══ AGENDA DE IMPLANTAÇÃO — Matheus ══ -->
+  <div class="scr" id="scr-agenda-impl">
+    <div class="agenda-header">
+      <div class="agenda-date-nav">
+        <button class="btn btn-g" onclick="mudarSemanaImpl(-1)">←</button>
+        <div class="agenda-date-lbl" id="implAgendaLbl">Esta semana</div>
+        <button class="btn btn-g" onclick="mudarSemanaImpl(1)">→</button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="fcp on" id="iagf-todos" onclick="setImplAgendaFiltro('todos',this)">Todos</div>
+        <div class="fcp" id="iagf-hoje" onclick="setImplAgendaFiltro('hoje',this)">Hoje</div>
+        <div class="fcp" id="iagf-semana" onclick="setImplAgendaFiltro('semana',this)">Semana</div>
+      </div>
+    </div>
+    <div class="agenda-list-wrap" id="implAgendaWrap">
+      <div id="implAgendaList"></div>
     </div>
   </div>
 
@@ -1366,6 +1387,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);heigh
           <label class="fl">Observações</label>
           <textarea class="fi fta" id="dpObs" rows="3" placeholder="Contexto do negócio, objeções, próximos passos..."></textarea>
         </div>
+      </div>
+    </div>
+
+    <!-- HISTÓRICO DE VIDA DO CLIENTE -->
+    <div class="fsect" id="dpTimelineSection">
+      <div class="fsect-lbl">Histórico de vida do cliente</div>
+      <div id="dpTimeline" style="position:relative;padding-left:18px;border-left:2px solid var(--bd)">
+        <div style="font-size:12px;color:var(--t3);padding:12px 0">Carregando histórico...</div>
       </div>
     </div>
 
@@ -1938,6 +1967,9 @@ function openDealPanel(id) {
 
   document.getElementById('dpObs').value = d['Observações'] || '';
 
+  // Renderiza histórico de vida do cliente
+  renderTimeline(id, d['ID Contato']);
+
   // Renderiza lista de produtos e selecionados
   renderProdSel('');
   renderProdSelecionados();
@@ -2133,6 +2165,104 @@ function askDeleteDealDirect() {
   const empresa = document.getElementById('dealPanelTitle').textContent;
   askDeleteDeal(editingId, empresa);
   closeDealPanel();
+}
+
+// ══ HISTÓRICO DE VIDA DO CLIENTE (TIMELINE) ═════════════════
+function renderTimeline(dealId, contatoId) {
+  const wrap = document.getElementById('dpTimeline');
+  if (!wrap) return;
+
+  // Ícones e cores por tipo de evento
+  const TIPO_ICON = {
+    'Lead criado':       { icon:'★', cor:'#4f7cff', label:'Lead criado' },
+    'Ligação':           { icon:'◉', cor:'#22d07a', label:'Ligação' },
+    'Proposta enviada':  { icon:'◈', cor:'#f5b731', label:'Proposta enviada' },
+    'Deal fechado':      { icon:'✦', cor:'#22c55e', label:'Deal fechado' },
+    'Briefing enviado':  { icon:'◆', cor:'#8b5cf6', label:'Briefing para Matheus' },
+    'Kickoff realizado': { icon:'▲', cor:'#06b6d4', label:'Kickoff realizado' },
+    'Aula concluída':    { icon:'●', cor:'#1D9E75', label:'Aula concluída' },
+    'Chamado Felipe aberto':{ icon:'◇', cor:'#f97316', label:'Chamado Felipe' },
+  };
+
+  // Filtra atividades deste deal + contato
+  const ativs = (window._atividades||[])
+    .filter(a => a['ID Deal']===dealId || a['ID Contato']===contatoId);
+
+  // Busca implantação relacionada
+  const impl = (allImplantacoes||[]).find(i=>i['ID Deal']===dealId) || null;
+
+  // Monta eventos — atividades + deal criado + implantação
+  const deal = allDeals.find(d=>d['ID']===dealId)||{};
+  const eventos = [];
+
+  // Evento inicial — lead criado (data do deal)
+  eventos.push({
+    tipo:'Lead criado',
+    data: deal['Data Criação'] || deal['Criado Em'] || '',
+    nota:`Lead cadastrado por ${deal['Criado Por']||'Sistema'}`,
+    statusLigacao:'Lead cadastrado',
+  });
+
+  // Atividades registradas
+  ativs.forEach(av => {
+    eventos.push({
+      tipo: av['Tipo'] || 'Ligação',
+      data: av['Data'] || av['Criado Em'] || '',
+      nota: av['Nota'] || '',
+      statusLigacao: av['Status Ligação'] || av['Status'] || '',
+    });
+  });
+
+  // Deal fechado?
+  if (deal['Etapa']==='Fechado' && deal['Data Fechamento']) {
+    eventos.push({ tipo:'Deal fechado', data:deal['Data Fechamento'], nota:`Fechado por ${deal['Responsável']||'—'}`, statusLigacao:'' });
+  }
+
+  // Implantação
+  if (impl) {
+    if (impl['Data Início']) {
+      eventos.push({ tipo:'Briefing enviado', data:impl['Data Início'], nota:'Implantação iniciada — Matheus notificado', statusLigacao:'' });
+    }
+    const aulasFeitas = Number(impl['Qtd Aulas Realizadas'])||0;
+    for (let i=1; i<=aulasFeitas; i++) {
+      eventos.push({ tipo:'Aula concluída', data:'', nota:`Aula ${i} concluída`, statusLigacao:impl['Tipo Próxima Aula']||'Treinamento' });
+    }
+  }
+
+  // Ordena por data (eventos sem data vão ao final)
+  eventos.sort((a,b) => {
+    if (!a.data && !b.data) return 0;
+    if (!a.data) return 1;
+    if (!b.data) return -1;
+    return new Date(a.data) - new Date(b.data);
+  });
+
+  if (eventos.length === 0) {
+    wrap.innerHTML = '<div style="font-size:12px;color:var(--t3);padding:12px 0">Nenhum histórico registrado ainda.</div>';
+    return;
+  }
+
+  wrap.innerHTML = eventos.map((ev,i) => {
+    const info = TIPO_ICON[ev.tipo] || { icon:'○', cor:'var(--t3)', label:ev.tipo };
+    const dataFmt = ev.data ? (() => {
+      try {
+        const dt = new Date(ev.data);
+        return isNaN(dt) ? ev.data : dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'2-digit'});
+      } catch(e) { return ev.data; }
+    })() : '';
+
+    return `<div style="position:relative;margin-bottom:14px;padding-left:14px">
+      <div style="position:absolute;left:-22px;top:2px;width:14px;height:14px;border-radius:50%;
+        background:${info.cor};display:flex;align-items:center;justify-content:center;
+        font-size:8px;color:#fff;font-weight:700;flex-shrink:0">${info.icon}</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px">
+        <span style="font-size:12px;font-weight:700;color:var(--tx)">${info.label}</span>
+        ${dataFmt?`<span style="font-size:10px;color:var(--t3);font-family:'DM Mono',monospace">${dataFmt}</span>`:''}
+        ${ev.statusLigacao?`<span style="font-size:10px;color:${info.cor}">${ev.statusLigacao}</span>`:''}
+      </div>
+      ${ev.nota?`<div style="font-size:12px;color:var(--t2);line-height:1.4">${ev.nota}</div>`:''}
+    </div>`;
+  }).join('');
 }
 
 // ══ CONTACT PANEL ══
@@ -2483,15 +2613,15 @@ function runGSearch(q){
 
 // ══ SCREENS ══
 function showScr(name){
-  ['contatos','pipeline','followups','relatorios','produtos','config','implantacao'].forEach(s=>{
-    document.getElementById('scr-'+s).classList.remove('on');
+  if(!podeVerTela(name)){const home=PERFIL_HOME[currentUser.perfil]||'pipeline';if(name!==home){showScr(home);return;}}
+  ['contatos','pipeline','followups','relatorios','produtos','config','implantacao','agenda-impl'].forEach(s=>{
+    const scr=document.getElementById('scr-'+s);if(scr)scr.classList.remove('on');
     const nav=document.getElementById('nav-'+s);if(nav)nav.classList.remove('on');
   });
   document.getElementById('scr-'+name).classList.add('on');
   const nav=document.getElementById('nav-'+name);if(nav)nav.classList.add('on');
-  const titles={contatos:'Contatos',pipeline:'Pipeline de Vendas',followups:'Agenda de Hoje',relatorios:'Relatórios',produtos:'Produtos GO',config:'Configurações',implantacao:'Implantação'};
+  const titles={contatos:'Contatos',pipeline:'Pipeline de Vendas',followups:'Agenda Comercial',relatorios:'Relatórios',produtos:'Produtos GO',config:'Configurações',implantacao:'Implantação','agenda-impl':'Agenda de Implantação'};
   document.getElementById('mainTitle').textContent=titles[name]||name;
-  // Botão contextual por tela
   const newBtn=document.getElementById('newBtn');
   if(name==='contatos'){
     newBtn.style.display='flex';newBtn.textContent='+ Novo Contato';newBtn.onclick=()=>openPanel('new');
@@ -2509,6 +2639,7 @@ function showScr(name){
   if(name==='relatorios') renderDashboard();
   if(name==='config') loadConfig();
   if(name==='implantacao') loadImplantacoes();
+  if(name==='agenda-impl') loadImplantacoes().then(()=>renderImplAgenda());
 }
 
 // ══ TOAST ══
@@ -3875,50 +4006,240 @@ async function salvarObsImpl(id) {
   } catch(e){toast('❌ Erro','err');}
 }
 
+// ══ GOVERNANÇA DE PERFIS ═════════════════════════════════════
+const PERFIL_MENUS = {
+  'Manager':     ['pipeline','contatos','followups','relatorios','implantacao','agenda-impl','produtos','config'],
+  'CEO':         ['pipeline','contatos','relatorios','implantacao','agenda-impl','produtos','config'],
+  'CTO':         ['pipeline','contatos','relatorios','implantacao','agenda-impl','produtos','config'],
+  'Vendedor':    ['pipeline','contatos','followups','relatorios'],
+  'Implantação': ['implantacao','agenda-impl'],
+};
+const PERFIL_HOME = {
+  'Manager':'pipeline','CEO':'pipeline','CTO':'pipeline',
+  'Vendedor':'pipeline','Implantação':'implantacao',
+};
+
+function aplicarGovernanca() {
+  const perfil = currentUser.perfil || 'Vendedor';
+  const menus  = PERFIL_MENUS[perfil] || PERFIL_MENUS['Vendedor'];
+  ['pipeline','contatos','followups','relatorios','implantacao','agenda-impl','produtos','config'].forEach(id => {
+    const el = document.getElementById('nav-' + id);
+    if (el) el.style.display = menus.includes(id) ? 'flex' : 'none';
+  });
+}
+
+function podeVerTela(name) {
+  const perfil = currentUser.perfil || 'Vendedor';
+  return (PERFIL_MENUS[perfil] || []).includes(name);
+}
+
+// ══ AGENDA DE IMPLANTAÇÃO — Matheus ═════════════════════════
+let implAgendaOffset = 0;
+let implAgendaFiltro = 'todos';
+
+function setImplAgendaFiltro(f, el) {
+  implAgendaFiltro = f;
+  document.querySelectorAll('#scr-agenda-impl .fcp').forEach(b => b.classList.remove('on'));
+  if (el) el.classList.add('on');
+  renderImplAgenda();
+}
+
+function mudarSemanaImpl(delta) {
+  implAgendaOffset += delta;
+  renderImplAgenda();
+}
+
+function renderImplAgenda() {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const inicioSem = new Date(hoje);
+  inicioSem.setDate(hoje.getDate() - hoje.getDay() + 1 + (implAgendaOffset * 7));
+  const fimSem = new Date(inicioSem); fimSem.setDate(inicioSem.getDate() + 6);
+
+  const lbl = document.getElementById('implAgendaLbl');
+  if (lbl) {
+    if (implAgendaOffset === 0) lbl.textContent = 'Esta semana';
+    else if (implAgendaOffset === 1) lbl.textContent = 'Próxima semana';
+    else if (implAgendaOffset === -1) lbl.textContent = 'Semana passada';
+    else lbl.textContent = inicioSem.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) + ' – ' + fimSem.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+  }
+
+  const eventos = [];
+  allImplantacoes.forEach(impl => {
+    if (!impl['Próxima Aula']) return;
+    const empresa  = impl['Cliente'] || impl['Empresa'] || '—';
+    const etapaInfo= IMPL_ETAPAS[impl['Etapa']] || IMPL_ETAPAS['briefing'];
+    let dataEvento = null;
+    const proxAula = String(impl['Próxima Aula']);
+    const matchData= proxAula.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+    const matchHora= proxAula.match(/(\d{2}):(\d{2})/);
+    if (matchData) {
+      dataEvento = new Date(parseInt(matchData[3]), parseInt(matchData[2])-1, parseInt(matchData[1]),
+        matchHora ? parseInt(matchHora[1]) : 8, matchHora ? parseInt(matchHora[2]) : 30);
+    } else if (proxAula.includes('T')) {
+      dataEvento = new Date(proxAula);
+    }
+    if (!dataEvento || isNaN(dataEvento)) return;
+    const soData = new Date(dataEvento); soData.setHours(0,0,0,0);
+    if (implAgendaFiltro === 'hoje' && soData.getTime() !== hoje.getTime()) return;
+    if (soData < inicioSem || soData > fimSem) return;
+    eventos.push({ impl, dataEvento, empresa, etapaInfo });
+  });
+
+  eventos.sort((a,b) => a.dataEvento - b.dataEvento);
+  const wrap = document.getElementById('implAgendaList');
+  if (!wrap) return;
+
+  if (eventos.length === 0) {
+    wrap.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;padding:60px 20px">
+      <div style="font-size:40px;margin-bottom:12px">📆</div>
+      <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:6px">Nenhuma aula agendada</div>
+      <div style="font-size:13px;color:var(--t3)">Registre aulas na tela de Implantação para aparecerem aqui.</div>
+    </div>`;
+    return;
+  }
+
+  const porDia = {};
+  eventos.forEach(ev => {
+    const dKey = ev.dataEvento.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+    if (!porDia[dKey]) porDia[dKey] = [];
+    porDia[dKey].push(ev);
+  });
+
+  wrap.innerHTML = Object.entries(porDia).map(([dia, evs]) => {
+    const isHoje = evs[0].dataEvento.toDateString() === hoje.toDateString();
+    return `<div style="margin-bottom:20px">
+      <div style="font-size:12px;font-weight:700;color:${isHoje?'var(--ac)':'var(--t2)'};
+        text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;
+        padding-bottom:6px;border-bottom:1px solid var(--bd)">
+        ${isHoje?'● Hoje — ':''}${dia}
+      </div>
+      ${evs.map(ev => {
+        const {impl, dataEvento, empresa, etapaInfo} = ev;
+        const hora = dataEvento.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+        const tipo = impl['Tipo Próxima Aula'] || 'Treinamento';
+        const cor  = etapaInfo.cor;
+        const aulasFeitas = Number(impl['Qtd Aulas Realizadas'])||0;
+        const aulasTotal  = Number(impl['Qtd Aulas Previstas'])||2;
+        const nps  = Number(impl['NPS Médio'])||0;
+        const npsStars = nps>0?Array.from({length:5},(_,i)=>`<span style="color:${i<Math.round(nps)?'#f59e0b':'var(--bd2)'}">★</span>`).join(''):'';
+        const id   = impl['ID'];
+        const eEsc = empresa.replace(/'/g,"\\'");
+        return `<div style="background:var(--sf);border:0.5px solid var(--bd);border-left:4px solid ${cor};
+          border-radius:var(--r);padding:14px 16px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start">
+          <div style="text-align:center;flex-shrink:0;min-width:48px">
+            <div style="font-size:18px;font-weight:800;color:var(--tx);font-family:'DM Mono',monospace">${hora}</div>
+            <div style="font-size:10px;color:var(--t3);margin-top:2px">hora</div>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap">
+              <span style="font-size:14px;font-weight:700;color:var(--tx)">${empresa}</span>
+              <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:${cor}22;color:${cor}">${tipo}</span>
+            </div>
+            <div style="font-size:12px;color:var(--t2);margin-bottom:4px">${impl['Contato']||'—'} · ${impl['Telefone']||'—'}</div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <span style="font-size:11px;color:var(--t3)">Aula ${aulasFeitas+1} de ${aulasTotal}</span>
+              ${nps>0?`<span style="font-size:12px">${npsStars}</span>`:''}
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+            <div class="impl-btn-aula" onclick="openAulaModal('${id}','${eEsc}')">+ Registrar</div>
+            <div class="impl-btn-ver" onclick="openImplPanel('${id}')">Ver projeto</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
 // ══ INITIAL RENDER ══
 updateEtapas();
 loadProdutos();
 carregarTemaLocal();
 carregarLogoLocal();
 loadConfig();
+aplicarGovernanca();
+showScr(PERFIL_HOME[currentUser.perfil] || 'pipeline');
 
 // ══ DADOS DE BENCHMARK — remover após testes ════════════════
-// 4 contatos + 4 deals em etapas diferentes para visualizar o sistema
 async function injetarDadosTeste() {
   if(allContatos.length > 0 || allDeals.length > 0) {
-    toast('⚠ Já existem dados — benchmark não inserido','warn'); return;
+    toast('⚠ Já existem dados — limpe o Sheets antes','warn'); return;
   }
-  toast('⏳ Inserindo dados de teste...','info');
+  toast('⏳ Inserindo 10 cards de teste...','info');
 
-  // Contatos
+  const d = (diasAtras) => new Date(Date.now() - diasAtras*86400000).toISOString().split('T')[0];
+  const df = (diasFrente) => new Date(Date.now() + diasFrente*86400000).toISOString().split('T')[0];
+
   const contatos = [
-    { empresa:'Grupo Ferreira Contabilidade', cnpj:'12.345.678/0001-90', segmento:'Contabilidade', nomeContato:'Carlos Ferreira', cargo:'Sócio', telefone:'(62) 98765-4321', email:'carlos@ferreiracont.com.br', papelICP:'AR — Autoridade de Registro', tipo:'Lead Novo', prioridade:'🔥 Quente', potencial:'Alto', responsavel:'Samuel Mateus', atribuidoPor:'Nicolau', contextoCEO:'Parceiro estratégico — indicou 3 clientes no ano passado', origem:'Indicação — Nicolau', proximoFollowUp: new Date().toISOString().split('T')[0], observacoes:'Interesse em Módulo Básico + GO Signer' },
-    { empresa:'TechSol Tecnologia', cnpj:'23.456.789/0001-01', segmento:'Tecnologia', nomeContato:'Ana Lima', cargo:'CEO', telefone:'(62) 99876-5432', email:'ana@techsol.com.br', papelICP:'Não se aplica', tipo:'Lead Novo', prioridade:'🌡 Morno', potencial:'Médio', responsavel:'Samuel Mateus', atribuidoPor:'Samuel Mateus', origem:'Prospecção Samuel', proximoFollowUp: new Date(Date.now()+2*86400000).toISOString().split('T')[0], observacoes:'Demonstração agendada para semana que vem' },
-    { empresa:'Construtora Horizonte', cnpj:'34.567.890/0001-12', segmento:'Construção', nomeContato:'Roberto Alves', cargo:'Diretor Financeiro', telefone:'(62) 97654-3210', email:'roberto@horizonte.com.br', papelICP:'Não se aplica', tipo:'Cliente Ativo', prioridade:'🔥 Quente', potencial:'Alto', responsavel:'Samuel Mateus', atribuidoPor:'Samuel Mateus', origem:'WhatsApp', proximoFollowUp: new Date(Date.now()-86400000).toISOString().split('T')[0], observacoes:'Cliente ativo — oportunidade de expansão com módulo financeiro' },
-    { empresa:'Advocacia Santos & Ramos', cnpj:'45.678.901/0001-23', segmento:'Jurídico', nomeContato:'Dra. Patricia Santos', cargo:'Sócia', telefone:'(62) 96543-2109', email:'patricia@santosramos.adv.br', papelICP:'Não se aplica', tipo:'Lead Novo', prioridade:'❄️ Frio', potencial:'Baixo', responsavel:'Samuel Mateus', atribuidoPor:'Samuel Mateus', origem:'LinkedIn', proximoFollowUp: new Date(Date.now()+5*86400000).toISOString().split('T')[0], observacoes:'Primeiro contato — precisa de nurturing' },
+    // Pipeline comercial ativo
+    { empresa:'Prime Contabilidade Goiânia', cnpj:'11.222.333/0001-44', segmento:'Contabilidade', nomeContato:'Ricardo Borges', cargo:'Sócio-Diretor', telefone:'(62) 98855-1234', email:'ricardo@primecontab.com.br', papelICP:'AR — Autoridade de Registro', tipo:'Lead Novo', prioridade:'🔥 Quente', potencial:'Alto', responsavel:'Samuel Mateus', atribuidoPor:'Nicolau', contextoCEO:'AR parceira da Gestão Online — grande potencial de expansão', origem:'Indicação — Nicolau', proximoFollowUp:df(0), observacoes:'Interesse em Módulo Básico + GO Signer. Decidem essa semana.' },
+    { empresa:'TechSol Goiânia', cnpj:'22.333.444/0001-55', segmento:'Tecnologia', nomeContato:'Ana Lima', cargo:'CEO', telefone:'(62) 99876-5432', email:'ana@techsol.com.br', papelICP:'Não se aplica', tipo:'Lead Novo', prioridade:'🌡 Morno', potencial:'Médio', responsavel:'Samuel Mateus', atribuidoPor:'Samuel Mateus', contextoCEO:'', origem:'Prospecção Samuel', proximoFollowUp:df(2), observacoes:'Avaliando solução para gestão financeira.' },
+    { empresa:'AR Vitória Digital', cnpj:'33.444.555/0001-66', segmento:'Contabilidade', nomeContato:'Fernanda Costa', cargo:'Diretora', telefone:'(64) 98765-3210', email:'fernanda@arvioria.com.br', papelICP:'AR — Autoridade de Registro', tipo:'Lead Novo', prioridade:'🔥 Quente', potencial:'Alto', responsavel:'Samuel Mateus', atribuidoPor:'Nicolau', contextoCEO:'Indicação da Soluti — já conhece o sistema', origem:'Indicação — Soluti', proximoFollowUp:df(1), observacoes:'Quer implantação para julho. Alta urgência.' },
+    { empresa:'CDL Anápolis', cnpj:'44.555.666/0001-77', segmento:'Comércio', nomeContato:'Marcos Souza', cargo:'Presidente', telefone:'(62) 3311-4455', email:'marcos@cdlanapolis.com.br', papelICP:'AC — 1º nível', tipo:'Lead Novo', prioridade:'🔥 Quente', potencial:'Alto', responsavel:'Samuel Mateus', atribuidoPor:'Nicolau', contextoCEO:'Grande conta — CDL com 400 associados', origem:'Indicação — Nicolau', proximoFollowUp:df(0), observacoes:'Proposta enviada. Aguardando aprovação da diretoria.' },
+    { empresa:'Escritório Mendes & Associados', cnpj:'55.666.777/0001-88', segmento:'Jurídico', nomeContato:'Dr. Paulo Mendes', cargo:'Sócio', telefone:'(62) 98800-7766', email:'paulo@mendesadv.com.br', papelICP:'Não se aplica', tipo:'Lead Novo', prioridade:'🌡 Morno', potencial:'Médio', responsavel:'Samuel Mateus', atribuidoPor:'Samuel Mateus', contextoCEO:'', origem:'LinkedIn', proximoFollowUp:df(3), observacoes:'Em negociação. Pediu desconto de 15%.' },
+    // Fechados — vão para implantação
+    { empresa:'FCDL Santa Catarina', cnpj:'66.777.888/0001-99', segmento:'Comércio', nomeContato:'Anderson Silva', cargo:'Diretor Executivo', telefone:'(48) 3322-5544', email:'anderson.silva@fcdlsc.com.br', papelICP:'AC — 1º nível', tipo:'Cliente Ativo', prioridade:'🔥 Quente', potencial:'Alto', responsavel:'Samuel Mateus', atribuidoPor:'Nicolau', contextoCEO:'Cliente de grande porte — kickoff já realizado', origem:'Indicação — Nicolau', proximoFollowUp:d(0), observacoes:'Em treinamento. 2 aulas concluídas.' },
+    { empresa:'AR Digital JG', cnpj:'77.888.999/0001-11', segmento:'Contabilidade', nomeContato:'Carlos Ferreira', cargo:'Sócio', telefone:'(35) 99909-3484', email:'carlos@ardigitaljg.com.br', papelICP:'AR — Autoridade de Registro', tipo:'Cliente Ativo', prioridade:'🔥 Quente', potencial:'Alto', responsavel:'Samuel Mateus', atribuidoPor:'Samuel Mateus', contextoCEO:'', origem:'Prospecção Samuel', proximoFollowUp:d(0), observacoes:'Em configuração — aguardando Felipe liberar acesso.' },
+    // Reativação
+    { empresa:'Grupo Serra Certificados', cnpj:'88.999.000/0001-22', segmento:'Contabilidade', nomeContato:'Beatriz Serra', cargo:'CEO', telefone:'(62) 97755-3322', email:'beatriz@gruposerra.com.br', papelICP:'AR — Autoridade de Registro', tipo:'Inativo — Reativar', prioridade:'🌡 Morno', potencial:'Médio', responsavel:'Samuel Mateus', atribuidoPor:'Samuel Mateus', contextoCEO:'Cliente antigo — perdemos para concorrente em 2023', origem:'Prospecção Samuel', proximoFollowUp:df(4), observacoes:'Voltou a demonstrar interesse.' },
+    // Expansão
+    { empresa:'CertiSal Soluções', cnpj:'99.000.111/0001-33', segmento:'Contabilidade', nomeContato:'Julio Salles', cargo:'Diretor', telefone:'(62) 98844-2211', email:'julio@certisal.com.br', papelICP:'AR — Autoridade de Registro', tipo:'Cliente Ativo', prioridade:'🔥 Quente', potencial:'Alto', responsavel:'Samuel Mateus', atribuidoPor:'Samuel Mateus', contextoCEO:'', origem:'WhatsApp', proximoFollowUp:df(1), observacoes:'Quer adicionar Módulo Financeiro e GOPag.' },
+    { empresa:'ARVerde Tecnologia', cnpj:'00.111.222/0001-44', segmento:'Tecnologia', nomeContato:'Renata Verde', cargo:'Sócia', telefone:'(62) 96633-1100', email:'renata@arverde.com.br', papelICP:'AR — Autoridade de Registro', tipo:'Cliente Ativo', prioridade:'🌡 Morno', potencial:'Médio', responsavel:'Samuel Mateus', atribuidoPor:'Samuel Mateus', contextoCEO:'', origem:'WhatsApp', proximoFollowUp:df(5), observacoes:'Proposta de expansão enviada.' },
   ];
 
-  const idsContatos = [];
+  const ids = [];
   for(const c of contatos) {
     const r = await apiPost({action:'CRIAR_CONTATO', payload:c, usuario:'Sistema'});
-    idsContatos.push(r.id||'');
-    await new Promise(res=>setTimeout(res,300));
+    ids.push(r.id||'');
+    await new Promise(res=>setTimeout(res,350));
   }
 
-  // Deals em etapas diferentes
   const deals = [
-    { idContato:idsContatos[0], empresa:'Grupo Ferreira Contabilidade', pipeline:'Novos Leads', etapa:'Proposta Enviada', valorEstimado:3800, responsavel:'Samuel Mateus', prioridade:'🔥 Quente', proximoFollowUp:new Date().toISOString().split('T')[0], observacoes:'Proposta para Módulo Básico + GO Signer. Cliente quer fechar essa semana.' },
-    { idContato:idsContatos[1], empresa:'TechSol Tecnologia', pipeline:'Novos Leads', etapa:'Qualificação', valorEstimado:1800, responsavel:'Samuel Mateus', prioridade:'🌡 Morno', proximoFollowUp:new Date(Date.now()+2*86400000).toISOString().split('T')[0], observacoes:'Ainda avaliando qual módulo se encaixa melhor' },
-    { idContato:idsContatos[2], empresa:'Construtora Horizonte', pipeline:'Expansão', etapa:'Apresentação', valorEstimado:2400, responsavel:'Samuel Mateus', prioridade:'🔥 Quente', proximoFollowUp:new Date(Date.now()-86400000).toISOString().split('T')[0], observacoes:'Cliente atual querendo adicionar Módulo Financeiro' },
-    { idContato:idsContatos[3], empresa:'Advocacia Santos & Ramos', pipeline:'Novos Leads', etapa:'1º Contato', valorEstimado:900, responsavel:'Samuel Mateus', prioridade:'❄️ Frio', proximoFollowUp:new Date(Date.now()+5*86400000).toISOString().split('T')[0], observacoes:'Primeiro contato via LinkedIn. Ainda no início.' },
+    { idContato:ids[0], empresa:'Prime Contabilidade Goiânia',    pipeline:'Novos Leads', etapa:'Novo Lead',        valorEstimado:4800,  responsavel:'Samuel Mateus', prioridade:'🔥 Quente', proximoFollowUp:df(0), observacoes:'Módulo Básico + GO Signer' },
+    { idContato:ids[1], empresa:'TechSol Goiânia',                pipeline:'Novos Leads', etapa:'1º Contato',      valorEstimado:2400,  responsavel:'Samuel Mateus', prioridade:'🌡 Morno',  proximoFollowUp:df(2), observacoes:'Módulo Financeiro' },
+    { idContato:ids[2], empresa:'AR Vitória Digital',             pipeline:'Novos Leads', etapa:'Qualificação',    valorEstimado:6200,  responsavel:'Samuel Mateus', prioridade:'🔥 Quente', proximoFollowUp:df(1), observacoes:'Módulo Básico + Financeiro + GO Signer' },
+    { idContato:ids[3], empresa:'CDL Anápolis',                   pipeline:'Novos Leads', etapa:'Proposta Enviada',valorEstimado:12000, responsavel:'Samuel Mateus', prioridade:'🔥 Quente', proximoFollowUp:df(0), observacoes:'Pacote completo — 4 módulos' },
+    { idContato:ids[4], empresa:'Escritório Mendes & Associados', pipeline:'Novos Leads', etapa:'Negociação',      valorEstimado:3200,  responsavel:'Samuel Mateus', prioridade:'🌡 Morno',  proximoFollowUp:df(3), observacoes:'Módulo Básico com desconto negociado' },
+    { idContato:ids[5], empresa:'FCDL Santa Catarina',            pipeline:'Novos Leads', etapa:'Fechado',         valorEstimado:18500, responsavel:'Samuel Mateus', prioridade:'🔥 Quente', proximoFollowUp:d(0),  observacoes:'Fechado em 05/04 — em treinamento' },
+    { idContato:ids[6], empresa:'AR Digital JG',                  pipeline:'Novos Leads', etapa:'Fechado',         valorEstimado:7800,  responsavel:'Samuel Mateus', prioridade:'🔥 Quente', proximoFollowUp:d(0),  observacoes:'Fechado em 10/04 — aguardando configuração' },
+    { idContato:ids[7], empresa:'Grupo Serra Certificados',       pipeline:'Reativação',  etapa:'Recontato',       valorEstimado:3600,  responsavel:'Samuel Mateus', prioridade:'🌡 Morno',  proximoFollowUp:df(4), observacoes:'Ex-cliente — proposta de reativação' },
+    { idContato:ids[8], empresa:'CertiSal Soluções',              pipeline:'Expansão',    etapa:'Oportunidade',    valorEstimado:4200,  responsavel:'Samuel Mateus', prioridade:'🔥 Quente', proximoFollowUp:df(1), observacoes:'Expansão: GOPag + Módulo Financeiro' },
+    { idContato:ids[9], empresa:'ARVerde Tecnologia',             pipeline:'Expansão',    etapa:'Proposta',        valorEstimado:2800,  responsavel:'Samuel Mateus', prioridade:'🌡 Morno',  proximoFollowUp:df(5), observacoes:'Proposta de expansão enviada' },
   ];
 
-  for(const d of deals) {
-    await apiPost({action:'CRIAR_DEAL', payload:d, usuario:'Sistema'});
-    await new Promise(res=>setTimeout(res,300));
+  const dealIds = [];
+  for(const dl of deals) {
+    const r = await apiPost({action:'CRIAR_DEAL', payload:dl, usuario:'Sistema'});
+    dealIds.push(r.id||'');
+    await new Promise(res=>setTimeout(res,350));
   }
 
-  toast('✅ 4 contatos e 4 deals de teste inseridos!','ok');
+  // Atividades históricas para o histórico de vida (FCDL e AR Digital JG)
+  const atividades = [
+    // FCDL — jornada completa
+    { idDeal:dealIds[5], idContato:ids[5], empresa:'FCDL Santa Catarina', tipo:'Lead criado',       statusLigacao:'Lead cadastrado por Nicolau',   nota:'Indicação estratégica — grande conta SC',              proximoFollowUp:d(30) },
+    { idDeal:dealIds[5], idContato:ids[5], empresa:'FCDL Santa Catarina', tipo:'Ligação',           statusLigacao:'✅ Atendeu',                     nota:'1º contato realizado. Anderson confirmou interesse.',   proximoFollowUp:d(25) },
+    { idDeal:dealIds[5], idContato:ids[5], empresa:'FCDL Santa Catarina', tipo:'Ligação',           statusLigacao:'✅ Atendeu',                     nota:'Qualificação: tem 6 unidades, 12 usuários.',           proximoFollowUp:d(20) },
+    { idDeal:dealIds[5], idContato:ids[5], empresa:'FCDL Santa Catarina', tipo:'Proposta enviada',  statusLigacao:'Proposta enviada',               nota:'Proposta R$18.500 — Módulo Básico + Financeiro + GOPag.',proximoFollowUp:d(15) },
+    { idDeal:dealIds[5], idContato:ids[5], empresa:'FCDL Santa Catarina', tipo:'Ligação',           statusLigacao:'✅ Atendeu',                     nota:'Negociação final. Aprovado pela diretoria.',           proximoFollowUp:d(11) },
+    { idDeal:dealIds[5], idContato:ids[5], empresa:'FCDL Santa Catarina', tipo:'Deal fechado',      statusLigacao:'Deal fechado',                  nota:'Fechado R$18.500. Entrada R$5.550 confirmada.',         proximoFollowUp:d(10) },
+    { idDeal:dealIds[5], idContato:ids[5], empresa:'FCDL Santa Catarina', tipo:'Kickoff realizado', statusLigacao:'Kickoff realizado',              nota:'Kickoff 05/03 — Anderson + equipe de 8 pessoas.',      proximoFollowUp:d(7)  },
+    { idDeal:dealIds[5], idContato:ids[5], empresa:'FCDL Santa Catarina', tipo:'Aula concluída',    statusLigacao:'Treinamento Operacional',        nota:'Aula 1 concluída. NPS: 5. Equipe animada.',            proximoFollowUp:d(3)  },
+    { idDeal:dealIds[5], idContato:ids[5], empresa:'FCDL Santa Catarina', tipo:'Aula concluída',    statusLigacao:'Treinamento Comercial',          nota:'Aula 2 concluída. NPS: 4. Dúvidas sobre GOPag.',       proximoFollowUp:df(4) },
+    // AR Digital JG — início de jornada
+    { idDeal:dealIds[6], idContato:ids[6], empresa:'AR Digital JG',       tipo:'Lead criado',       statusLigacao:'Lead cadastrado por Samuel',     nota:'Prospecção ativa via LinkedIn.',                       proximoFollowUp:d(20) },
+    { idDeal:dealIds[6], idContato:ids[6], empresa:'AR Digital JG',       tipo:'Ligação',           statusLigacao:'✅ Atendeu',                     nota:'Carlos confirmou interesse. Quer Módulo Básico + Signer.',proximoFollowUp:d(15)},
+    { idDeal:dealIds[6], idContato:ids[6], empresa:'AR Digital JG',       tipo:'Proposta enviada',  statusLigacao:'Proposta enviada',               nota:'Proposta R$7.800 enviada por email.',                  proximoFollowUp:d(12) },
+    { idDeal:dealIds[6], idContato:ids[6], empresa:'AR Digital JG',       tipo:'Deal fechado',      statusLigacao:'Deal fechado',                  nota:'Fechado. Entrada R$2.000 confirmada.',                 proximoFollowUp:d(6)  },
+    { idDeal:dealIds[6], idContato:ids[6], empresa:'AR Digital JG',       tipo:'Briefing enviado',  statusLigacao:'Chamado Felipe aberto',          nota:'Briefing para Matheus. Aguardando acesso do Felipe.',  proximoFollowUp:df(2) },
+  ];
+
+  for(const av of atividades) {
+    await apiPost({action:'REGISTRAR_ATIVIDADE', payload:av, usuario:'Sistema'});
+    await new Promise(res=>setTimeout(res,250));
+  }
+
+  toast('✅ 10 contatos, 10 deals e histórico inseridos!','ok');
   await syncAll();
 }
 </script>
