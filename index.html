@@ -776,6 +776,7 @@ body.tema-light{
     <div class="nv" id="nav-relatorios" onclick="showScr('relatorios')"><span>📊</span><span>Relatórios</span></div>
     <div class="nv" id="nav-implantacao" onclick="showScr('implantacao')"><span>🚀</span><span>Implantação</span><span class="nb" id="implCount">0</span></div>
     <div class="nv" id="nav-agenda-impl" onclick="showScr('agenda-impl')"><span>📆</span><span>Agenda Implantação</span></div>
+    <div class="nv" id="nav-dash-impl" onclick="showScr('dash-impl')"><span>📊</span><span>Meu Dashboard</span></div>
     <div class="sb-lb" style="margin-top:6px">Sistema</div>
     <div class="nv" id="nav-produtos" onclick="showScr('produtos')"><span>📦</span><span>Produtos GO</span></div>
     <div class="nv" id="nav-config" onclick="showScr('config')"><span>⚙️</span><span>Config</span></div>
@@ -1010,6 +1011,38 @@ body.tema-light{
     </div>
     <div class="impl-grid-wrap" id="implGridWrap">
       <div class="impl-grid" id="implGrid"></div>
+    </div>
+  </div>
+
+  <!-- ══ DASHBOARD IMPLANTAÇÃO — Matheus ══ -->
+  <div class="scr" id="scr-dash-impl">
+    <div class="tbar" style="justify-content:space-between">
+      <div style="font-size:14px;font-weight:700;color:var(--tx)" id="dashImplGreeting">Bom dia!</div>
+      <div style="font-size:11px;color:var(--t3)" id="dashImplUpdate"></div>
+    </div>
+    <div class="dash-wrap" style="padding:16px 20px;display:flex;flex-direction:column;gap:16px;overflow-y:auto;flex:1">
+
+      <!-- KPIs rápidos -->
+      <div class="dash-kpis" id="dashImplKpis"></div>
+
+      <!-- Projetos por etapa -->
+      <div class="dash-card">
+        <div class="dash-card-title">🚀 Projetos por etapa</div>
+        <div id="dashImplEtapas"></div>
+      </div>
+
+      <!-- Em risco / atenção -->
+      <div class="dash-card" id="dashImplRiscoCard">
+        <div class="dash-card-title">⚠️ Atenção — SLA em risco</div>
+        <div id="dashImplRisco"></div>
+      </div>
+
+      <!-- Agenda da semana -->
+      <div class="dash-card">
+        <div class="dash-card-title">📆 Agenda desta semana</div>
+        <div id="dashImplSemana"></div>
+      </div>
+
     </div>
   </div>
 
@@ -2831,7 +2864,7 @@ function showScr(name){
   });
   document.getElementById('scr-'+name).classList.add('on');
   const nav=document.getElementById('nav-'+name);if(nav)nav.classList.add('on');
-  const titles={contatos:'Contatos',pipeline:'Pipeline de Vendas',followups:'Agenda Comercial',relatorios:'Relatórios',produtos:'Produtos GO',config:'Configurações',implantacao:'Implantação','agenda-impl':'Agenda de Implantação'};
+  const titles={contatos:'Contatos',pipeline:'Pipeline de Vendas',followups:'Agenda Comercial',relatorios:'Relatórios',produtos:'Produtos GO',config:'Configurações',implantacao:'Implantação','agenda-impl':'Agenda de Implantação','dash-impl':'Meu Dashboard'};
   document.getElementById('mainTitle').textContent=titles[name]||name;
   const newBtn=document.getElementById('newBtn');
   if(name==='contatos'){
@@ -2851,6 +2884,7 @@ function showScr(name){
   if(name==='config') loadConfig();
   if(name==='implantacao') loadImplantacoes();
   if(name==='agenda-impl') loadImplantacoes().then(()=>renderImplAgenda());
+  if(name==='dash-impl') loadImplantacoes().then(()=>renderDashImpl());
 }
 
 // ══ TOAST ══
@@ -3288,7 +3322,7 @@ function renderNicolau() {
   const dealsMes      = allDeals.filter(d=>d['Status']==='Fechado — Ganho' && new Date(d['Última Atualização']||0)>=mesInicio);
   const valorFechado  = dealsMes.reduce((s,d)=>s+Number(d['Valor Estimado']||0),0);
   const valorPipeline = dealsAtivos.reduce((s,d)=>s+Number(d['Valor Estimado']||0),0);
-  const metaMensal    = 45000; // Sprint 5 — virá da CONFIG
+  const metaMensal    = 45000; 
   const pctMeta       = Math.min(Math.round((valorFechado/metaMensal)*100),100);
   const forecast30    = valorFechado + valorPipeline * 0.3;
   const corMeta       = pctMeta>=100?'var(--gn)':pctMeta>=60?'var(--ye)':'var(--ac)';
@@ -3533,7 +3567,7 @@ function renderSamuel() {
   const metaMensal   = 45000;
   const pctMeta      = Math.min(Math.round((valorFechado/metaMensal)*100),100);
 
-  // Comissão (3% — virá da CONFIG no Sprint 5)
+  
   const pctComissao  = 3;
   const comissao     = valorFechado * (pctComissao/100);
 
@@ -3724,27 +3758,118 @@ function carregarTemaLocal() {
   }
 }
 
-function renderUsuarios() {
-  const lista = document.getElementById('cfgUsuariosList'); if(!lista) return;
-  const usuarios = [
-    {nome:'Bruno Camara',  email:'bruno.camara@gestao-online.com',  perfil:'Manager'},
-    {nome:'Samuel Mateus', email:'samuel.mateus@gestao-online.com', perfil:'Vendedor'},
-    {nome:'Nicolau',       email:'nicolau@gestao-online.com',       perfil:'CEO'},
-  ];
-  lista.innerHTML = usuarios.map(u=>`
-    <div class="cfg-toggle-row">
-      <div class="cfg-tgl-info">
-        <div class="cfg-tgl-lbl">${u.nome}
-          <span style="background:var(--as);color:var(--ac);font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700;margin-left:6px">${u.perfil}</span>
+// ══ GESTÃO DE USUÁRIOS ═══════════════════════════════════════
+let allUsuarios = [];
+
+async function renderUsuarios() {
+  const lista = document.getElementById('cfgUsuariosList');
+  if (!lista) return;
+  lista.innerHTML = '<div style="color:var(--t3);font-size:13px">Carregando...</div>';
+  try {
+    const res = await apiGet('USUARIOS');
+    allUsuarios = (res.data || []).filter(u => u['Ativo'] === 'Sim' || u['Ativo'] === true);
+    lista.innerHTML = allUsuarios.map((u,i) => {
+      const perfil = u['Perfil'] || 'Vendedor';
+      const corPerfil = perfil==='Manager'?'var(--ac)':perfil==='CEO'?'var(--ye)':perfil==='CTO'?'var(--pu)':'var(--gn)';
+      return `<div class="cfg-toggle-row" style="padding:12px 0;border-bottom:1px solid var(--bd)">
+        <div class="cfg-tgl-info">
+          <div class="cfg-tgl-lbl">${u['Nome']||'—'}
+            <span style="background:${corPerfil}22;color:${corPerfil};font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;margin-left:6px">${perfil}</span>
+          </div>
+          <div class="cfg-tgl-sub">${u['Email']||'—'}</div>
         </div>
-        <div class="cfg-tgl-sub">${u.email}</div>
-      </div>
-      <button class="btn btn-g" style="font-size:11px;padding:5px 10px">✏️ Editar</button>
-    </div>`).join('');
+        <button class="btn btn-g" style="font-size:11px;padding:5px 12px" onclick="editarUsuario(${i})">✏️ Editar</button>
+      </div>`;
+    }).join('') || '<div style="color:var(--t3);font-size:13px">Nenhum usuário cadastrado.</div>';
+  } catch(e) {
+    lista.innerHTML = '<div style="color:var(--re);font-size:13px">Erro ao carregar usuários.</div>';
+  }
+}
+
+function editarUsuario(idx) {
+  const u = allUsuarios[idx];
+  if (!u) return;
+  abrirModalUsuario({
+    id: u['ID'], nome: u['Nome'], email: u['Email'],
+    perfil: u['Perfil'], senha: '', modo: 'editar'
+  });
 }
 
 function abrirNovoUsuario() {
-  toast('👥 Gestão de usuários via Sheets — Sprint 5','info');
+  abrirModalUsuario({ id:'', nome:'', email:'', perfil:'Vendedor', senha:'', modo:'novo' });
+}
+
+function abrirModalUsuario(dados) {
+  const isNovo = dados.modo === 'novo';
+  const ov = document.getElementById('confirmOv');
+  document.getElementById('confirmTitle').textContent = isNovo ? 'Adicionar usuário' : 'Editar usuário';
+  document.getElementById('confirmDesc').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;text-align:left">
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--t3);display:block;margin-bottom:4px">NOME</label>
+        <input class="fi" id="usrNome" value="${dados.nome||''}" placeholder="Nome completo" style="width:100%">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--t3);display:block;margin-bottom:4px">EMAIL</label>
+        <input class="fi" id="usrEmail" type="email" value="${dados.email||''}" placeholder="email@gestao-online.com" style="width:100%">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--t3);display:block;margin-bottom:4px">PERFIL</label>
+        <select class="fse" id="usrPerfil" style="width:100%">
+          ${['Manager','Vendedor','CEO','CTO','Implantação'].map(p=>`<option value="${p}" ${dados.perfil===p?'selected':''}>${p}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--t3);display:block;margin-bottom:4px">${isNovo?'SENHA':'NOVA SENHA (deixe em branco para não alterar)'}</label>
+        <input class="fi" id="usrSenha" type="password" placeholder="${isNovo?'Mínimo 6 caracteres':'••••••••'}" style="width:100%">
+      </div>
+      ${!isNovo?`<button class="btn btn-re" style="font-size:11px;width:100%;justify-content:center" onclick="desativarUsuario('${dados.id}')">🗑 Desativar usuário</button>`:''}
+    </div>`;
+
+  const btn = document.getElementById('confirmBtn');
+  btn.textContent = isNovo ? 'Adicionar' : 'Salvar'; btn.disabled = false;
+  btn.onclick = () => salvarUsuario(dados.id, isNovo);
+  ov.classList.add('open');
+}
+
+async function salvarUsuario(id, isNovo) {
+  const nome  = document.getElementById('usrNome')?.value.trim();
+  const email = document.getElementById('usrEmail')?.value.trim();
+  const perfil= document.getElementById('usrPerfil')?.value;
+  const senha = document.getElementById('usrSenha')?.value;
+  const btn   = document.getElementById('confirmBtn');
+
+  if (!nome || !email) { toast('⚠ Nome e email são obrigatórios','warn'); return; }
+  if (isNovo && !senha) { toast('⚠ Defina uma senha para o novo usuário','warn'); return; }
+  if (senha && senha.length < 6) { toast('⚠ Senha deve ter no mínimo 6 caracteres','warn'); return; }
+
+  btn.disabled=true; btn.textContent='Salvando...';
+  try {
+    const action = isNovo ? 'CRIAR_USUARIO' : 'ATUALIZAR_USUARIO';
+    const payload = isNovo
+      ? { nome, email, perfil, senha }
+      : { id, nome, email, perfil, ...(senha ? { senha } : {}) };
+    const res = await apiPost({ action, payload, usuario: currentUser.nome });
+    if (res.success) {
+      closeConfirm();
+      toast(isNovo ? '✅ Usuário criado!' : '✅ Usuário atualizado!', 'ok');
+      renderUsuarios();
+    } else {
+      toast('❌ ' + (res.error||'Erro ao salvar'), 'err');
+      btn.disabled=false; btn.textContent = isNovo?'Adicionar':'Salvar';
+    }
+  } catch(e) {
+    toast('❌ Erro de conexão','err');
+    btn.disabled=false; btn.textContent = isNovo?'Adicionar':'Salvar';
+  }
+}
+
+async function desativarUsuario(id) {
+  if (!id) return;
+  closeConfirm();
+  const res = await apiPost({ action:'ATUALIZAR_USUARIO', payload:{ id, ativo:'Não' }, usuario:currentUser.nome });
+  if (res.success) { toast('Usuário desativado','ok'); renderUsuarios(); }
+  else toast('❌ Erro ao desativar','err');
 }
 
 // ── Logo da empresa ──
@@ -4380,15 +4505,18 @@ function validarCamposEtapa(deal, novaEtapa) {
 
 // ══ GOVERNANÇA DE PERFIS ═════════════════════════════════════
 const PERFIL_MENUS = {
-  'Manager':     ['pipeline','contatos','followups','relatorios','implantacao','agenda-impl','produtos','config'],
-  'CEO':         ['pipeline','contatos','relatorios','implantacao','agenda-impl','produtos','config'],
-  'CTO':         ['pipeline','contatos','relatorios','implantacao','agenda-impl','produtos','config'],
+  'Manager':     ['pipeline','contatos','followups','relatorios','implantacao','agenda-impl','produtos','config','dash-impl'],
+  'CEO':         ['pipeline','contatos','relatorios','implantacao','agenda-impl','produtos','config','dash-impl'],
+  'CTO':         ['pipeline','contatos','relatorios','implantacao','agenda-impl','produtos','config','dash-impl'],
   'Vendedor':    ['pipeline','contatos','followups','relatorios'],
-  'Implantação': ['implantacao','agenda-impl'],
+  'Implantação': ['dash-impl','implantacao','agenda-impl','contatos'],
 };
 const PERFIL_HOME = {
-  'Manager':'pipeline','CEO':'pipeline','CTO':'pipeline',
-  'Vendedor':'pipeline','Implantação':'implantacao',
+  'Manager':     'relatorios',
+  'CEO':         'relatorios',
+  'CTO':         'relatorios',
+  'Vendedor':    'followups',
+  'Implantação': 'dash-impl',
 };
 
 function aplicarGovernanca() {
@@ -4403,6 +4531,127 @@ function aplicarGovernanca() {
 function podeVerTela(name) {
   const perfil = currentUser.perfil || 'Vendedor';
   return (PERFIL_MENUS[perfil] || []).includes(name);
+}
+
+// ══ DASHBOARD MATHEUS ════════════════════════════════════════
+function renderDashImpl() {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const hora  = new Date().getHours();
+  const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+  const greet = document.getElementById('dashImplGreeting');
+  if (greet) greet.textContent = `${saudacao}, ${(currentUser.nome||'').split(' ')[0]}!`;
+  const upd = document.getElementById('dashImplUpdate');
+  if (upd) upd.textContent = 'Atualizado ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+
+  const ativos = (allImplantacoes||[]).filter(i => i['Etapa'] !== 'concluido' && i['Status'] !== 'Cancelado');
+  const concluidos = (allImplantacoes||[]).filter(i => i['Etapa'] === 'concluido');
+
+  // KPIs
+  const emRisco = ativos.filter(i => {
+    if (!i['Data Início'] || !IMPL_ETAPAS[i['Etapa']]?.sla) return false;
+    const dias = Math.floor((hoje - new Date(i['Data Início']))/(1000*60*60*24));
+    return (IMPL_ETAPAS[i['Etapa']].sla - dias) <= 2;
+  }).length;
+
+  const npsVals = ativos.filter(i=>Number(i['NPS Médio'])>0);
+  const npsMedia = npsVals.length > 0
+    ? (npsVals.reduce((s,i)=>s+Number(i['NPS Médio']),0)/npsVals.length).toFixed(1) : '—';
+
+  const kpis = document.getElementById('dashImplKpis');
+  if (kpis) kpis.innerHTML = `
+    <div class="dash-kpi"><div class="dash-kpi-stripe" style="background:var(--ac)"></div>
+      <div class="dash-kpi-icon">🚀</div><div class="dash-kpi-val">${ativos.length}</div>
+      <div class="dash-kpi-lbl">Projetos ativos</div></div>
+    <div class="dash-kpi"><div class="dash-kpi-stripe" style="background:var(--gn)"></div>
+      <div class="dash-kpi-icon">✅</div><div class="dash-kpi-val">${concluidos.length}</div>
+      <div class="dash-kpi-lbl">Concluídos</div></div>
+    <div class="dash-kpi"><div class="dash-kpi-stripe" style="background:${emRisco>0?'var(--re)':'var(--gn)'}"></div>
+      <div class="dash-kpi-icon">⚠️</div><div class="dash-kpi-val">${emRisco}</div>
+      <div class="dash-kpi-lbl">SLA em risco</div></div>
+    <div class="dash-kpi"><div class="dash-kpi-stripe" style="background:var(--ye)"></div>
+      <div class="dash-kpi-icon">⭐</div><div class="dash-kpi-val">${npsMedia}</div>
+      <div class="dash-kpi-lbl">NPS médio</div></div>`;
+
+  // Projetos por etapa
+  const etapasEl = document.getElementById('dashImplEtapas');
+  if (etapasEl) {
+    if (ativos.length === 0) {
+      etapasEl.innerHTML = '<div style="color:var(--t3);font-size:13px;text-align:center;padding:16px">Nenhum projeto ativo.</div>';
+    } else {
+      const porEtapa = {};
+      Object.keys(IMPL_ETAPAS).forEach(e => { porEtapa[e] = []; });
+      ativos.forEach(i => { if (porEtapa[i['Etapa']]) porEtapa[i['Etapa']].push(i); });
+      etapasEl.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px">` +
+        Object.entries(IMPL_ETAPAS).map(([key, info]) => {
+          const lista = porEtapa[key] || [];
+          if (lista.length === 0) return '';
+          return `<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 12px;background:var(--s2);border-radius:var(--rsm);border-left:3px solid ${info.cor}">
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:700;color:${info.cor};margin-bottom:4px">${info.label}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                ${lista.map(i=>`<span style="font-size:12px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:2px 8px;color:var(--tx)">${i['Cliente']||'—'}</span>`).join('')}
+              </div>
+            </div>
+            <div style="font-size:22px;font-weight:800;color:${info.cor};min-width:28px;text-align:right">${lista.length}</div>
+          </div>`;
+        }).join('') + `</div>`;
+    }
+  }
+
+  // SLA em risco
+  const riscoCard = document.getElementById('dashImplRiscoCard');
+  const riscoEl   = document.getElementById('dashImplRisco');
+  const riscos = ativos.filter(i => {
+    if (!i['Data Início'] || !IMPL_ETAPAS[i['Etapa']]?.sla) return false;
+    const dias = Math.floor((hoje - new Date(i['Data Início']))/(1000*60*60*24));
+    return (IMPL_ETAPAS[i['Etapa']].sla - dias) <= 3;
+  });
+  if (riscoCard) riscoCard.style.display = riscos.length > 0 ? 'block' : 'none';
+  if (riscoEl && riscos.length > 0) {
+    riscoEl.innerHTML = riscos.map(i => {
+      const info = IMPL_ETAPAS[i['Etapa']] || {};
+      const dias  = Math.floor((hoje - new Date(i['Data Início']))/(1000*60*60*24));
+      const rest  = Math.max((info.sla||0) - dias, 0);
+      return `<div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--rs);border-radius:var(--rsm);border-left:3px solid var(--re);margin-bottom:8px">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:var(--tx)">${i['Cliente']||'—'}</div>
+          <div style="font-size:11px;color:var(--t2)">${info.label||i['Etapa']}</div>
+        </div>
+        <div style="font-size:13px;font-weight:800;color:var(--re)">${rest}d restante${rest!==1?'s':''}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Agenda da semana — agrupa aulas por dia
+  const semEl = document.getElementById('dashImplSemana');
+  if (semEl) {
+    const fim = new Date(hoje); fim.setDate(hoje.getDate() + 7);
+    const aulasProximas = [];
+    ativos.forEach(impl => {
+      (impl['Aulas']||[]).forEach(aula => {
+        if (!aula.data) return;
+        const d = new Date(aula.data); d.setHours(0,0,0,0);
+        if (d >= hoje && d <= fim) aulasProximas.push({ ...aula, cliente:impl['Cliente'], implId:impl['ID'] });
+      });
+    });
+    aulasProximas.sort((a,b)=>new Date(a.data)-new Date(b.data));
+    if (aulasProximas.length === 0) {
+      semEl.innerHTML = '<div style="color:var(--t3);font-size:13px;text-align:center;padding:16px">Nenhuma aula agendada para esta semana.</div>';
+    } else {
+      semEl.innerHTML = aulasProximas.map(a => {
+        const d = new Date(a.data);
+        const label = d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});
+        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)">
+          <div style="font-size:11px;font-weight:700;color:var(--ac);width:70px;flex-shrink:0;text-transform:capitalize">${label}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:var(--tx)">${a.cliente||'—'}</div>
+            <div style="font-size:11px;color:var(--t3)">${a.tipo||'Aula'}</div>
+          </div>
+          <button class="btn btn-g" style="font-size:11px;padding:4px 10px" onclick="showScr('agenda-impl')">Ver</button>
+        </div>`;
+      }).join('');
+    }
+  }
 }
 
 // ══ AGENDA DE IMPLANTAÇÃO — Matheus ═════════════════════════
