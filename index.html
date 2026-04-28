@@ -1015,36 +1015,23 @@ body.tema-light{
     </div>
   </div>
   <div class="scr" id="scr-implantacao">
-    <div class="tbar" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
-      <div style="display:flex;gap:6px;align-items:center">
-        <button class="btn btn-g" id="implViewKanban" onclick="setImplView('kanban')" style="font-size:11px;padding:5px 12px;background:var(--as);color:var(--ac);border-color:var(--ac)">Kanban</button>
-        <button class="btn btn-g" id="implViewLista" onclick="setImplView('lista')" style="font-size:11px;padding:5px 12px">Lista</button>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center" id="implListaTabs">
-        <div class="rel-tab on" id="itab-todos"     onclick="setImplTab('todos')">Todos</div>
-        <div class="rel-tab" id="itab-briefing"    onclick="setImplTab('briefing')">Briefing</div>
-        <div class="rel-tab" id="itab-dados"       onclick="setImplTab('dados')">Ag. Dados</div>
-        <div class="rel-tab" id="itab-config"      onclick="setImplTab('config')">Configuração</div>
-        <div class="rel-tab" id="itab-kickoff"     onclick="setImplTab('kickoff')">Kickoff</div>
-        <div class="rel-tab" id="itab-treinamento" onclick="setImplTab('treinamento')">Treinamento</div>
-        <div class="rel-tab" id="itab-finais"      onclick="setImplTab('finais')">Finais</div>
-        <div class="rel-tab" id="itab-golive"      onclick="setImplTab('golive')">Go-live</div>
-        <div class="rel-tab" id="itab-concluido"   onclick="setImplTab('concluido')">Concluído</div>
-      </div>
+    <div class="rel-tabs" id="implTabs">
+      <div class="rel-tab on" id="itab-todos"     onclick="setImplTab('todos')">Todos</div>
+      <div class="rel-tab" id="itab-briefing"    onclick="setImplTab('briefing')">Briefing</div>
+      <div class="rel-tab" id="itab-dados"       onclick="setImplTab('dados')">Ag. Dados</div>
+      <div class="rel-tab" id="itab-config"      onclick="setImplTab('config')">Configuração</div>
+      <div class="rel-tab" id="itab-kickoff"     onclick="setImplTab('kickoff')">Kickoff</div>
+      <div class="rel-tab" id="itab-treinamento" onclick="setImplTab('treinamento')">Treinamento</div>
+      <div class="rel-tab" id="itab-finais"      onclick="setImplTab('finais')">Finais</div>
+      <div class="rel-tab" id="itab-golive"      onclick="setImplTab('golive')">Go-live</div>
+      <div class="rel-tab" id="itab-concluido"   onclick="setImplTab('concluido')">Concluído</div>
     </div>
-
-    <!-- Kanban view -->
-    <div id="implKanbanWrap" style="display:flex;gap:0;overflow-x:auto;flex:1;padding:12px 16px">
-      <!-- colunas geradas por JS -->
-    </div>
-
-    <!-- Lista view -->
     <div class="empty" id="implEmpty" style="display:none">
       <div class="empty-icon">🚀</div>
       <div class="empty-title">Nenhum projeto de implantação</div>
       <div class="empty-sub">Os projetos aparecem aqui quando um deal é fechado.</div>
     </div>
-    <div class="impl-grid-wrap" id="implGridWrap" style="display:none">
+    <div class="impl-grid-wrap" id="implGridWrap">
       <div class="impl-grid" id="implGrid"></div>
     </div>
   </div>
@@ -3111,7 +3098,7 @@ function showScr(name){
   if(name==='followups') renderAgenda();
   if(name==='relatorios') renderDashboard();
   if(name==='config') loadConfig();
-  if(name==='implantacao') loadImplantacoes().then(()=>{ if(implView==='kanban') renderImplKanban(); else renderImplantacao(); });
+  if(name==='implantacao') loadImplantacoes();
   if(name==='agenda-impl') loadImplantacoes().then(()=>renderImplAgenda());
   if(name==='dash-impl') loadImplantacoes().then(()=>renderDashImpl());
 }
@@ -4557,128 +4544,9 @@ const IMPL_ETAPAS = {
   'concluido':   { label:'Concluído',              cor:'#94a3b8', sla:null },
 };
 
-let implView = 'kanban';
-
-function setImplView(view) {
-  implView = view;
-  const kanbanWrap = document.getElementById('implKanbanWrap');
-  const listaTabs  = document.getElementById('implListaTabs');
-  const btnK = document.getElementById('implViewKanban');
-  const btnL = document.getElementById('implViewLista');
-
-  if (view === 'kanban') {
-    kanbanWrap.style.display = 'flex';
-    document.getElementById('implGridWrap').style.display = 'none';
-    document.getElementById('implEmpty').style.display = 'none';
-    listaTabs.style.display = 'none';
-    btnK.style.background='var(--as)'; btnK.style.color='var(--ac)'; btnK.style.borderColor='var(--ac)';
-    btnL.style.background=''; btnL.style.color=''; btnL.style.borderColor='';
-    renderImplKanban();
-  } else {
-    kanbanWrap.style.display = 'none';
-    listaTabs.style.display = 'flex';
-    btnL.style.background='var(--as)'; btnL.style.color='var(--ac)'; btnL.style.borderColor='var(--ac)';
-    btnK.style.background=''; btnK.style.color=''; btnK.style.borderColor='';
-    renderImplantacao();
-  }
-}
-
-function renderImplKanban() {
-  const wrap = document.getElementById('implKanbanWrap');
-  if (!wrap) return;
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const ativos = (allImplantacoes||[]).filter(i => i['Etapa'] !== 'concluido');
-
-  wrap.innerHTML = Object.entries(IMPL_ETAPAS)
-    .filter(([key]) => key !== 'concluido')
-    .map(([key, info]) => {
-      const cards = ativos.filter(i => i['Etapa'] === key);
-      const cardsHTML = cards.map(impl => {
-        const aulasF = Number(impl['Qtd Aulas Realizadas'])||0;
-        const aulasT = Number(impl['Qtd Aulas Previstas'])||2;
-        const pct    = aulasT > 0 ? Math.round((aulasF/aulasT)*100) : 0;
-        const nps    = Number(impl['NPS Médio'])||0;
-        const stars  = nps > 0 ? '★'.repeat(Math.round(nps)) + '☆'.repeat(5-Math.round(nps)) : '';
-
-        // SLA
-        let slaHtml = '';
-        if (impl['Data Início'] && info.sla) {
-          const dias = Math.floor((hoje - new Date(impl['Data Início']))/(1000*60*60*24));
-          const rest = Math.max(info.sla - dias, 0);
-          const cor  = rest<=1?'var(--re)':rest<=3?'var(--ye)':'var(--t3)';
-          slaHtml = `<span class="impl-kcard-sla" style="color:${cor}">${rest}d SLA</span>`;
-        }
-
-        return `<div class="impl-kcard"
-          draggable="true"
-          ondragstart="implDragStart(event,'${impl['ID']}')"
-          ondragend="implDragEnd(event)"
-          onclick="abrirImplModal('${impl['ID']}')">
-          <div class="impl-kcard-empresa">${impl['Cliente']||'—'}</div>
-          <div class="impl-kcard-sub">${impl['Contato']||''}</div>
-          <div class="impl-kcard-bar">
-            <div class="impl-kcard-bar-fill" style="width:${pct}%;background:${info.cor}"></div>
-          </div>
-          <div class="impl-kcard-foot">
-            <span class="impl-kcard-nps">${stars}</span>
-            ${slaHtml}
-          </div>
-        </div>`;
-      }).join('') || `<div style="font-size:11px;color:var(--t3);text-align:center;padding:12px 0">Nenhum projeto</div>`;
-
-      return `<div class="impl-col">
-        <div class="impl-col-head" style="background:${info.cor}">
-          <span class="impl-col-label" style="color:#fff">${info.label}</span>
-          <span class="impl-col-count">${cards.length}</span>
-        </div>
-        <div class="impl-col-body"
-          ondragover="event.preventDefault();this.classList.add('drag-over')"
-          ondragleave="this.classList.remove('drag-over')"
-          ondrop="implDrop(event,'${key}')">
-          ${cardsHTML}
-        </div>
-      </div>`;
-    }).join('');
-}
-
-let _implDragged = null;
-
-function implDragStart(e, id) {
-  _implDragged = id;
-  e.target.style.opacity = '.4';
-}
-
-function implDragEnd(e) {
-  e.target.style.opacity = '1';
-  document.querySelectorAll('.impl-col-body').forEach(c=>c.classList.remove('drag-over'));
-}
-
-async function implDrop(e, novaEtapa) {
-  e.preventDefault();
-  document.querySelectorAll('.impl-col-body').forEach(c=>c.classList.remove('drag-over'));
-  if (!_implDragged) return;
-  const impl = allImplantacoes.find(i=>i['ID']===_implDragged);
-  if (!impl || impl['Etapa']===novaEtapa) { _implDragged=null; return; }
-
-  impl['Etapa'] = novaEtapa;
-  renderImplKanban();
-
-  try {
-    await apiPost({
-      action:'ATUALIZAR_IMPLANTACAO',
-      payload:{ id:_implDragged, etapa:novaEtapa },
-      usuario:currentUser.nome
-    });
-    toast(`Movido para ${IMPL_ETAPAS[novaEtapa]?.label||novaEtapa}`,'ok');
-  } catch(e) {
-    toast('Erro ao mover','err');
-  }
-  _implDragged = null;
-}
-
 function setImplTab(tab) {
   implTab = tab;
-  document.querySelectorAll('#implListaTabs .rel-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('#implTabs .rel-tab').forEach(t=>t.classList.remove('on'));
   document.getElementById('itab-'+tab)?.classList.add('on');
   renderImplantacao();
 }
