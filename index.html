@@ -1547,23 +1547,46 @@ body.tema-light{
 <!-- ══ QUICK LOG MODAL ══ -->
 <div class="qlog-ov" id="qlogOv" onclick="if(event.target===this)closeQLog()">
   <div class="qlog-card">
-    <div class="qlog-title">📞 Registrar ligação</div>
+    <div class="qlog-title" id="qlogTitle">Registrar atividade</div>
     <div class="qlog-company" id="qlogCompany">—</div>
     <input type="hidden" id="qlogDealId">
-    <div class="cbs" style="margin-bottom:10px">
-      <button class="cb" onclick="selCb(this,'a')">✅ Atendeu</button>
-      <button class="cb" onclick="selCb(this,'n')">❌ Não atendeu</button>
-      <button class="cb" onclick="selCb(this,'c')">🔁 Callback</button>
-      <button class="cb" onclick="selCb(this,'e')">✉️ Email</button>
+
+    <!-- Tipo de atividade -->
+    <div style="margin-bottom:12px">
+      <label class="fl" style="margin-bottom:6px">Tipo</label>
+      <div class="cbs" id="qlogTipos">
+        <button class="cb" onclick="selTipo(this,'Ligação')">📞 Ligação</button>
+        <button class="cb" onclick="selTipo(this,'WhatsApp')">💬 WhatsApp</button>
+        <button class="cb" onclick="selTipo(this,'Email')">✉️ Email</button>
+        <button class="cb" onclick="selTipo(this,'Reunião')">🤝 Reunião</button>
+        <button class="cb" onclick="selTipo(this,'Anotação')">📝 Anotação</button>
+        <button class="cb" onclick="selTipo(this,'Pesquisa')">🔍 Pesquisa</button>
+      </div>
     </div>
-    <div style="margin-bottom:10px"><input class="fi" id="qlogNota" placeholder="Nota rápida (opcional)..."></div>
+
+    <!-- Status (só para ligação) -->
+    <div id="qlogStatusWrap" style="margin-bottom:10px">
+      <label class="fl" style="margin-bottom:6px">Resultado</label>
+      <div class="cbs">
+        <button class="cb" onclick="selCb(this,'a')">✅ Atendeu</button>
+        <button class="cb" onclick="selCb(this,'n')">❌ Não atendeu</button>
+        <button class="cb" onclick="selCb(this,'c')">🔁 Callback</button>
+      </div>
+    </div>
+
+    <!-- Nota -->
+    <div style="margin-bottom:10px">
+      <label class="fl" style="margin-bottom:4px">Nota / Observação</label>
+      <textarea class="fi" id="qlogNota" placeholder="O que foi discutido, descoberto, encaminhado..." rows="3" style="resize:none;margin-top:4px"></textarea>
+    </div>
+
     <div class="fgrid" style="margin-bottom:0">
       <div><label class="fl">Próximo follow-up</label><input class="fi" id="qlogFollowup" type="date" style="margin-top:4px"></div>
-      <div><label class="fl">Horário</label><input class="fi" id="qlogHora" type="time" style="margin-top:4px" value="09:00" placeholder="09:00"></div>
+      <div><label class="fl">Horário</label><input class="fi" id="qlogHora" type="time" style="margin-top:4px" placeholder="09:00"></div>
     </div>
     <div style="display:flex;gap:8px;margin-top:14px">
       <button class="btn btn-g" style="flex:1" onclick="closeQLog()">Cancelar</button>
-      <button class="btn btn-gn" style="flex:2" onclick="saveQLog()">💾 Salvar ligação</button>
+      <button class="btn btn-gn" style="flex:2" id="qlogSaveBtn" onclick="saveQLog()">Salvar</button>
     </div>
   </div>
 </div>
@@ -2042,6 +2065,12 @@ function cardHTML(d, stage, pipeColor, stages) {
   const entradaBadge = entradaPendente
     ? `<div style="font-size:10px;font-weight:700;color:var(--ye);background:var(--ys);padding:2px 7px;border-radius:4px;margin-top:4px;display:inline-block">⏳ Entrada pendente</div>`
     : '';
+  // Contador de atividades no card
+  const qtdAtivs = (window._atividades||[]).filter(a=>a['ID Deal']===d['ID']).length;
+  const ativBadge = qtdAtivs > 0
+    ? `<div style="font-size:10px;color:var(--t3);font-weight:600">📋 ${qtdAtivs} atividade${qtdAtivs!==1?'s':''}</div>`
+    : '';
+
   return `<div class="card" draggable="true"
     ondragstart="startDrag(event,this,'${d['ID']}')"
     ondragend="this.style.opacity='1'"
@@ -2059,6 +2088,7 @@ function cardHTML(d, stage, pipeColor, stages) {
       <div class="cvrow">
         <div class="cval">${valor}</div>
         <div class="cvlb">estimado</div>
+        ${ativBadge}
       </div>
       ${entradaBadge}
       <div class="cprog">
@@ -2072,7 +2102,7 @@ function cardHTML(d, stage, pipeColor, stages) {
       ${flHtml}
     </div>
     <div class="cqact">
-      <div class="qa qa-c" onclick="event.stopPropagation();openQLog('${d['ID']}','${(d['Empresa']||'').replace(/'/g,"\\'")}')">📞 Ligar</div>
+      <div class="qa qa-c" onclick="event.stopPropagation();openQLog('${d['ID']}','${(d['Empresa']||'').replace(/'/g,"\\'")}')">+ Atividade</div>
       <div class="qa qa-e" onclick="event.stopPropagation();openDealPanel('${d['ID']}')">✏️ Editar</div>
       <div class="qa qa-d" onclick="event.stopPropagation();askDeleteDeal('${d['ID']}','${(d['Empresa']||'').replace(/'/g,"\\'")}')">🗑</div>
     </div>
@@ -2502,27 +2532,39 @@ function renderTimeline(dealId, contatoId) {
     return;
   }
 
-  wrap.innerHTML = eventos.map((ev,i) => {
+  wrap.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <span style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.06em;text-transform:uppercase">${eventos.length} registro${eventos.length!==1?'s':''}</span>
+      <button class="btn btn-g" style="font-size:11px;padding:4px 10px" onclick="openQLog('${dealId}','${(allDeals.find(d=>d['ID']===dealId)||{})['Empresa']||''}')">+ Registrar</button>
+    </div>
+    ${eventos.map((ev,i) => {
     const info = TIPO_ICON[ev.tipo] || { icon:'○', cor:'var(--t3)', label:ev.tipo };
     const dataFmt = ev.data ? (() => {
       try {
         const dt = new Date(ev.data);
-        return isNaN(dt) ? ev.data : dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'2-digit'});
+        if (isNaN(dt)) return ev.data;
+        const hoje = new Date(); hoje.setHours(0,0,0,0);
+        const evDt = new Date(dt); evDt.setHours(0,0,0,0);
+        const diff = Math.floor((hoje-evDt)/(1000*60*60*24));
+        const hora = dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+        if (diff===0) return `Hoje ${hora}`;
+        if (diff===1) return `Ontem ${hora}`;
+        return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) + ' ' + hora;
       } catch(e) { return ev.data; }
     })() : '';
 
-    return `<div style="position:relative;margin-bottom:14px;padding-left:14px">
-      <div style="position:absolute;left:-22px;top:2px;width:14px;height:14px;border-radius:50%;
-        background:${info.cor};display:flex;align-items:center;justify-content:center;
-        font-size:8px;color:#fff;font-weight:700;flex-shrink:0">${info.icon}</div>
-      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px">
-        <span style="font-size:12px;font-weight:700;color:var(--tx)">${info.label}</span>
-        ${dataFmt?`<span style="font-size:10px;color:var(--t3);font-family:'DM Mono',monospace">${dataFmt}</span>`:''}
-        ${ev.statusLigacao?`<span style="font-size:10px;color:${info.cor}">${ev.statusLigacao}</span>`:''}
+    return `<div style="display:flex;gap:10px;margin-bottom:10px;padding:10px 12px;
+        background:var(--s2);border-radius:var(--rsm);border-left:3px solid ${info.cor}">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:${ev.nota?'4px':'0'}">
+          <span style="font-size:12px;font-weight:700;color:var(--tx)">${info.label}</span>
+          ${ev.statusLigacao?`<span style="font-size:10px;font-weight:700;color:${info.cor};background:${info.cor}18;padding:1px 6px;border-radius:4px">${ev.statusLigacao}</span>`:''}
+        </div>
+        ${ev.nota?`<div style="font-size:12px;color:var(--t2);line-height:1.5;word-break:break-word">${ev.nota}</div>`:''}
       </div>
-      ${ev.nota?`<div style="font-size:12px;color:var(--t2);line-height:1.4">${ev.nota}</div>`:''}
+      ${dataFmt?`<div style="font-size:10px;color:var(--t3);white-space:nowrap;font-family:'DM Mono',monospace;flex-shrink:0;margin-top:2px">${dataFmt}</div>`:''}
     </div>`;
-  }).join('');
+  }).join('')}`;
 }
 
 // ══ CONTACT PANEL ══
@@ -2767,18 +2809,37 @@ async function createDeal(){
 }
 
 // ══ QUICK LOG ══
+let _qlogTipo = 'Ligação';
+
 function openQLog(dealId, empresa){
   qlogDealData={id:dealId};
+  _qlogTipo = 'Ligação';
   document.getElementById('qlogCompany').textContent=empresa;
   document.getElementById('qlogDealId').value=dealId;
   const tmrw=new Date();tmrw.setDate(tmrw.getDate()+1);
   document.getElementById('qlogFollowup').value=`${tmrw.getFullYear()}-${String(tmrw.getMonth()+1).padStart(2,'0')}-${String(tmrw.getDate()).padStart(2,'0')}`;
+  document.getElementById('qlogHora').value='';
   document.getElementById('qlogNota').value='';
   document.querySelectorAll('.cb').forEach(b=>b.className='cb');
+  document.getElementById('qlogStatusWrap').style.display='block';
+  document.getElementById('qlogSaveBtn').textContent='Salvar';
+  // Seleciona Ligação como padrão
+  const firstTipo = document.querySelector('#qlogTipos .cb');
+  if(firstTipo) firstTipo.classList.add('sel-a');
   document.getElementById('qlogOv').classList.add('open');
 }
+
+function selTipo(btn, tipo) {
+  _qlogTipo = tipo;
+  document.querySelectorAll('#qlogTipos .cb').forEach(b=>b.className='cb');
+  btn.classList.add('sel-a');
+  // Mostra status de resultado só para ligação
+  document.getElementById('qlogStatusWrap').style.display = tipo==='Ligação' ? 'block' : 'none';
+  document.getElementById('qlogSaveBtn').textContent = 'Salvar ' + tipo;
+}
+
 function closeQLog(){document.getElementById('qlogOv').classList.remove('open');qlogDealData=null;}
-function selCb(btn,t){document.querySelectorAll('.cb').forEach(b=>b.className='cb');btn.classList.add('sel-'+t);}
+function selCb(btn,t){document.querySelectorAll('#qlogStatusWrap .cb').forEach(b=>b.className='cb');btn.classList.add('sel-'+t);}
 
 async function saveQLog(){
   const dealId=document.getElementById('qlogDealId').value;
@@ -2786,25 +2847,52 @@ async function saveQLog(){
   const fuData=document.getElementById('qlogFollowup').value;
   const fuHora=document.getElementById('qlogHora').value;
   const fu = fuData ? (fuHora ? `${fuData}T${fuHora}` : fuData) : fuData;
-  const selBtn=document.querySelector('.cb.sel-a,.cb.sel-n,.cb.sel-c,.cb.sel-e');
-  const statusMap={'sel-a':'✅ Atendeu','sel-n':'❌ Não atendeu','sel-c':'🔁 Callback agendado','sel-e':'✉️ Email enviado'};
-  const status=selBtn?statusMap[selBtn.classList[1]]||'Ligação':'Ligação';
+  const selBtn=document.querySelector('#qlogStatusWrap .cb.sel-a,#qlogStatusWrap .cb.sel-n,#qlogStatusWrap .cb.sel-c');
+  const statusMap={'sel-a':'✅ Atendeu','sel-n':'❌ Não atendeu','sel-c':'🔁 Callback agendado'};
+  const status=selBtn?statusMap[selBtn.classList[1]]||'':'' ;
   const deal=allDeals.find(d=>d['ID']===dealId)||{};
 
-  // OPTIMISTIC UI
+  if (!nota && _qlogTipo !== 'Ligação') {
+    toast('⚠ Adicione uma nota antes de salvar','warn'); return;
+  }
+
+  const btn = document.getElementById('qlogSaveBtn');
+  btn.disabled=true; btn.textContent='Salvando...';
+
   const fuAnterior=deal['Próximo Follow-up'];
   if(fu) deal['Próximo Follow-up']=fu;
   closeQLog();
-  toast('✅ Ligação registrada!','ok');
+  toast(`✅ ${_qlogTipo} registrada!`,'ok');
   renderBoard(); renderAgenda();
 
   try{
-    await apiPost({action:'REGISTRAR_ATIVIDADE',payload:{idDeal:dealId,idContato:deal['ID Contato']||'',empresa:deal['Empresa']||'',tipo:'Ligação',statusLigacao:status,nota,proximoFollowUp:fu},usuario:currentUser.nome});
+    const res = await apiPost({
+      action:'REGISTRAR_ATIVIDADE',
+      payload:{
+        idDeal:dealId,
+        idContato:deal['ID Contato']||'',
+        empresa:deal['Empresa']||'',
+        tipo:_qlogTipo,
+        statusLigacao:status,
+        nota,
+        proximoFollowUp:fu
+      },
+      usuario:currentUser.nome
+    });
+    // Atualiza _atividades local e recarrega timeline se painel estiver aberto
+    if(res.success){
+      apiGet('ATIVIDADES').then(at=>{
+        if(at.success){
+          window._atividades=at.data||[];
+          if(editingId===dealId) renderTimeline(dealId, deal['ID Contato']||'');
+        }
+      });
+    }
   }catch(e){
     deal['Próximo Follow-up']=fuAnterior;
     renderBoard();
-    toast('⚠ Ligação não salva — sem conexão','warn');
-  }
+    toast('⚠ Atividade não salva — sem conexão','warn');
+  } finally { btn.disabled=false; }
 }
 
 // ══ DELETE ══
