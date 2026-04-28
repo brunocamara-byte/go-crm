@@ -1164,7 +1164,12 @@ body.tema-light{
             <div class="tema-card" onclick="aplicarTema('gosigner',this)" data-tema="gosigner">
               <div class="tema-preview tp-gosigner"><div class="tp-sb"></div><div class="tp-main"><div class="tp-bar"></div><div class="tp-content"></div></div></div>
               <div class="tema-nome">GOSigner</div>
-              <div class="tema-sub">Roxo assinatura</div>
+              <div class="tema-sub">Nordic Frost</div>
+            </div>
+            <div class="tema-card" onclick="aplicarTema('cyberpunk',this)" data-tema="cyberpunk">
+              <div class="tema-preview" style="background:#0d0221"><div class="tp-sb" style="background:#0f0844"></div><div class="tp-main"><div class="tp-bar" style="background:#fb2576"></div><div class="tp-content" style="background:#160b55"></div></div></div>
+              <div class="tema-nome">Cyberpunk</div>
+              <div class="tema-sub">Neon magenta</div>
             </div>
           </div>
         </div>
@@ -2141,8 +2146,30 @@ async function dropCard(e,etapa,pipe){
     const res=await apiPost({action:'ATUALIZAR_DEAL',payload:{id:dragged.id,etapa},usuario:currentUser.nome});
     if(res.success){
       toast(`✅ ${etapa}`,'ok');
+      // Se fechou — registra evento na timeline e atualiza agenda
+      if(etapa==='Fechado'){
+        const agora = new Date().toISOString();
+        deal['Data Fechamento'] = agora;
+        // Registra atividade "Deal fechado" na timeline
+        apiPost({
+          action:'REGISTRAR_ATIVIDADE',
+          payload:{
+            idDeal: deal['ID'],
+            idContato: deal['ID Contato']||'',
+            empresa: deal['Empresa']||'',
+            tipo: 'Deal fechado',
+            statusLigacao: '✅ Fechado — Ganho',
+            nota: `Follow-ups encerrados. Deal fechado por ${currentUser.nome}.`,
+            proximoFollowUp: ''
+          },
+          usuario: currentUser.nome
+        }).then(()=>{
+          apiGet('ATIVIDADES').then(at=>{ if(at.success) window._atividades=at.data||[]; });
+        });
+        renderAgenda(); // Remove da agenda imediatamente
+        toast('🏆 Deal fechado! Implantação iniciada.','ok');
+      }
     } else {
-      // Reverte se falhou
       deal['Etapa']=etapaAnterior;
       renderBoard();renderPipeTabs();
       toast('❌ Erro ao salvar — revertido','err');
@@ -2477,12 +2504,14 @@ function renderTimeline(dealId, contatoId) {
   const deal = allDeals.find(d=>d['ID']===dealId)||{};
   const eventos = [];
 
-  // Evento inicial — lead criado (data do deal)
+  // Evento inicial — lead criado (sempre primeiro)
+  const dataCriacao = deal['Data Criação'] || deal['Criado Em'] || '2000-01-01';
   eventos.push({
     tipo:'Lead criado',
-    data: deal['Data Criação'] || deal['Criado Em'] || '',
+    data: dataCriacao,
     nota:`Lead cadastrado por ${deal['Criado Por']||'Sistema'}`,
     statusLigacao:'Lead cadastrado',
+    _primeiro: true,
   });
 
   // Atividades registradas
@@ -2523,8 +2552,10 @@ function renderTimeline(dealId, contatoId) {
     }
   }
 
-  // Ordena por data (eventos sem data vão ao final)
+  // Ordena por data — Lead criado sempre primeiro, sem data vai ao final
   eventos.sort((a,b) => {
+    if (a._primeiro) return -1;
+    if (b._primeiro) return 1;
     if (!a.data && !b.data) return 0;
     if (!a.data) return 1;
     if (!b.data) return -1;
@@ -3229,8 +3260,14 @@ function renderAgenda() {
   const hoje = new Date(); hoje.setHours(0,0,0,0);
   const agora = new Date();
 
-  // Classifica cada deal ativo com follow-up
-  const deals = allDeals.filter(d => d['Status']==='Ativo' && d['Próximo Follow-up']);
+  // Classifica cada deal ativo com follow-up — exclui fechados
+  const deals = allDeals.filter(d =>
+    d['Status']==='Ativo' &&
+    d['Próximo Follow-up'] &&
+    d['Etapa'] !== 'Fechado' &&
+    d['Status'] !== 'Fechado — Ganho' &&
+    d['Status'] !== 'Fechado — Perdido'
+  );
 
   const classificados = deals.map(d => {
     const fuRaw = d['Próximo Follow-up'];
@@ -3837,16 +3874,66 @@ async function salvarConfig() {
 
 // ── Temas visuais
 const TEMAS = {
-  // ── GO Dark — padrão atual, fundo escuro azulado
-  dark:    {'--bg':'#07090f','--sf':'#0e1118','--s2':'#161b26','--s3':'#1e2535','--bd':'#232d42','--bd2':'#2d3a55','--tx':'#e8edf8','--t2':'#8fa3c4','--t3':'#4d6080','--ac':'#4f7cff','--a2':'#7b9fff','--as':'rgba(79,124,255,.1)','--gn':'#22d07a','--re':'#f05454','--ye':'#f5b731','--gs':'rgba(34,208,122,.1)','--rs':'rgba(240,84,84,.1)','--ys':'rgba(245,183,49,.1)','--sh':'0 4px 24px rgba(0,0,0,.4)','--sh2':'0 8px 40px rgba(0,0,0,.5)'},
-  // ── GO Light — fundo branco limpo
-  light:   {'--bg':'#f1f5f9','--sf':'#ffffff','--s2':'#f8fafc','--s3':'#e2e8f0','--bd':'#cbd5e1','--bd2':'#94a3b8','--tx':'#0f172a','--t2':'#475569','--t3':'#94a3b8','--ac':'#4f7cff','--a2':'#3b6fe8','--as':'rgba(79,124,255,.08)','--gn':'#16a34a','--re':'#dc2626','--ye':'#ca8a04','--gs':'rgba(22,163,74,.08)','--rs':'rgba(220,38,38,.08)','--ys':'rgba(202,138,4,.08)','--sh':'0 2px 12px rgba(0,0,0,.08)','--sh2':'0 4px 24px rgba(0,0,0,.12)'},
-  // ── Gestão Online — branco + laranja #f97316 (cor real do site gestao-online.com)
-  gestao:  {'--bg':'#fafafa','--sf':'#ffffff','--s2':'#fff7f0','--s3':'#ffe8d6','--bd':'#fcd8b8','--bd2':'#f9a96a','--tx':'#1a0900','--t2':'#7c3a10','--t3':'#b86830','--ac':'#f97316','--a2':'#ea6a05','--as':'rgba(249,115,22,.1)','--gn':'#16a34a','--re':'#dc2626','--ye':'#ca8a04','--gs':'rgba(22,163,74,.08)','--rs':'rgba(220,38,38,.08)','--ys':'rgba(202,138,4,.08)','--sh':'0 2px 12px rgba(249,115,22,.15)','--sh2':'0 4px 24px rgba(249,115,22,.2)'},
-  // ── GOPag — branco + verde #00c97a (verde real do logo gopag.com.br)
-  gopag:   {'--bg':'#f0faf5','--sf':'#ffffff','--s2':'#f0fdf8','--s3':'#dcfaed','--bd':'#b3f0d4','--bd2':'#6ddcad','--tx':'#022510','--t2':'#1a6640','--t3':'#3a9e6a','--ac':'#00c97a','--a2':'#00a864','--as':'rgba(0,201,122,.1)','--gn':'#00c97a','--re':'#dc2626','--ye':'#ca8a04','--gs':'rgba(0,201,122,.12)','--rs':'rgba(220,38,38,.08)','--ys':'rgba(202,138,4,.08)','--sh':'0 2px 12px rgba(0,201,122,.15)','--sh2':'0 4px 24px rgba(0,201,122,.2)'},
-  // ── GOSigner — branco + roxo #6c3ce1 (roxo real do logo gosigner.com.br)
-  gosigner:{'--bg':'#f8f4ff','--sf':'#ffffff','--s2':'#f5f0ff','--s3':'#ede5ff','--bd':'#d4bcff','--bd2':'#a97df5','--tx':'#1a0a3d','--t2':'#4a2080','--t3':'#7a4ab0','--ac':'#6c3ce1','--a2':'#5929cc','--as':'rgba(108,60,225,.1)','--gn':'#16a34a','--re':'#dc2626','--ye':'#ca8a04','--gs':'rgba(22,163,74,.08)','--rs':'rgba(220,38,38,.08)','--ys':'rgba(202,138,4,.08)','--sh':'0 2px 12px rgba(108,60,225,.15)','--sh2':'0 4px 24px rgba(108,60,225,.2)'},
+  // ── Dark Asana — cinza escuro, coral accent
+  dark: {
+    '--bg':'#1e1f21','--sf':'#2a2b2d','--s2':'#313234','--s3':'#3a3b3d',
+    '--bd':'#424244','--bd2':'#555557',
+    '--tx':'#f5f5f5','--t2':'#a2a0a2','--t3':'#6e6c6e',
+    '--ac':'#f06a6a','--a2':'#f08080','--as':'rgba(240,106,106,.12)',
+    '--gn':'#22d07a','--re':'#f05454','--ye':'#f5b731',
+    '--gs':'rgba(34,208,122,.1)','--rs':'rgba(240,84,84,.1)','--ys':'rgba(245,183,49,.1)',
+    '--sh':'0 4px 24px rgba(0,0,0,.5)','--sh2':'0 8px 40px rgba(0,0,0,.6)'
+  },
+  // ── Light — fundo frio, contraste real
+  light: {
+    '--bg':'#f0f2f5','--sf':'#ffffff','--s2':'#f5f6f8','--s3':'#e8eaee',
+    '--bd':'#d8dce4','--bd2':'#bfc5d0',
+    '--tx':'#1a1d21','--t2':'#3e4a5a','--t3':'#6b7685',
+    '--ac':'#4f7cff','--a2':'#3b6fe8','--as':'rgba(79,124,255,.08)',
+    '--gn':'#16a34a','--re':'#dc2626','--ye':'#ca8a04',
+    '--gs':'rgba(22,163,74,.08)','--rs':'rgba(220,38,38,.08)','--ys':'rgba(202,138,4,.08)',
+    '--sh':'0 1px 8px rgba(0,0,0,.07)','--sh2':'0 6px 24px rgba(0,0,0,.10)'
+  },
+  // ── Gestão Online — laranja #f97316
+  gestao: {
+    '--bg':'#fafafa','--sf':'#ffffff','--s2':'#fff7f0','--s3':'#ffe8d6',
+    '--bd':'#fcd8b8','--bd2':'#f9a96a',
+    '--tx':'#1a0900','--t2':'#7c3a10','--t3':'#b86830',
+    '--ac':'#f97316','--a2':'#ea6a05','--as':'rgba(249,115,22,.1)',
+    '--gn':'#16a34a','--re':'#dc2626','--ye':'#ca8a04',
+    '--gs':'rgba(22,163,74,.08)','--rs':'rgba(220,38,38,.08)','--ys':'rgba(202,138,4,.08)',
+    '--sh':'0 2px 12px rgba(249,115,22,.15)','--sh2':'0 4px 24px rgba(249,115,22,.2)'
+  },
+  // ── GOPag — Deep Ocean (Fintech/SaaS)
+  gopag: {
+    '--bg':'#0f172a','--sf':'#1e293b','--s2':'#263348','--s3':'#2f3f58',
+    '--bd':'#334155','--bd2':'#475569',
+    '--tx':'#f8fafc','--t2':'#94a3b8','--t3':'#64748b',
+    '--ac':'#38bdf8','--a2':'#7dd3fc','--as':'rgba(56,189,248,.12)',
+    '--gn':'#10b981','--re':'#f05454','--ye':'#f5b731',
+    '--gs':'rgba(16,185,129,.1)','--rs':'rgba(240,84,84,.1)','--ys':'rgba(245,183,49,.1)',
+    '--sh':'0 4px 24px rgba(0,0,0,.5)','--sh2':'0 8px 40px rgba(0,0,0,.6)'
+  },
+  // ── GOSigner — Nordic Frost (clean/elegante)
+  gosigner: {
+    '--bg':'#2e3440','--sf':'#3b4252','--s2':'#434c5e','--s3':'#4c566a',
+    '--bd':'#4c566a','--bd2':'#5e6e88',
+    '--tx':'#eceff4','--t2':'#d8dee9','--t3':'#a0aab8',
+    '--ac':'#88c0d0','--a2':'#81a1c1','--as':'rgba(136,192,208,.12)',
+    '--gn':'#a3be8c','--re':'#bf616a','--ye':'#ebcb8b',
+    '--gs':'rgba(163,190,140,.1)','--rs':'rgba(191,97,106,.1)','--ys':'rgba(235,203,139,.1)',
+    '--sh':'0 4px 24px rgba(0,0,0,.4)','--sh2':'0 8px 40px rgba(0,0,0,.5)'
+  },
+  // ── Cyberpunk Soft — high contrast, neon
+  cyberpunk: {
+    '--bg':'#0d0221','--sf':'#0f0844','--s2':'#160b55','--s3':'#1e1066',
+    '--bd':'#3120e0','--bd2':'#4535f0',
+    '--tx':'#ffffff','--t2':'#c084fc','--t3':'#7c3aed',
+    '--ac':'#fb2576','--a2':'#ff4d8f','--as':'rgba(251,37,118,.15)',
+    '--gn':'#22d07a','--re':'#f05454','--ye':'#fbbf24',
+    '--gs':'rgba(34,208,122,.1)','--rs':'rgba(240,84,84,.1)','--ys':'rgba(251,191,36,.1)',
+    '--sh':'0 4px 24px rgba(49,32,224,.4)','--sh2':'0 8px 40px rgba(251,37,118,.3)'
+  },
 };
 
 function aplicarTema(nome, el) {
