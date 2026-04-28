@@ -1746,8 +1746,11 @@ function iniciarApp() {
   document.getElementById('userAv').textContent  = av;
   document.getElementById('userName').textContent = currentUser.nome;
   document.getElementById('userRole').textContent  = currentUser.perfil;
-  aplicarGovernanca(currentUser.perfil);
+  aplicarGovernanca();
   carregarLogoLocal();
+  // Mostra a home do perfil antes do sync para não ficar em branco
+  const home = PERFIL_HOME[currentUser.perfil] || 'pipeline';
+  showScr(home);
   syncAll();
 }
 
@@ -1833,7 +1836,7 @@ function irParaLead() {
 // ══ SYNC ALL ══
 async function syncAll() {
   const btn = document.getElementById('syncBtn');
-  btn.textContent = '🔄 ...'; btn.disabled = true;
+  if(btn){ btn.textContent = '🔄 ...'; btn.disabled = true; }
   try {
     const [ct, dl, pl] = await Promise.all([
       apiGet('CONTATOS'), apiGet('DEALS'), apiGet('PIPELINES')
@@ -1862,9 +1865,10 @@ async function syncAll() {
     toast(`✅ Sincronizado — ${allContatos.length} contatos, ${allDeals.length} deals`, 'ok');
     iniciarPollingNotif();
   } catch(e) {
+    console.error('syncAll erro:', e);
     toast('❌ Erro de conexão', 'err');
   } finally {
-    btn.textContent = '🔄 Sincronizar'; btn.disabled = false;
+    if(btn){ btn.textContent = '🔄 Sincronizar'; btn.disabled = false; }
   }
 }
 
