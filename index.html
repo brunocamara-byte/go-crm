@@ -92,7 +92,7 @@ body.tema-light{
 }
 .sb{width:210px;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0}
 .sb-lg{padding:15px 13px 11px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:9px}
-.sq{width:28px;height:28px;background:linear-gradient(135deg,var(--ac),#8b5cf6);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:#fff;flex-shrink:0}
+.sq{width:36px;height:36px;background:linear-gradient(135deg,var(--ac),#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:#fff;flex-shrink:0}
 .sb-w{font-family:'Syne',sans-serif;font-weight:800;font-size:13px}
 .sb-su{font-size:10px;color:var(--t3);letter-spacing:.04em;text-transform:uppercase}
 .sb-sc{padding:11px 7px 4px}
@@ -100,6 +100,9 @@ body.tema-light{
 .nv{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:var(--rsm);cursor:pointer;font-size:12.5px;font-weight:500;color:var(--t2);margin-bottom:2px;transition:all .15s;user-select:none}
 .nv:hover{background:var(--s2);color:var(--tx)}
 .nv.on{background:var(--as);color:var(--ac)}
+.nv-ic{font-size:10px;color:var(--t3);width:14px;flex-shrink:0;transition:color .15s}
+.nv.on .nv-ic{color:var(--ac)}
+.nv:hover .nv-ic{color:var(--t2)}
 .nb{margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;font-family:'DM Mono',monospace;background:var(--as);color:var(--ac)}
 .sb-bt{margin-top:auto;padding:11px 7px;border-top:1px solid var(--bd)}
 .ur{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:var(--rsm);cursor:pointer;transition:background .15s}
@@ -776,16 +779,16 @@ body.tema-light{
   </div>
   <div class="sb-sc">
     <div class="sb-lb">Principal</div>
-    <div class="nv" id="nav-pipeline" onclick="showScr('pipeline')"><span>⚡</span><span>Pipeline</span><span class="nb" id="dealCount">0</span></div>
-    <div class="nv on" id="nav-contatos" onclick="showScr('contatos')"><span>👥</span><span>Contatos</span><span class="nb" id="ctCount">0</span></div>
-    <div class="nv" id="nav-followups" onclick="showScr('followups')"><span>📅</span><span>Agenda Comercial</span></div>
-    <div class="nv" id="nav-relatorios" onclick="showScr('relatorios')"><span>📊</span><span>Relatórios</span></div>
-    <div class="nv" id="nav-implantacao" onclick="showScr('implantacao')"><span>🚀</span><span>Implantação</span><span class="nb" id="implCount">0</span></div>
-    <div class="nv" id="nav-agenda-impl" onclick="showScr('agenda-impl')"><span>📆</span><span>Agenda Implantação</span></div>
-    <div class="nv" id="nav-dash-impl" onclick="showScr('dash-impl')"><span>📊</span><span>Meu Dashboard</span></div>
+    <div class="nv" id="nav-pipeline" onclick="showScr('pipeline')"><span class="nv-ic">▸</span><span>Pipeline</span><span class="nb" id="dealCount">0</span></div>
+    <div class="nv on" id="nav-contatos" onclick="showScr('contatos')"><span class="nv-ic">▸</span><span>Contatos</span><span class="nb" id="ctCount">0</span></div>
+    <div class="nv" id="nav-followups" onclick="showScr('followups')"><span class="nv-ic">▸</span><span>Agenda Comercial</span></div>
+    <div class="nv" id="nav-relatorios" onclick="showScr('relatorios')"><span class="nv-ic">▸</span><span>Relatórios</span></div>
+    <div class="nv" id="nav-implantacao" onclick="showScr('implantacao')"><span class="nv-ic">▸</span><span>Implantação</span><span class="nb" id="implCount">0</span></div>
+    <div class="nv" id="nav-agenda-impl" onclick="showScr('agenda-impl')"><span class="nv-ic">▸</span><span>Agenda Implantação</span></div>
+    <div class="nv" id="nav-dash-impl" onclick="showScr('dash-impl')"><span class="nv-ic">▸</span><span>Meu Dashboard</span></div>
     <div class="sb-lb" style="margin-top:6px">Sistema</div>
-    <div class="nv" id="nav-produtos" onclick="showScr('produtos')"><span>📦</span><span>Produtos GO</span></div>
-    <div class="nv" id="nav-config" onclick="showScr('config')"><span>⚙️</span><span>Config</span></div>
+    <div class="nv" id="nav-produtos" onclick="showScr('produtos')"><span class="nv-ic">▸</span><span>Produtos GO</span></div>
+    <div class="nv" id="nav-config" onclick="showScr('config')"><span class="nv-ic">▸</span><span>Configurações</span></div>
   </div>
   <div class="sb-bt">
     <div class="ur">
@@ -802,9 +805,9 @@ body.tema-light{
     <span class="v1badge">✦ v3.0 · LIVE</span>
     <div class="tb-r" id="tbRight">
       <button class="btn btn-g" onclick="openGSearch()" title="Ctrl+K">🔍 Ctrl+K</button>
-      <button class="btn btn-g" id="syncBtn" onclick="syncAll()">🔄 Sincronizar</button>
-      <button class="btn btn-g" id="benchBtn" onclick="injetarDadosTeste()" title="Inserir 10 cards de teste" style="font-size:11px;opacity:.5">📊 Demo</button>
-      <button class="btn btn-g" id="importLeadsBtn" onclick="openImport()" style="display:none">📥 Importar</button>
+      <button class="btn btn-g" id="syncBtn" onclick="syncAll()">Sincronizar</button>
+      <button class="btn btn-g" id="benchBtn" onclick="injetarDadosTeste()" title="Inserir 10 cards de teste" style="font-size:11px;opacity:.5">Demo</button>
+      <button class="btn btn-g" id="importLeadsBtn" onclick="openImport()" style="display:none">Importar</button>
       <button class="btn btn-p" id="newBtn" onclick="openPanel('new')">+ Novo Contato</button>
     </div>
   </div>
@@ -1112,7 +1115,7 @@ body.tema-light{
           </div>
         </div>
         <div style="display:flex;justify-content:flex-end">
-          <button class="btn btn-p" onclick="salvarConfig()">💾 Salvar configurações</button>
+          <button class="btn btn-p" onclick="salvarConfig()">Salvar configurações</button>
         </div>
       </div>
     </div>
@@ -1142,7 +1145,7 @@ body.tema-light{
           </div>
         </div>
         <div class="dash-card">
-          <div class="dash-card-title">🎨 Tema do sistema</div>
+          <div class="dash-card-title">Tema do sistema</div>
           <div class="cfg-helper">Escolha a identidade visual. Cada tema muda as cores do sistema inteiro.</div>
           <div class="tema-grid" id="temaGrid">
             <div class="tema-card on" onclick="aplicarTema('dark',this)" data-tema="dark">
@@ -1194,7 +1197,7 @@ body.tema-light{
           </div>
         </div>
         <div style="display:flex;justify-content:flex-end">
-          <button class="btn btn-p" onclick="salvarConfig()">💾 Salvar configurações</button>
+          <button class="btn btn-p" onclick="salvarConfig()">Salvar configurações</button>
         </div>
       </div>
     </div>
@@ -1367,7 +1370,7 @@ body.tema-light{
   </div>
   <div class="p-foot">
     <button class="btn btn-g" style="flex:1" onclick="toggleProdStatus()" id="toggleProdBtn">🔄 Ativar/Inativar</button>
-    <button class="btn btn-p" style="flex:2" onclick="saveProduto()" id="saveProdBtn">💾 Salvar produto</button>
+    <button class="btn btn-p" style="flex:2" onclick="saveProduto()" id="saveProdBtn">Salvar produto</button>
   </div>
 </div>
 
@@ -1408,6 +1411,7 @@ body.tema-light{
         <div><label class="fl">Responsável</label><select class="fse" id="fResponsavel"><option>Samuel Mateus</option><option>Nicolau</option><option>Bruno Camara</option></select></div>
         <div><label class="fl">Próximo follow-up</label><input class="fi" id="fFollowup" type="date"></div>
         <div class="ff"><label class="fl">Observações</label><textarea class="fta" id="fObs" placeholder="Contexto do lead..."></textarea></div>
+        <div class="ff"><label class="fl">Produtos atuais <span style="font-size:10px;color:var(--t3);font-weight:400">(para Reativação)</span></label><input class="fi" id="fProdutosAtuais" placeholder="Ex: GOSigner, Módulo Financeiro..."></div>
       </div>
     </div>
     <div class="fsec">
@@ -1423,7 +1427,7 @@ body.tema-light{
     <button class="btn btn-g" style="flex:1" onclick="closePanel()">Cancelar</button>
     <button class="btn btn-re" id="deleteBtn" style="display:none" onclick="confirmDelete()">🗑 Excluir</button>
     <button class="btn btn-gn" id="pipeBtn" style="display:none" onclick="openPipeModal()">⚡ Mover para pipeline</button>
-    <button class="btn btn-p" id="saveBtn" onclick="saveContato()">💾 Salvar Contato</button>
+    <button class="btn btn-p" id="saveBtn" onclick="saveContato()">Salvar Contato</button>
   </div>
 </div>
 
@@ -1520,7 +1524,7 @@ body.tema-light{
   <div class="p-foot">
     <button class="btn btn-re" id="dpDeleteBtn" onclick="askDeleteDealDirect()">🗑 Excluir</button>
     <button class="btn btn-g" onclick="closeDealPanel()">Cancelar</button>
-    <button class="btn btn-p" style="flex:2" onclick="saveDealPanel()" id="dpSaveBtn">💾 Salvar oportunidade</button>
+    <button class="btn btn-p" style="flex:2" onclick="saveDealPanel()" id="dpSaveBtn">Salvar oportunidade</button>
   </div>
 </div>
 
@@ -1676,7 +1680,7 @@ body.tema-light{
 <div class="import-ov" id="importOv" onclick="if(event.target===this)closeImport()">
   <div class="import-modal">
     <div class="import-head">
-      <div class="p-title">📥 Importar leads em lote</div>
+      <div class="p-title">Importar leads em lote</div>
       <button class="btn btn-g" onclick="closeImport()" style="padding:6px;font-size:14px">✕</button>
     </div>
     <div class="import-body">
@@ -1712,7 +1716,7 @@ body.tema-light{
     <div class="import-foot">
       <button class="btn btn-g" style="flex:1" onclick="closeImport()">Cancelar</button>
       <button class="btn btn-p" style="flex:2" id="importBtn" onclick="executarImport()" disabled>
-        📥 Importar leads
+        Importar leads
       </button>
     </div>
   </div>
@@ -1789,6 +1793,7 @@ function iniciarApp() {
   document.getElementById('userRole').textContent  = currentUser.perfil;
   aplicarGovernanca();
   carregarLogoLocal();
+  iniciarControleInatividade();
   // Mostra a home do perfil antes do sync para não ficar em branco
   const home = PERFIL_HOME[currentUser.perfil] || 'pipeline';
   showScr(home);
@@ -1823,6 +1828,25 @@ async function apiGet(tabela) {
 // ══ NOTIFICAÇÃO GRANDE — polling 30s ══
 let _notifLastIds = null;
 let _notifInterval = null;
+
+// ══ SESSÃO POR INATIVIDADE (30 min) ══
+const INATIVIDADE_MS = 30 * 60 * 1000;
+let _inativTimer = null;
+
+function resetInatividade() {
+  clearTimeout(_inativTimer);
+  _inativTimer = setTimeout(() => {
+    toast('Sessão encerrada por inatividade.', 'warn');
+    setTimeout(() => logout(), 2000);
+  }, INATIVIDADE_MS);
+}
+
+function iniciarControleInatividade() {
+  ['mousemove','keydown','click','scroll','touchstart'].forEach(ev =>
+    document.addEventListener(ev, resetInatividade, { passive:true })
+  );
+  resetInatividade();
+}
 
 function iniciarPollingNotif() {
   if (_notifInterval) return;
@@ -1909,7 +1933,7 @@ async function syncAll() {
     console.error('syncAll erro:', e);
     toast('❌ Erro de conexão', 'err');
   } finally {
-    if(btn){ btn.textContent = '🔄 Sincronizar'; btn.disabled = false; }
+    if(btn){ btn.textContent = 'Sincronizar'; btn.disabled = false; }
   }
 }
 
@@ -2148,7 +2172,7 @@ function cardHTML(d, stage, pipeColor, stages) {
     </div>
     <div class="cqact">
       <div class="qa qa-c" onclick="event.stopPropagation();openQLog('${d['ID']}','${(d['Empresa']||'').replace(/'/g,"\\'")}')">+ Atividade</div>
-      <div class="qa qa-e" onclick="event.stopPropagation();openDealPanel('${d['ID']}')">✏️ Editar</div>
+      <div class="qa qa-e" onclick="event.stopPropagation();openDealPanel('${d['ID']}')">Editar</div>
       <div class="qa qa-d" onclick="event.stopPropagation();askDeleteDeal('${d['ID']}','${(d['Empresa']||'').replace(/'/g,"\\'")}')">🗑</div>
     </div>
   </div>`;
@@ -2480,7 +2504,7 @@ async function saveDealPanel() {
       toast('❌ Erro: ' + (res.error||''), 'err');
     }
   } catch(e) { toast('❌ Erro de conexão', 'err'); }
-  finally { isProcessing = false; btn.disabled = false; btn.textContent = '💾 Salvar oportunidade'; }
+  finally { isProcessing = false; btn.disabled = false; btn.textContent = 'Salvar oportunidade'; }
 }
 
 function askDeleteDealDirect() {
@@ -2648,7 +2672,7 @@ function openPanel(mode,id){
     const c=allContatos.find(x=>x['ID']===id); if(!c)return;
     editingId=id;
     document.getElementById('panelTitle').textContent=c['Empresa']||'Editar';
-    document.getElementById('saveBtn').textContent='💾 Salvar alterações';
+    document.getElementById('saveBtn').textContent='Salvar alterações';
     document.getElementById('editId').value=id;
     document.getElementById('fEmpresa').value=c['Empresa']||'';
     document.getElementById('fCNPJ').value=c['CNPJ']||'';
@@ -2666,6 +2690,7 @@ function openPanel(mode,id){
     document.getElementById('fFollowup').value=c['Próximo Follow-up']?fmtDateInput(c['Próximo Follow-up']):'';
     document.getElementById('fObs').value=c['Observações']||'';
     document.getElementById('fContextoCEO').value=c['Contexto CEO']||'';
+    document.getElementById('fProdutosAtuais').value=c['Produtos Atuais']||'';
     document.getElementById('notifInfo').style.display='none';
     document.getElementById('pipeInfo').style.display='flex';
     document.getElementById('deleteBtn').style.display='flex';
@@ -2673,7 +2698,7 @@ function openPanel(mode,id){
     pipeContactId=id;
   } else {
     document.getElementById('panelTitle').textContent='Novo Contato';
-    document.getElementById('saveBtn').textContent='💾 Salvar e notificar Samuel';
+    document.getElementById('saveBtn').textContent='Salvar e notificar Samuel';
     document.getElementById('notifInfo').style.display='flex';
     document.getElementById('pipeInfo').style.display='none';
     const tmrw=new Date();tmrw.setDate(tmrw.getDate()+1);
@@ -2691,7 +2716,7 @@ function closePanel(){
 }
 
 function clearForm(){
-  ['fEmpresa','fCNPJ','fNome','fCargo','fTelefone','fEmail','fObs','fContextoCEO','editId'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['fEmpresa','fCNPJ','fNome','fCargo','fTelefone','fEmail','fObs','fContextoCEO','fProdutosAtuais','editId'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['fSegmento','fICP'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['fTipo','fPrioridade','fPotencial','fOrigem','fResponsavel'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
   ['errEmpresa','errNome','errTelefone'].forEach(id=>document.getElementById(id).classList.remove('show'));
@@ -2751,6 +2776,7 @@ async function saveContato(){
     proximoFollowUp:document.getElementById('fFollowup').value,
     observacoes:document.getElementById('fObs').value.trim(),
     contextoCEO:document.getElementById('fContextoCEO').value.trim(),
+    produtosAtuais:document.getElementById('fProdutosAtuais')?.value.trim()||'',
     atribuidoPor:currentUser.nome,
   };
   try{
@@ -2771,7 +2797,7 @@ async function saveContato(){
       toast('❌ Erro: '+(res.error||'desconhecido'),'err');
     }
   }catch(e){toast('❌ Erro de conexão','err');}
-  finally{btn.disabled=false;btn.textContent=editingId?'💾 Salvar alterações':'💾 Salvar e notificar Samuel';}
+  finally{btn.disabled=false;btn.textContent=editingId?'Salvar alterações':'Salvar e notificar Samuel';}
 }
 
 // ══ PIPE MODAL ══
@@ -3259,7 +3285,7 @@ async function saveProduto() {
   } finally {
     isProcessing = false;
     btn.disabled = false;
-    btn.textContent = '💾 Salvar produto';
+    btn.textContent = 'Salvar produto';
   }
 }
 
@@ -3461,8 +3487,8 @@ function fuCardHTML(deal) {
     </div>
     ${ultimaHtml}
     <div class="fu-actions">
-      <div class="fu-btn fu-btn-call" onclick="abrirQLogAgenda('${deal['ID']}','${(deal['Empresa']||'').replace(/'/g,"\\'")}')">📞 Registrar</div>
-      <div class="fu-btn fu-btn-deal" onclick="openDealPanel('${deal['ID']}')">✏️ Abrir</div>
+      <div class="fu-btn fu-btn-call" onclick="abrirQLogAgenda('${deal['ID']}','${(deal['Empresa']||'').replace(/'/g,"\\'")}')">Registrar</div>
+      <div class="fu-btn fu-btn-deal" onclick="openDealPanel('${deal['ID']}')">Abrir</div>
       <div class="fu-btn fu-btn-reagendar" onclick="reagendarFollowUp('${deal['ID']}','${(deal['Empresa']||'').replace(/'/g,"\\'")}')">📅 Reagendar</div>
       <div class="fu-btn fu-btn-desq" onclick="abrirDesqualificar('${deal['ID']}','${(deal['Empresa']||'').replace(/'/g,"\\'")}')">✖ Desqualificar</div>
     </div>
@@ -4099,7 +4125,7 @@ function aplicarTema(nome, el) {
   const tema = TEMAS[nome]; if(!tema) return;
   Object.entries(tema).forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
   localStorage.setItem('go_crm_tema', nome);
-  toast(`🎨 Tema ${el.querySelector('.tema-nome').textContent} aplicado!`,'ok');
+  toast(`Tema ${el.querySelector('.tema-nome').textContent} aplicado!`,'ok');
   apiPost({action:'SALVAR_CONFIG',payload:{campos:[['TEMA',nome]]},usuario:currentUser.nome}).catch(()=>{});
 }
 
@@ -4132,7 +4158,7 @@ async function renderUsuarios() {
           </div>
           <div class="cfg-tgl-sub">${u['Email']||'—'}</div>
         </div>
-        <button class="btn btn-g" style="font-size:11px;padding:5px 12px" onclick="editarUsuario(${i})">✏️ Editar</button>
+        <button class="btn btn-g" style="font-size:11px;padding:5px 12px" onclick="editarUsuario(${i})">Editar</button>
       </div>`;
     }).join('') || '<div style="color:var(--t3);font-size:13px">Nenhum usuário cadastrado.</div>';
   } catch(e) {
@@ -4177,7 +4203,7 @@ function abrirModalUsuario(dados) {
         <label style="font-size:11px;font-weight:600;color:var(--t3);display:block;margin-bottom:4px">${isNovo?'SENHA':'NOVA SENHA (deixe em branco para não alterar)'}</label>
         <input class="fi" id="usrSenha" type="password" placeholder="${isNovo?'Mínimo 6 caracteres':'••••••••'}" style="width:100%">
       </div>
-      ${!isNovo?`<button class="btn btn-re" style="font-size:11px;width:100%;justify-content:center" onclick="desativarUsuario('${dados.id}')">🗑 Desativar usuário</button>`:''}
+      ${!isNovo?`<button class="btn btn-re" style="font-size:11px;width:100%;justify-content:center" onclick="desativarUsuario('${dados.id}')">Desativar usuário</button>`:''}
     </div>`;
 
   const btn = document.getElementById('confirmBtn');
@@ -4259,7 +4285,7 @@ function removerLogo() {
   if(preview) preview.innerHTML = `<div class="sq" style="width:64px;height:64px;font-size:20px">GO</div>`;
   localStorage.removeItem('go_crm_logo');
   apiPost({action:'SALVAR_CONFIG', payload:{campos:[['LOGO_BASE64','']]}, usuario:currentUser.nome}).catch(()=>{});
-  toast('🗑 Logo removido','ok');
+  toast('Logo removido','ok');
 }
 
 function carregarLogoLocal() {
