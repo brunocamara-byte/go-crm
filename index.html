@@ -387,6 +387,10 @@ body.tema-light{
 .fu-btn-call:hover{background:var(--ac);color:#fff}
 .fu-btn-deal{background:var(--gs);border-color:var(--gn);color:var(--gn)}
 .fu-btn-deal:hover{background:var(--gn);color:#000}
+.fu-btn-reagendar{background:var(--ys);border-color:var(--ye);color:var(--ye)}
+.fu-btn-reagendar:hover{background:var(--ye);color:#000}
+.fu-btn-desq{background:var(--rs);border-color:var(--re);color:var(--re)}
+.fu-btn-desq:hover{background:var(--re);color:#fff}
 /* card já contatado hoje */
 .fu-card.fu-done{opacity:.5}
 .fu-done-badge{background:var(--gs);color:var(--gn);font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700}
@@ -1592,6 +1596,38 @@ body.tema-light{
     <div style="display:flex;gap:8px;margin-top:14px">
       <button class="btn btn-g" style="flex:1" onclick="closeQLog()">Cancelar</button>
       <button class="btn btn-gn" style="flex:2" id="qlogSaveBtn" onclick="saveQLog()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL DESQUALIFICAR ══ -->
+<div class="confirm-ov" id="desqOv" style="display:none;align-items:center;justify-content:center">
+  <div class="confirm-card" style="max-width:400px;width:100%">
+    <div style="font-size:24px;margin-bottom:8px">✖</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--re);margin-bottom:6px">Desqualificar lead</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:16px" id="desqEmpresa">—</div>
+    <input type="hidden" id="desqDealId">
+    <div style="margin-bottom:14px">
+      <label class="fl" style="margin-bottom:8px">Motivo</label>
+      <div class="cbs" id="desqMotivos" style="flex-wrap:wrap;gap:6px">
+        <button class="cb" onclick="selDesq(this,'Sem interesse agora')">Sem interesse agora</button>
+        <button class="cb" onclick="selDesq(this,'Sem budget')">Sem budget</button>
+        <button class="cb" onclick="selDesq(this,'Foi para concorrente')">Foi para concorrente</button>
+        <button class="cb" onclick="selDesq(this,'Sem retorno')">Sem retorno</button>
+        <button class="cb" onclick="selDesq(this,'Timing ruim')">Timing ruim</button>
+        <button class="cb" onclick="selDesq(this,'Outro')">Outro</button>
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <label class="fl" style="margin-bottom:4px">Observação (opcional)</label>
+      <input class="fi" id="desqObs" placeholder="Detalhes adicionais..." style="margin-top:4px">
+    </div>
+    <div style="background:rgba(245,183,49,.08);border:1px solid rgba(245,183,49,.2);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--ye);margin-bottom:16px">
+      🔄 O lead será movido para <strong>Perdido</strong> e um card será criado automaticamente no pipe de <strong>Reativação</strong> para contato futuro.
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-g" style="flex:1" onclick="fecharDesq()">Cancelar</button>
+      <button class="btn btn-re" style="flex:2" id="desqBtn" onclick="confirmarDesqualificar()">✖ Desqualificar e mover para Reativação</button>
     </div>
   </div>
 </div>
@@ -3425,8 +3461,10 @@ function fuCardHTML(deal) {
     </div>
     ${ultimaHtml}
     <div class="fu-actions">
-      <div class="fu-btn fu-btn-call" onclick="abrirQLogAgenda('${deal['ID']}','${(deal['Empresa']||'').replace(/'/g,"\\'")}')">📞 Registrar ligação</div>
-      <div class="fu-btn fu-btn-deal" onclick="openDealPanel('${deal['ID']}')">✏️ Abrir oportunidade</div>
+      <div class="fu-btn fu-btn-call" onclick="abrirQLogAgenda('${deal['ID']}','${(deal['Empresa']||'').replace(/'/g,"\\'")}')">📞 Registrar</div>
+      <div class="fu-btn fu-btn-deal" onclick="openDealPanel('${deal['ID']}')">✏️ Abrir</div>
+      <div class="fu-btn fu-btn-reagendar" onclick="reagendarFollowUp('${deal['ID']}','${(deal['Empresa']||'').replace(/'/g,"\\'")}')">📅 Reagendar</div>
+      <div class="fu-btn fu-btn-desq" onclick="abrirDesqualificar('${deal['ID']}','${(deal['Empresa']||'').replace(/'/g,"\\'")}')">✖ Desqualificar</div>
     </div>
   </div>`;
 }
@@ -3434,9 +3472,128 @@ function fuCardHTML(deal) {
 // Abre quick log a partir da agenda e marca como contatado
 function abrirQLogAgenda(dealId, empresa) {
   openQLog(dealId, empresa);
-  // Marca como contatado ao registrar
   contatadosHoje.add(dealId);
   renderAgenda();
+}
+
+// ══ REAGENDAR FOLLOW-UP ══
+function reagendarFollowUp(dealId, empresa) {
+  document.getElementById('confirmTitle').textContent = '📅 Reagendar follow-up';
+  document.getElementById('confirmDesc').innerHTML = `
+    <div style="text-align:left">
+      <div style="font-size:13px;color:var(--t2);margin-bottom:12px">${empresa}</div>
+      <label class="fl" style="margin-bottom:4px">Nova data</label>
+      <input class="fi" type="date" id="reagendarData" style="margin-bottom:8px">
+      <label class="fl" style="margin-bottom:4px">Horário (opcional)</label>
+      <input class="fi" type="time" id="reagendarHora">
+    </div>`;
+  // Preenche data padrão: 7 dias à frente
+  const d = new Date(); d.setDate(d.getDate()+7);
+  setTimeout(()=>{
+    const el = document.getElementById('reagendarData');
+    if(el) el.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  },50);
+  const btn = document.getElementById('confirmBtn');
+  btn.textContent = 'Reagendar'; btn.className = 'btn btn-p'; btn.disabled = false;
+  btn.onclick = async () => {
+    const data = document.getElementById('reagendarData')?.value;
+    const hora = document.getElementById('reagendarHora')?.value;
+    if (!data) { toast('⚠ Escolha uma data','warn'); return; }
+    const fu = hora ? `${data}T${hora}` : data;
+    btn.disabled=true; btn.textContent='Salvando...';
+    const deal = allDeals.find(d=>d['ID']===dealId);
+    if(deal) deal['Próximo Follow-up'] = fu;
+    closeConfirm();
+    toast('📅 Follow-up reagendado!','ok');
+    renderAgenda();
+    await apiPost({action:'ATUALIZAR_DEAL',payload:{id:dealId,proximoFollowUp:fu},usuario:currentUser.nome}).catch(()=>{});
+  };
+  document.getElementById('confirmOv').classList.add('open');
+}
+
+// ══ DESQUALIFICAR ══
+let _desqMotivo = '';
+
+function abrirDesqualificar(dealId, empresa) {
+  _desqMotivo = '';
+  document.getElementById('desqDealId').value = dealId;
+  document.getElementById('desqEmpresa').textContent = empresa;
+  document.getElementById('desqObs').value = '';
+  document.querySelectorAll('#desqMotivos .cb').forEach(b=>b.className='cb');
+  document.getElementById('desqBtn').disabled = false;
+  document.getElementById('desqBtn').textContent = '✖ Desqualificar e mover para Reativação';
+  document.getElementById('desqOv').style.display = 'flex';
+}
+
+function fecharDesq() {
+  document.getElementById('desqOv').style.display = 'none';
+}
+
+function selDesq(btn, motivo) {
+  _desqMotivo = motivo;
+  document.querySelectorAll('#desqMotivos .cb').forEach(b=>b.className='cb');
+  btn.classList.add('sel-a');
+}
+
+async function confirmarDesqualificar() {
+  if (!_desqMotivo) { toast('⚠ Selecione um motivo','warn'); return; }
+  const dealId = document.getElementById('desqDealId').value;
+  const obs    = document.getElementById('desqObs').value.trim();
+  const deal   = allDeals.find(d=>d['ID']===dealId);
+  if (!deal) return;
+
+  const btn = document.getElementById('desqBtn');
+  btn.disabled=true; btn.textContent='Processando...';
+
+  try {
+    // 1. Move deal para Perdido
+    await apiPost({
+      action:'ATUALIZAR_DEAL',
+      payload:{ id:dealId, status:'Fechado — Perdido', etapa:'Perdido' },
+      usuario:currentUser.nome
+    });
+
+    // 2. Registra atividade com motivo
+    await apiPost({
+      action:'REGISTRAR_ATIVIDADE',
+      payload:{
+        idDeal:dealId, idContato:deal['ID Contato']||'',
+        empresa:deal['Empresa']||'', tipo:'Desqualificado',
+        statusLigacao:_desqMotivo,
+        nota:`Desqualificado: ${_desqMotivo}${obs?' — '+obs:''}`,
+        proximoFollowUp:''
+      },
+      usuario:currentUser.nome
+    });
+
+    // 3. Cria card no pipe Reativação automaticamente
+    await apiPost({
+      action:'CRIAR_DEAL',
+      payload:{
+        idContato: deal['ID Contato']||'',
+        empresa:   deal['Empresa']||'',
+        pipeline:  'Reativação',
+        etapa:     'Identificado',
+        valorEstimado: deal['Valor Estimado']||0,
+        responsavel:   deal['Responsável']||currentUser.nome,
+        observacoes:   `Reativação — veio de Novos Leads. Motivo do no: ${_desqMotivo}${obs?' — '+obs:''}`,
+        prioridade:    '❄️ Frio',
+      },
+      usuario:currentUser.nome
+    });
+
+    fecharDesq();
+    toast('✅ Lead desqualificado e enviado para Reativação!','ok');
+
+    // Atualiza localmente
+    deal['Status'] = 'Fechado — Perdido';
+    deal['Etapa']  = 'Perdido';
+    await syncAll();
+
+  } catch(e) {
+    toast('❌ Erro ao processar','err');
+    btn.disabled=false; btn.textContent='✖ Desqualificar e mover para Reativação';
+  }
 }
 
 // ══ RELATÓRIOS — DUAS VISÕES ════════════════════════════════
