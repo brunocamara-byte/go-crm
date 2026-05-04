@@ -2264,6 +2264,28 @@ async function dropCard(e,etapa,pipe){
     const res=await apiPost({action:'ATUALIZAR_DEAL',payload:{id:dragged.id,etapa},usuario:currentUser.nome});
     if(res.success){
       toast(`✅ ${etapa}`,'ok');
+
+      // Se movido para Perdido — cria card automaticamente em Reativação/Mapeado
+      if(etapa==='Perdido'){
+        apiPost({
+          action:'CRIAR_DEAL',
+          payload:{
+            idContato:  deal['ID Contato']||'',
+            empresa:    deal['Empresa']||'',
+            pipeline:   'Reativação',
+            etapa:      'Mapeado',
+            valorEstimado: deal['Valor Estimado']||0,
+            responsavel:   deal['Responsável']||currentUser.nome,
+            prioridade:    '❄️ Frio',
+            observacoes:   'Reativação automática — veio de pipeline Perdido',
+          },
+          usuario: currentUser.nome
+        }).then(async ()=>{
+          toast('🔄 Card criado automaticamente em Reativação!','info');
+          await syncAll();
+        });
+      }
+
       // Se fechou — registra evento na timeline e atualiza agenda
       if(etapa==='Fechado'){
         const agora = new Date().toISOString();
@@ -4075,62 +4097,32 @@ async function loadConfig() {
 }
 
 async function salvarConfig() {
-  // Usa setTimeout para garantir que event.target seja capturado antes de qualquer await
-  const btn = (event && event.target) ? event.target : document.querySelector('#ccont-'+cfgTab+' .btn-p');
-  const origTxt = btn ? btn.textContent : '';
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Salvando...'; }
-
-  // Reset isProcessing caso tenha ficado travado
   isProcessing = false;
-
   const g = id => document.getElementById(id);
-
-  // Monta apenas os campos relevantes para a aba atual + campos sempre presentes
-  let campos = [];
-
-  // Aba Notificações
-  if (g('cfgEmailSamuel') !== null) {
-    campos.push(
-      ['EMAIL_SAMUEL',   g('cfgEmailSamuel')?.value||''],
-      ['EMAIL_NICOLAU',  g('cfgEmailNicolau')?.value||''],
-      ['EMAIL_BRUNO',    g('cfgEmailBruno')?.value||''],
-      ['EMAIL_CTO',      g('cfgEmailCTO')?.value||''],
-      ['EMAIL_AMANDA',   g('cfgEmailAmanda')?.value||''],
-      ['EMAIL_MATHEUS',  g('cfgEmailMatheus')?.value||''],
-      ['ALERTA_LEAD_PARADO_DIAS', g('cfgDiasParado')?.value||'5'],
-      ['NOTIF_NOVO_LEAD',         g('cfgNotifLead')?.checked?'true':'false'],
-      ['NOTIF_RESUMO_DIARIO',     g('cfgNotifDiario')?.checked?'true':'false'],
-      ['NOTIF_LEAD_PARADO',       g('cfgNotifParado')?.checked?'true':'false'],
-      ['NOTIF_RELATORIO_SEMANAL', g('cfgNotifSemanal')?.checked?'true':'false'],
-      ['NOTIF_DEAL_FECHADO',      g('cfgNotifAmanda')?.checked?'true':'false'],
-      ['NOTIF_PAGAMENTO_CONFIRMADO', g('cfgNotifMatheus')?.checked?'true':'false'],
-    );
-  }
-
-  // Aba Metas
-  if (g('cfgMeta') !== null) {
-    campos.push(
-      ['META_MENSAL',     g('cfgMeta')?.value||'45000'],
-      ['COMISSAO_SAMUEL', g('cfgComissao')?.value||'3'],
-      ['VALOR_HORA_DEV',  g('cfgValorHora')?.value||'200'],
-      ['SINAL_PADRAO_PCT',g('cfgSinal')?.value||'30'],
-    );
-  }
-
-  if (campos.length === 0) {
-    toast('⚠ Nenhum campo para salvar','warn');
-    if (btn) { btn.disabled = false; btn.textContent = origTxt; }
-    return;
-  }
-
+  const campos = [
+    ['EMAIL_SAMUEL',               g('cfgEmailSamuel')?.value||''],
+    ['EMAIL_NICOLAU',              g('cfgEmailNicolau')?.value||''],
+    ['EMAIL_BRUNO',                g('cfgEmailBruno')?.value||''],
+    ['EMAIL_CTO',                  g('cfgEmailCTO')?.value||''],
+    ['EMAIL_AMANDA',               g('cfgEmailAmanda')?.value||''],
+    ['EMAIL_MATHEUS',              g('cfgEmailMatheus')?.value||''],
+    ['META_MENSAL',                g('cfgMeta')?.value||'45000'],
+    ['COMISSAO_SAMUEL',            g('cfgComissao')?.value||'3'],
+    ['VALOR_HORA_DEV',             g('cfgValorHora')?.value||'200'],
+    ['SINAL_PADRAO_PCT',           g('cfgSinal')?.value||'30'],
+    ['ALERTA_LEAD_PARADO_DIAS',    g('cfgDiasParado')?.value||'5'],
+    ['NOTIF_NOVO_LEAD',            g('cfgNotifLead')?.checked?'true':'false'],
+    ['NOTIF_RESUMO_DIARIO',        g('cfgNotifDiario')?.checked?'true':'false'],
+    ['NOTIF_LEAD_PARADO',          g('cfgNotifParado')?.checked?'true':'false'],
+    ['NOTIF_RELATORIO_SEMANAL',    g('cfgNotifSemanal')?.checked?'true':'false'],
+    ['NOTIF_DEAL_FECHADO',         g('cfgNotifAmanda')?.checked?'true':'false'],
+    ['NOTIF_PAGAMENTO_CONFIRMADO', g('cfgNotifMatheus')?.checked?'true':'false'],
+  ];
   try {
     const res = await apiPost({ action:'SALVAR_CONFIG', payload:{campos}, usuario:currentUser.nome });
-    toast(res.success ? '✅ Configurações salvas!' : '❌ Erro ao salvar: ' + (res.error||''), res.success ? 'ok' : 'err');
+    toast(res.success ? '✅ Configurações salvas!' : '❌ Erro: ' + (res.error||''), res.success ? 'ok' : 'err');
   } catch(e) {
     toast('❌ Erro de conexão','err');
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = origTxt; }
-    isProcessing = false;
   }
 }
 
