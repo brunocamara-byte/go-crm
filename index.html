@@ -3723,7 +3723,7 @@ function renderNicolau() {
 
   // Dados base
   const dealsAtivos   = allDeals.filter(d=>d['Status']==='Ativo');
-  const dealsMes      = allDeals.filter(d=>d['Status']==='Fechado — Ganho' && new Date(d['Última Atualização']||0)>=mesInicio);
+  const dealsMes      = allDeals.filter(d=>(d['Status']==='Fechado — Ganho' || d['Etapa']==='Fechado') && new Date(d['Última Atualização']||d['Data Fechamento']||0)>=mesInicio);
   const valorFechado  = dealsMes.reduce((s,d)=>s+Number(d['Valor Estimado']||0),0);
   const valorPipeline = dealsAtivos.reduce((s,d)=>s+Number(d['Valor Estimado']||0),0);
   const metaMensal    = Number(cfg['META_MENSAL']||45000);
