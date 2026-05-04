@@ -3726,7 +3726,7 @@ function renderNicolau() {
   const dealsMes      = allDeals.filter(d=>d['Status']==='Fechado — Ganho' && new Date(d['Última Atualização']||0)>=mesInicio);
   const valorFechado  = dealsMes.reduce((s,d)=>s+Number(d['Valor Estimado']||0),0);
   const valorPipeline = dealsAtivos.reduce((s,d)=>s+Number(d['Valor Estimado']||0),0);
-  const metaMensal    = 45000; 
+  const metaMensal    = Number(cfg['META_MENSAL']||45000);
   const pctMeta       = Math.min(Math.round((valorFechado/metaMensal)*100),100);
   const forecast30    = valorFechado + valorPipeline * 0.3;
   const corMeta       = pctMeta>=100?'var(--gn)':pctMeta>=60?'var(--ye)':'var(--ac)';
@@ -3968,7 +3968,7 @@ function renderSamuel() {
   );
 
   const valorFechado = dealsFechadosSamuel.reduce((s,d)=>s+Number(d['Valor Estimado']||0),0);
-  const metaMensal   = 45000;
+  const metaMensal   = Number(cfg['META_MENSAL']||45000);
   const pctMeta      = Math.min(Math.round((valorFechado/metaMensal)*100),100);
 
   
@@ -4055,6 +4055,7 @@ function fmtMoeda(v) {
 
 // ══ CONFIG ══════════════════════════════════════════════════
 let cfgTab = 'notif';
+let cfg = {}; // CONFIG global — lida do Sheets ao iniciar
 
 function setCfgTab(tab) {
   cfgTab = tab;
@@ -4069,7 +4070,7 @@ async function loadConfig() {
   try {
     const res = await apiGet('CONFIG');
     if (!res.success) return;
-    const cfg = {};
+    cfg = {}; // atualiza a variável global
     (res.data||[]).forEach(r=>{ cfg[r['Chave']] = r['Valor']; });
     const set = (id,val)=>{ const el=document.getElementById(id); if(el&&val) el.value=val; };
     set('cfgEmailSamuel',  cfg['EMAIL_SAMUEL']);
