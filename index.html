@@ -91,10 +91,10 @@ body.tema-light{
   --sh:0 1px 8px rgba(0,0,0,.07);--sh2:0 6px 24px rgba(0,0,0,.10);
 }
 .sb{width:210px;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0}
-.sb-lg{padding:15px 13px 11px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:9px}
-.sq{width:36px;height:36px;background:linear-gradient(135deg,var(--ac),#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:#fff;flex-shrink:0}
-.sb-w{font-family:'Syne',sans-serif;font-weight:800;font-size:13px}
-.sb-su{font-size:10px;color:var(--t3);letter-spacing:.04em;text-transform:uppercase}
+.sb-lg{padding:16px 14px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:11px}
+.sq{width:44px;height:44px;background:linear-gradient(135deg,var(--ac),#8b5cf6);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:#fff;flex-shrink:0}
+.sb-w{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;letter-spacing:.01em}
+.sb-su{font-size:10px;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;opacity:.7}
 .sb-sc{padding:11px 7px 4px}
 .sb-lb{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);padding:0 8px;margin-bottom:5px}
 .nv{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:var(--rsm);cursor:pointer;font-size:12.5px;font-weight:500;color:var(--t2);margin-bottom:2px;transition:all .15s;user-select:none}
@@ -111,7 +111,7 @@ body.tema-light{
 .uav-br{background:linear-gradient(135deg,#4f7cff,#8b5cf6)}
 .uav-sa{background:linear-gradient(135deg,#22d07a,#1ec8b0)}
 .uav-ni{background:linear-gradient(135deg,#f5b731,#f97340)}
-.un{font-size:12px;font-weight:600}.uro{font-size:10px;color:var(--t3)}
+.un{font-size:12px;font-weight:600}.uro{font-size:10px;color:var(--t3)}.btn-sair{display:flex;align-items:center;gap:6px;padding:6px 9px;border-radius:var(--rsm);cursor:pointer;font-size:11px;font-weight:600;color:var(--re);background:var(--rs);border:1px solid rgba(240,84,84,.2);margin-top:6px;transition:all .15s;width:100%;justify-content:center}.btn-sair:hover{background:var(--re);color:#fff}
 
 /* ══ MAIN ══ */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -809,6 +809,7 @@ body.tema-light{
     <div class="ur">
       <div class="uav uav-br" id="userAv">BR</div>
       <div><div class="un" id="userName">Bruno Camara</div><div class="uro" id="userRole">Manager</div></div>
+      <div class="btn-sair" onclick="confirmarLogout()">⎋ Sair</div>
     </div>
   </div>
 </aside>
@@ -1797,6 +1798,16 @@ function fazerLogin() {
 function logout() {
   localStorage.removeItem('go_crm_user');
   location.reload();
+}
+
+function confirmarLogout() {
+  document.getElementById('confirmTitle').textContent = 'Sair do sistema?';
+  document.getElementById('confirmDesc').textContent = 'Sua sessão será encerrada. Você precisará fazer login novamente.';
+  const btn = document.getElementById('confirmBtn');
+  btn.textContent = 'Sair'; btn.disabled = false;
+  btn.className = 'btn btn-re';
+  btn.onclick = () => { closeConfirm(); logout(); };
+  document.getElementById('confirmOv').classList.add('open');
 }
 
 function iniciarApp() {
@@ -4070,35 +4081,63 @@ async function loadConfig() {
 }
 
 async function salvarConfig() {
-  if(isProcessing) return;
-  isProcessing = true;
-  const btn = event.target;
-  const origTxt = btn.textContent;
-  btn.disabled=true; btn.textContent='⏳ Salvando...';
+  // Usa setTimeout para garantir que event.target seja capturado antes de qualquer await
+  const btn = (event && event.target) ? event.target : document.querySelector('#ccont-'+cfgTab+' .btn-p');
+  const origTxt = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Salvando...'; }
+
+  // Reset isProcessing caso tenha ficado travado
+  isProcessing = false;
+
   const g = id => document.getElementById(id);
-  const campos = [
-    ['EMAIL_SAMUEL',   g('cfgEmailSamuel')?.value||''],
-    ['EMAIL_NICOLAU',  g('cfgEmailNicolau')?.value||''],
-    ['EMAIL_BRUNO',    g('cfgEmailBruno')?.value||''],
-    ['EMAIL_CTO',      g('cfgEmailCTO')?.value||''],
-    ['EMAIL_AMANDA',   g('cfgEmailAmanda')?.value||''],
-    ['EMAIL_MATHEUS',  g('cfgEmailMatheus')?.value||''],
-    ['META_MENSAL',    g('cfgMeta')?.value||'45000'],
-    ['COMISSAO_SAMUEL',g('cfgComissao')?.value||'3'],
-    ['VALOR_HORA_DEV', g('cfgValorHora')?.value||'200'],
-    ['SINAL_PADRAO_PCT',g('cfgSinal')?.value||'30'],
-    ['ALERTA_LEAD_PARADO_DIAS',g('cfgDiasParado')?.value||'5'],
-    ['NOTIF_NOVO_LEAD',g('cfgNotifLead')?.checked?'true':'false'],
-    ['NOTIF_RESUMO_DIARIO',g('cfgNotifDiario')?.checked?'true':'false'],
-    ['NOTIF_LEAD_PARADO',g('cfgNotifParado')?.checked?'true':'false'],
-    ['NOTIF_RELATORIO_SEMANAL',g('cfgNotifSemanal')?.checked?'true':'false'],
-    ['NOTIF_DEAL_FECHADO',g('cfgNotifAmanda')?.checked?'true':'false'],
-    ['NOTIF_PAGAMENTO_CONFIRMADO',g('cfgNotifMatheus')?.checked?'true':'false'],
-  ];
+
+  // Monta apenas os campos relevantes para a aba atual + campos sempre presentes
+  let campos = [];
+
+  // Aba Notificações
+  if (g('cfgEmailSamuel') !== null) {
+    campos.push(
+      ['EMAIL_SAMUEL',   g('cfgEmailSamuel')?.value||''],
+      ['EMAIL_NICOLAU',  g('cfgEmailNicolau')?.value||''],
+      ['EMAIL_BRUNO',    g('cfgEmailBruno')?.value||''],
+      ['EMAIL_CTO',      g('cfgEmailCTO')?.value||''],
+      ['EMAIL_AMANDA',   g('cfgEmailAmanda')?.value||''],
+      ['EMAIL_MATHEUS',  g('cfgEmailMatheus')?.value||''],
+      ['ALERTA_LEAD_PARADO_DIAS', g('cfgDiasParado')?.value||'5'],
+      ['NOTIF_NOVO_LEAD',         g('cfgNotifLead')?.checked?'true':'false'],
+      ['NOTIF_RESUMO_DIARIO',     g('cfgNotifDiario')?.checked?'true':'false'],
+      ['NOTIF_LEAD_PARADO',       g('cfgNotifParado')?.checked?'true':'false'],
+      ['NOTIF_RELATORIO_SEMANAL', g('cfgNotifSemanal')?.checked?'true':'false'],
+      ['NOTIF_DEAL_FECHADO',      g('cfgNotifAmanda')?.checked?'true':'false'],
+      ['NOTIF_PAGAMENTO_CONFIRMADO', g('cfgNotifMatheus')?.checked?'true':'false'],
+    );
+  }
+
+  // Aba Metas
+  if (g('cfgMeta') !== null) {
+    campos.push(
+      ['META_MENSAL',     g('cfgMeta')?.value||'45000'],
+      ['COMISSAO_SAMUEL', g('cfgComissao')?.value||'3'],
+      ['VALOR_HORA_DEV',  g('cfgValorHora')?.value||'200'],
+      ['SINAL_PADRAO_PCT',g('cfgSinal')?.value||'30'],
+    );
+  }
+
+  if (campos.length === 0) {
+    toast('⚠ Nenhum campo para salvar','warn');
+    if (btn) { btn.disabled = false; btn.textContent = origTxt; }
+    return;
+  }
+
   try {
     const res = await apiPost({ action:'SALVAR_CONFIG', payload:{campos}, usuario:currentUser.nome });
-    toast(res.success?'✅ Configurações salvas!':'❌ Erro ao salvar', res.success?'ok':'err');
-  } catch(e) { toast('❌ Erro de conexão','err'); }
+    toast(res.success ? '✅ Configurações salvas!' : '❌ Erro ao salvar: ' + (res.error||''), res.success ? 'ok' : 'err');
+  } catch(e) {
+    toast('❌ Erro de conexão','err');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = origTxt; }
+    isProcessing = false;
+  }
   finally { isProcessing=false; btn.disabled=false; btn.textContent=origTxt; }
 }
 
