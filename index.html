@@ -2561,8 +2561,7 @@ async function saveDealPanel() {
     } else {
       toast('❌ Erro: ' + (res.error||''), 'err');
     }
-  } catch(e) { toast('❌ Erro de conexão', 'err'); }
-  finally { isProcessing = false; btn.disabled = false; btn.textContent = 'Salvar oportunidade'; }
+  } catch(e) { toast('❌ Erro de conexão', 'err'); } finally { isProcessing = false; btn.disabled = false; btn.textContent = 'Salvar oportunidade'; }
 }
 
 function askDeleteDealDirect() {
@@ -2584,8 +2583,7 @@ function askDeleteDealDirect() {
         toast('Oportunidade removida!','ok');
         await syncAll();
       } else { toast('Erro ao excluir','err'); btn.disabled=false; btn.textContent='Excluir'; }
-    } catch(e) { toast('Erro de conexão','err'); btn.disabled=false; btn.textContent='Excluir'; }
-    finally { isProcessing=false; }
+    } catch(e) { toast('Erro de conexão','err'); btn.disabled=false; btn.textContent='Excluir'; } finally { isProcessing=false; }
   };
   btn.onclick = confirmCallback;
   document.getElementById('confirmOv').classList.add('open');
@@ -2854,8 +2852,7 @@ async function saveContato(){
     } else {
       toast('❌ Erro: '+(res.error||'desconhecido'),'err');
     }
-  }catch(e){toast('❌ Erro de conexão','err');}
-  finally{btn.disabled=false;btn.textContent=editingId?'Salvar alterações':'Salvar e notificar Samuel';}
+  }catch(e){toast('❌ Erro de conexão','err');}finally{btn.disabled=false;btn.textContent=editingId?'Salvar alterações':'Salvar e notificar Samuel';}
 }
 
 // ══ PIPE MODAL ══
@@ -3065,8 +3062,7 @@ function askDeleteContact(id,empresa){
       const res=await apiPost({action:'ATUALIZAR_CONTATO',payload:{id,status:'Arquivado'},usuario:currentUser.nome});
       if(res.success){closeConfirm();closePanel();toast('✅ Contato arquivado!','ok');await syncAll();}
       else{toast('❌ Erro ao excluir','err');btn.disabled=false;btn.textContent='Excluir';}
-    }catch(e){toast('❌ Erro de conexão','err');btn.disabled=false;btn.textContent='Excluir';}
-    finally{isProcessing=false;}
+    }catch(e){toast('❌ Erro de conexão','err');btn.disabled=false;btn.textContent='Excluir';}finally{isProcessing=false;}
   };
   btn.onclick=confirmCallback;
   document.getElementById('confirmOv').classList.add('open');
@@ -3085,8 +3081,7 @@ function askDeleteDeal(id,empresa){
       const res=await apiPost({action:'ATUALIZAR_DEAL',payload:{id,status:'Fechado — Perdido'},usuario:currentUser.nome});
       if(res.success){closeConfirm();toast('✅ Oportunidade removida!','ok');await syncAll();}
       else{toast('❌ Erro','err');btn.disabled=false;btn.textContent='Excluir';}
-    }catch(e){toast('❌ Erro de conexão','err');btn.disabled=false;btn.textContent='Excluir';}
-    finally{isProcessing=false;}
+    }catch(e){toast('❌ Erro de conexão','err');btn.disabled=false;btn.textContent='Excluir';}finally{isProcessing=false;}
   };
   btn.onclick=confirmCallback;
   document.getElementById('confirmOv').classList.add('open');
@@ -3361,8 +3356,7 @@ async function toggleProdStatus() {
       closeProdPanel();
       await loadProdutos();
     }
-  } catch(e) { toast('❌ Erro','err'); }
-  finally { isProcessing = false; }
+  } catch(e) { toast('❌ Erro','err'); } finally { isProcessing = false; }
 }
 
 // ══ AGENDA DE HOJE ══════════════════════════════════════════
@@ -4138,7 +4132,6 @@ async function salvarConfig() {
     if (btn) { btn.disabled = false; btn.textContent = origTxt; }
     isProcessing = false;
   }
-  finally { isProcessing=false; btn.disabled=false; btn.textContent=origTxt; }
 }
 
 // ── Temas visuais
@@ -4798,8 +4791,7 @@ async function saveAula() {
       closeAulaModal();
       await loadImplantacoes();
     } else { toast('❌ Erro: '+(res.error||''),'err'); }
-  } catch(e) { toast('❌ Erro de conexão','err'); }
-  finally { isProcessing=false; btn.disabled=false; btn.textContent='📧 Salvar e enviar resumo ao cliente'; }
+  } catch(e) { toast('❌ Erro de conexão','err'); } finally { isProcessing=false; btn.disabled=false; btn.textContent='📧 Salvar e enviar resumo ao cliente'; }
 }
 
 // ── Painel detalhe do projeto ──
