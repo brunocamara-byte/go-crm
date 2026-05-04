@@ -5228,12 +5228,9 @@ function renderImplAgenda() {
 
 // ══ INITIAL RENDER ══
 updateEtapas();
-loadProdutos();
 carregarTemaLocal();
-carregarLogoLocal();
-loadConfig();
-aplicarGovernanca();
-showScr(PERFIL_HOME[currentUser.perfil] || 'pipeline');
+// loadProdutos, loadConfig, aplicarGovernanca e showScr só rodam após login
+// via iniciarApp() — não executar aqui para evitar erro quando currentUser=null
 
 // ══ DADOS DE BENCHMARK — remover após testes ════════════════
 async function injetarDadosTeste() {
