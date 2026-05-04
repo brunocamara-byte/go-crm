@@ -220,13 +220,13 @@ body.tema-light{
 .board{display:flex;gap:11px;height:100%;min-width:max-content}
 
 /* ══ COLUMN ══ */
-.col{width:300px;display:flex;flex-direction:column;flex-shrink:0}
+.col{width:300px;display:flex;flex-direction:column;flex-shrink:0;height:100%}
 .ch{display:flex;align-items:center;gap:7px;padding:0 2px;margin-bottom:7px}
 .cdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 .ctitle{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;flex:1}
 .cn{font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);background:var(--s2);padding:2px 6px;border-radius:20px}
 .cv2{font-size:10px;color:var(--t3);font-family:'DM Mono',monospace}
-.cbody{flex:1;background:rgba(255,255,255,.013);border:1px solid var(--bd);border-radius:var(--r);padding:6px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;min-height:120px;transition:all .15s}
+.cbody{background:rgba(255,255,255,.013);border:1px solid var(--bd);border-radius:var(--r);padding:6px;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:7px;min-height:120px;max-height:calc(100vh - 270px);transition:background .15s}
 .cbody.dov{background:var(--as);border-color:var(--ac)}
 .cbody::-webkit-scrollbar{width:5px}
 .cbody::-webkit-scrollbar-track{background:transparent}
@@ -236,7 +236,7 @@ body.tema-light{
 .addbtn:hover{background:var(--s2);color:var(--tx)}
 
 /* ══ CARD ══ */
-.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);cursor:pointer;transition:all .18s;position:relative;overflow:hidden;animation:ci .2s ease}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);cursor:pointer;transition:all .18s;position:relative;overflow:hidden;animation:ci .2s ease;flex-shrink:0}
 @keyframes ci{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .card:hover{border-color:var(--bd2);transform:translateY(-3px);box-shadow:var(--sh)}
 .card[draggable]:active{cursor:grabbing;opacity:.8;transform:scale(.97)}
@@ -616,8 +616,8 @@ body.tema-light{
 .tema-nome{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:2px}
 .tema-sub{font-size:11px;color:var(--t3)}
 /* Logo upload */
-.logo-upload-area{display:flex;align-items:center;gap:20px;padding:16px;background:var(--s2);border:1px dashed var(--bd2);border-radius:var(--r)}
-.logo-preview{width:80px;height:80px;background:var(--s3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.logo-upload-area{display:flex;align-items:center;gap:20px;padding:20px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r)}
+.logo-preview{width:96px;height:96px;background:var(--s3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;border:1px solid var(--bd)}
 .logo-preview img{width:100%;height:100%;object-fit:contain}
 .logo-upload-controls{flex:1}
 .logo-upload-btn{cursor:pointer;display:inline-flex;align-items:center;gap:6px}
@@ -821,7 +821,6 @@ body.tema-light{
     <div class="tb-r" id="tbRight">
       <button class="btn btn-g" onclick="openGSearch()" title="Ctrl+K">🔍 Ctrl+K</button>
       <button class="btn btn-g" id="syncBtn" onclick="syncAll()">Sincronizar</button>
-      <button class="btn btn-g" id="benchBtn" onclick="injetarDadosTeste()" title="Inserir 10 cards de teste" style="font-size:11px;opacity:.5">Demo</button>
       <button class="btn btn-g" id="importLeadsBtn" onclick="openImport()" style="display:none">Importar</button>
       <button class="btn btn-p" id="newBtn" onclick="openPanel('new')">+ Novo Contato</button>
     </div>
@@ -924,7 +923,7 @@ body.tema-light{
   <div class="scr" id="scr-relatorios">
     <!-- Abas de visão -->
     <div class="rel-tabs">
-      <div class="rel-tab on" id="rtab-nicolau" onclick="setRelTab('nicolau')">👑 Visão Nicolau</div>
+      <div class="rel-tab on" id="rtab-nicolau" onclick="setRelTab('nicolau')">📊 Visão Executiva</div>
       <div class="rel-tab" id="rtab-samuel" onclick="setRelTab('samuel')">📈 Minha Performance</div>
       <div class="dash-updated" id="dashUpdated" style="margin-left:auto;padding-right:16px"></div>
     </div>
@@ -1154,7 +1153,13 @@ body.tema-light{
           </div>
           <div class="cfg-row" style="margin-top:16px">
             <label class="cfg-lbl">Nome do sistema (aparece na sidebar)</label>
-            <input class="fi cfg-input" id="cfgNomeSistema" placeholder="GO CRM" value="GO CRM">
+            <input class="fi cfg-input" id="cfgNomeSistema" placeholder="GO CRM" value="GO CRM" style="font-size:16px;font-weight:700;letter-spacing:.01em;padding:10px 14px;">
+            <div style="font-size:11px;color:var(--t3);margin-top:4px">Linha principal exibida abaixo do logo</div>
+          </div>
+          <div class="cfg-row" style="margin-top:12px">
+            <label class="cfg-lbl">Subtítulo / versão</label>
+            <input class="fi cfg-input" id="cfgSubtitulo" placeholder="Ex: Gestão Online · v3.0" value="v3.0">
+            <div style="font-size:11px;color:var(--t3);margin-top:4px">Linha menor exibida abaixo do nome</div>
           </div>
         </div>
         <div class="dash-card">
@@ -1186,11 +1191,7 @@ body.tema-light{
               <div class="tema-nome">GOSigner</div>
               <div class="tema-sub">Nordic Frost</div>
             </div>
-            <div class="tema-card" onclick="aplicarTema('cyberpunk',this)" data-tema="cyberpunk">
-              <div class="tema-preview" style="background:#0d0221"><div class="tp-sb" style="background:#0f0844"></div><div class="tp-main"><div class="tp-bar" style="background:#fb2576"></div><div class="tp-content" style="background:#160b55"></div></div></div>
-              <div class="tema-nome">Cyberpunk</div>
-              <div class="tema-sub">Neon magenta</div>
-            </div>
+
           </div>
         </div>
       </div>
@@ -1545,7 +1546,7 @@ body.tema-light{
 <div class="modal-ov" id="pipeModal" onclick="if(event.target===this)closePipeModal()">
   <div class="modal">
     <div class="modal-head">
-      <div class="modal-title">⚡ Mover para pipeline</div>
+      <div class="modal-title">⚡ Nova oportunidade no pipeline</div>
       <button class="btn btn-g" onclick="closePipeModal()" style="padding:6px;font-size:14px">✕</button>
     </div>
     <div class="modal-body">
@@ -1838,7 +1839,39 @@ async function apiGet(tabela) {
   return res.json();
 }
 
-// ══ NOTIFICAÇÃO GRANDE — polling 30s ══
+// ══ POLLING NOTIFICAÇÃO MATHEUS (formulário preenchido) ══
+let _mathNotifInterval = null;
+
+function iniciarPollingNotifMatheus() {
+  if (!currentUser || currentUser.perfil !== 'Implantação') return;
+  if (_mathNotifInterval) return;
+  _mathNotifInterval = setInterval(async () => {
+    try {
+      const res = await apiPost({ action:'CHECK_NOTIFICACOES_MATHEUS', payload:{}, usuario:currentUser.nome });
+      if (res.success && res.notificacoes && res.notificacoes.length > 0) {
+        const notif = res.notificacoes[0];
+        document.getElementById('notifEmpresa').textContent = 'Formulário preenchido!';
+        document.getElementById('notifInfo').innerHTML = `
+          <strong>${notif.msg}</strong><br><br>
+          O cliente preencheu o formulário de onboarding.<br>
+          Revise os dados e mova o card para <strong>Configuração</strong>.`;
+        document.getElementById('notifCtx').style.display = 'none';
+        document.getElementById('notifLeadModal').classList.add('show');
+        const btn = document.querySelector('.notif-modal-btn-p');
+        if (btn) {
+          btn.textContent = 'Ver na Implantação';
+          btn.onclick = () => {
+            fecharNotifModal();
+            showScr('implantacao');
+            apiPost({ action:'MARCAR_NOTIFICACAO_LIDA', payload:{ key: notif.key }, usuario:currentUser.nome }).catch(()=>{});
+          };
+        }
+      }
+    } catch(e) {}
+  }, 30000);
+}
+
+// ══ NOTIFICAÇÃO GRANDE SAMUEL — polling 30s ══
 let _notifLastIds = null;
 let _notifInterval = null;
 
@@ -1942,6 +1975,7 @@ async function syncAll() {
     renderBoard();
     toast(`✅ Sincronizado — ${allContatos.length} contatos, ${allDeals.length} deals`, 'ok');
     iniciarPollingNotif();
+    iniciarPollingNotifMatheus();
   } catch(e) {
     console.error('syncAll erro:', e);
     toast('❌ Erro de conexão', 'err');
@@ -3027,8 +3061,8 @@ function askDeleteContact(id,empresa){
   document.getElementById('confirmOv').classList.add('open');
 }
 function askDeleteDeal(id,empresa){
-  document.getElementById('confirmTitle').textContent='Excluir deal?';
-  document.getElementById('confirmDesc').textContent=`O deal de "${empresa}" será marcado como perdido.`;
+  document.getElementById('confirmTitle').textContent='Excluir oportunidade?';
+  document.getElementById('confirmDesc').textContent=`A oportunidade de "${empresa}" será marcada como perdida.`;
   const btn=document.getElementById('confirmBtn');
   btn.textContent='Excluir'; btn.disabled=false;
   confirmCallback=async()=>{
@@ -3612,7 +3646,7 @@ async function confirmarDesqualificar() {
         idContato: deal['ID Contato']||'',
         empresa:   deal['Empresa']||'',
         pipeline:  'Reativação',
-        etapa:     'Identificado',
+        etapa:     'Mapeado',
         valorEstimado: deal['Valor Estimado']||0,
         responsavel:   deal['Responsável']||currentUser.nome,
         observacoes:   `Reativação — veio de Novos Leads. Motivo do no: ${_desqMotivo}${obs?' — '+obs:''}`,
@@ -3900,9 +3934,9 @@ function renderSamuel() {
   const mesInicio = new Date(); mesInicio.setDate(1); mesInicio.setHours(0,0,0,0);
 
   // Deals fechados pelo Samuel no mês
+  // FIX: inclui deals com Etapa='Fechado' que ainda não foram sincronizados com status 'Fechado — Ganho'
   const dealsFechadosSamuel = allDeals.filter(d=>
-    d['Status']==='Fechado — Ganho' &&
-    new Date(d['Última Atualização']||0) >= mesInicio &&
+    (d['Status']==='Fechado — Ganho' || d['Etapa']==='Fechado') &&
     (d['Responsável']||'').includes('Samuel')
   );
 
@@ -3941,13 +3975,13 @@ function renderSamuel() {
       <div class="dash-kpi-stripe" style="background:var(--gn)"></div>
       <div class="dash-kpi-icon">🏆</div>
       <div class="dash-kpi-val">${dealsFechadosSamuel.length}</div>
-      <div class="dash-kpi-lbl">Deals fechados no mês</div>
+      <div class="dash-kpi-lbl">Oportunidades fechadas no mês</div>
     </div>
     <div class="dash-kpi">
       <div class="dash-kpi-stripe" style="background:var(--ac)"></div>
       <div class="dash-kpi-icon">⚡</div>
       <div class="dash-kpi-val">${dealsAtivos.length}</div>
-      <div class="dash-kpi-lbl">Deals ativos (seus)</div>
+      <div class="dash-kpi-lbl">Oportunidades ativas (suas)</div>
     </div>
     <div class="dash-kpi">
       <div class="dash-kpi-stripe" style="background:var(--ye)"></div>
@@ -4120,16 +4154,7 @@ const TEMAS = {
     '--gs':'rgba(163,190,140,.1)','--rs':'rgba(191,97,106,.1)','--ys':'rgba(235,203,139,.1)',
     '--sh':'0 4px 24px rgba(0,0,0,.4)','--sh2':'0 8px 40px rgba(0,0,0,.5)'
   },
-  // ── Cyberpunk Soft — high contrast, neon
-  cyberpunk: {
-    '--bg':'#0d0221','--sf':'#0f0844','--s2':'#160b55','--s3':'#1e1066',
-    '--bd':'#3120e0','--bd2':'#4535f0',
-    '--tx':'#ffffff','--t2':'#c084fc','--t3':'#7c3aed',
-    '--ac':'#fb2576','--a2':'#ff4d8f','--as':'rgba(251,37,118,.15)',
-    '--gn':'#22d07a','--re':'#f05454','--ye':'#fbbf24',
-    '--gs':'rgba(34,208,122,.1)','--rs':'rgba(240,84,84,.1)','--ys':'rgba(251,191,36,.1)',
-    '--sh':'0 4px 24px rgba(49,32,224,.4)','--sh2':'0 8px 40px rgba(251,37,118,.3)'
-  },
+
 };
 
 function aplicarTema(nome, el) {
