@@ -1959,17 +1959,43 @@ function irParaLead() {
 async function syncAll() {
   const btn = document.getElementById('syncBtn');
   if(btn){ btn.textContent = '🔄 ...'; btn.disabled = true; }
+  // Se sync manual (botão), limpa cache para forçar dados frescos
+  if(btn && btn.id === 'syncBtn') {
+    localStorage.removeItem('go_crm_contatos');
+    localStorage.removeItem('go_crm_pipelines');
+  }
   try {
-    const [ct, dl, pl] = await Promise.all([
-      apiGet('CONTATOS'), apiGet('DEALS'), apiGet('PIPELINES')
-    ]);
-    if (ct.success) allContatos = ct.data || [];
+    // Cache PIPELINES por 30 min (raramente muda)
+    let plData = null;
+    const plCache = localStorage.getItem('go_crm_pipelines');
+    if (plCache) {
+      try { const p = JSON.parse(plCache); if(Date.now()-p.ts < 30*60*1000) plData = p.data; } catch(e){}
+    }
+
+    // Cache CONTATOS por 3 min
+    let ctData = null;
+    const ctCache = localStorage.getItem('go_crm_contatos');
+    if (ctCache) {
+      try { const c = JSON.parse(ctCache); if(Date.now()-c.ts < 3*60*1000) ctData = c.data; } catch(e){}
+    }
+
+    // Só busca o que não está em cache — DEALS sempre atualiza
+    const promises = [ctData ? Promise.resolve({success:true,data:ctData}) : apiGet('CONTATOS'),
+                      apiGet('DEALS'),
+                      plData ? Promise.resolve({success:true,data:plData}) : apiGet('PIPELINES')];
+    const [ct, dl, pl] = await Promise.all(promises);
+
+    if (ct.success) {
+      allContatos = ct.data || [];
+      if (!ctData) localStorage.setItem('go_crm_contatos', JSON.stringify({data:allContatos,ts:Date.now()}));
+    }
     if (dl.success) allDeals = dl.data || [];
-    // Carrega atividades e auditoria para timeline
+    // Carrega atividades e auditoria para timeline (lazy — não bloqueia)
     apiGet('ATIVIDADES').then(at => { if(at.success) window._atividades = at.data||[]; });
     apiGet('AUDITORIA').then(au => { if(au.success) window._auditoria = au.data||[]; });
     if (pl.success) {
       allPipelines = {};
+      if (!plData) localStorage.setItem('go_crm_pipelines', JSON.stringify({data:pl.data,ts:Date.now()}));
       (pl.data || []).forEach(r => {
         const pipe = r['Pipeline'];
         if (!allPipelines[pipe]) allPipelines[pipe] = [];
@@ -4068,33 +4094,73 @@ function setCfgTab(tab) {
 
 async function loadConfig() {
   try {
+    // Tenta carregar do cache localStorage primeiro (TTL 5 min)
+    const cacheKey = 'go_crm_cfg';
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const { data, ts } = JSON.parse(cached);
+        if (Date.now() - ts < 5 * 60 * 1000) {
+          cfg = data;
+          _aplicarCfgNaTela(cfg);
+          renderDashboards();
+          return;
+        }
+      } catch(e) {}
+    }
     const res = await apiGet('CONFIG');
     if (!res.success) return;
     cfg = {}; // atualiza a variável global
     (res.data||[]).forEach(r=>{ cfg[r['Chave']] = r['Valor']; });
-    const set = (id,val)=>{ const el=document.getElementById(id); if(el&&val) el.value=val; };
-    set('cfgEmailSamuel',  cfg['EMAIL_SAMUEL']);
-    set('cfgEmailNicolau', cfg['EMAIL_NICOLAU']);
-    set('cfgEmailBruno',   cfg['EMAIL_BRUNO']);
-    set('cfgEmailCTO',     cfg['EMAIL_CTO']);
-    set('cfgEmailAmanda',  cfg['EMAIL_AMANDA']);
-    set('cfgEmailMatheus', cfg['EMAIL_MATHEUS']);
-    set('cfgMeta',         cfg['META_MENSAL']);
-    set('cfgComissao',     cfg['COMISSAO_SAMUEL']);
-    set('cfgValorHora',    cfg['VALOR_HORA_DEV']);
-    set('cfgSinal',        cfg['SINAL_PADRAO_PCT']);
-    set('cfgDiasParado',   cfg['ALERTA_LEAD_PARADO_DIAS']);
+    _aplicarCfgNaTela(cfg);
     const tgl=(key,id)=>{ const el=document.getElementById(id); if(el) el.checked=String(cfg[key]).toLowerCase()==='true'; };
     tgl('NOTIF_NOVO_LEAD','cfgNotifLead');
     tgl('NOTIF_RESUMO_DIARIO','cfgNotifDiario');
     tgl('NOTIF_LEAD_PARADO','cfgNotifParado');
     tgl('NOTIF_RELATORIO_SEMANAL','cfgNotifSemanal');
+    // Salva no cache localStorage com timestamp
+    localStorage.setItem('go_crm_cfg', JSON.stringify({ data: cfg, ts: Date.now() }));
+    // Re-renderiza dashboards com cfg atualizado
+    renderDashboards();
     tgl('NOTIF_DEAL_FECHADO','cfgNotifAmanda');
     tgl('NOTIF_PAGAMENTO_CONFIRMADO','cfgNotifMatheus');
     const temaSalvo = cfg['TEMA']||'dark';
     const temaEl = document.querySelector(`[data-tema="${temaSalvo}"]`);
     if(temaEl){ document.querySelectorAll('.tema-card').forEach(c=>c.classList.remove('on')); temaEl.classList.add('on'); }
   } catch(e) { console.log('Erro loadConfig:',e); }
+}
+
+function _aplicarCfgNaTela(c) {
+  const set = (id,val)=>{ const el=document.getElementById(id); if(el&&val) el.value=val; };
+  set('cfgEmailSamuel',  c['EMAIL_SAMUEL']);
+  set('cfgEmailNicolau', c['EMAIL_NICOLAU']);
+  set('cfgEmailBruno',   c['EMAIL_BRUNO']);
+  set('cfgEmailCTO',     c['EMAIL_CTO']);
+  set('cfgEmailAmanda',  c['EMAIL_AMANDA']);
+  set('cfgEmailMatheus', c['EMAIL_MATHEUS']);
+  set('cfgMeta',         c['META_MENSAL']);
+  set('cfgComissao',     c['COMISSAO_SAMUEL']);
+  set('cfgValorHora',    c['VALOR_HORA_DEV']);
+  set('cfgSinal',        c['SINAL_PADRAO_PCT']);
+  set('cfgDiasParado',   c['ALERTA_LEAD_PARADO_DIAS']);
+  const tgl=(key,id)=>{ const el=document.getElementById(id); if(el) el.checked=String(c[key]).toLowerCase()==='true'; };
+  tgl('NOTIF_NOVO_LEAD','cfgNotifLead');
+  tgl('NOTIF_RESUMO_DIARIO','cfgNotifDiario');
+  tgl('NOTIF_LEAD_PARADO','cfgNotifParado');
+  tgl('NOTIF_RELATORIO_SEMANAL','cfgNotifSemanal');
+  const temaSalvo = c['TEMA']||'dark';
+  const temaEl = document.querySelector('[data-tema="'+temaSalvo+'"]');
+  if(temaEl){ document.querySelectorAll('.tema-card').forEach(c=>c.classList.remove('on')); temaEl.classList.add('on'); }
+}
+
+function renderDashboards() {
+  // Re-renderiza apenas o dashboard ativo para refletir cfg atualizado
+  try {
+    const activeRel = document.querySelector('.rel-content.active');
+    if (!activeRel) return;
+    if (activeRel.id === 'rcont-nicolau') renderNicolau();
+    else if (activeRel.id === 'rcont-samuel') renderSamuel();
+  } catch(e) {}
 }
 
 async function salvarConfig() {
@@ -4121,7 +4187,12 @@ async function salvarConfig() {
   ];
   try {
     const res = await apiPost({ action:'SALVAR_CONFIG', payload:{campos}, usuario:currentUser.nome });
-    toast(res.success ? '✅ Configurações salvas!' : '❌ Erro: ' + (res.error||''), res.success ? 'ok' : 'err');
+    if(res.success) {
+      localStorage.removeItem('go_crm_cfg'); // invalida cache para forçar reload
+      toast('✅ Configurações salvas!', 'ok');
+    } else {
+      toast('❌ Erro: ' + (res.error||''), 'err');
+    }
   } catch(e) {
     toast('❌ Erro de conexão','err');
   }
