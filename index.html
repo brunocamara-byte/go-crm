@@ -1811,6 +1811,15 @@ function confirmarLogout() {
 }
 
 function iniciarApp() {
+  // ── Carrega cfg do cache ANTES de qualquer render (síncrono) ──
+  try {
+    const cfgCached = localStorage.getItem('go_crm_cfg');
+    if (cfgCached) {
+      const parsed = JSON.parse(cfgCached);
+      if (parsed && parsed.data) cfg = parsed.data;
+    }
+  } catch(e) {}
+
   document.getElementById('loginScreen').style.display = 'none';
   const av = (currentUser.nome||'??').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
   document.getElementById('userAv').textContent  = av;
@@ -1823,6 +1832,7 @@ function iniciarApp() {
   const home = PERFIL_HOME[currentUser.perfil] || 'pipeline';
   showScr(home);
   syncAll();
+  loadConfig(); // atualiza cfg em background — invalida cache se mudou
 }
 
 // ══ INIT — verifica sessão salva ══
