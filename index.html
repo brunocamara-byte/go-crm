@@ -2368,13 +2368,6 @@ let dealProdutosSelecionados = []; // [{id, nome, tipo, modeloPreco, valorNeg, h
     .sort((a,b) => new Date(b['Data Hora']||0) - new Date(a['Data Hora']||0))
     .slice(0, 20); // máx 20 registros
 
-  if (ativs.length === 0) {
-    section.style.display = 'block';
-    list.innerHTML = '<div class="hist-empty">Nenhuma atividade registrada neste deal.</div>';
-    return;
-  }
-
-
 function openDealPanel(id) {
   const d = allDeals.find(x => x['ID'] === id);
   if (!d) return;
