@@ -2003,6 +2003,8 @@ async function syncAll() {
     // Carrega atividades e auditoria para timeline (lazy — não bloqueia)
     apiGet('ATIVIDADES').then(at => { if(at.success) window._atividades = at.data||[]; });
     apiGet('AUDITORIA').then(au => { if(au.success) window._auditoria = au.data||[]; });
+    // Carrega produtos em background — disponível para buscador e tela Produtos GO
+    apiGet('PRODUTOS').then(pr => { if(pr.success){ allProdutos = pr.data||[]; window._allProdutos = allProdutos; renderProdutos(); } });
     if (pl.success) {
       allPipelines = {};
       if (!plData) localStorage.setItem('go_crm_pipelines', JSON.stringify({data:pl.data,ts:Date.now()}));
