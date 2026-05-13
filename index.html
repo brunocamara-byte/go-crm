@@ -2299,7 +2299,7 @@ async function dropCard(e,etapa,pipe){
 
   // Grava no Sheets em segundo plano
   try{
-    const res=await apiPost({action:'ATUALIZAR_DEAL',payload:{id:dragged.id,etapa},usuario:currentUser.nome});
+    const res=await apiPost({action:'ATUALIZAR_DEAL',payload:{id:dragged.id,etapa, status: etapa==='Fechado' ? 'Fechado — Ganho' : etapa==='Perdido' ? 'Fechado — Perdido' : 'Ativo'},usuario:currentUser.nome});
     if(res.success){
       toast(`✅ ${etapa}`,'ok');
 
