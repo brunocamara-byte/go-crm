@@ -756,14 +756,17 @@ body.tema-light{
 <!-- TELA DE LOGIN -->
 <div id="loginScreen">
   <div class="login-box">
-    <div class="login-logo">GO CRM</div>
-    <div class="login-sub">Gestão Online Soluções em TI</div>
+    <div style="text-align:center;margin-bottom:28px">
+      <img src="https://go-crm-two.vercel.app/logo-branco.png" alt="Gestão Online" style="height:72px;width:auto;display:inline-block;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;color:#52525b;text-transform:uppercase">Sistema Comercial Interno</div>
+    </div>
     <div class="login-err" id="loginErr">Email ou senha incorretos</div>
     <label class="login-lbl">Email</label>
     <input class="login-input" id="loginEmail" type="email" placeholder="seu@gestao-online.com" onkeydown="if(event.key==='Enter')fazerLogin()">
     <label class="login-lbl">Senha</label>
     <input class="login-input" id="loginSenha" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()">
     <button class="login-btn" id="loginBtn" onclick="fazerLogin()">Entrar</button>
+    <div style="text-align:center;margin-top:20px;font-size:11px;color:#3f3f46">GO CRM v3.0 &middot; Gestão Online Soluções em TI</div>
   </div>
 </div>
 
@@ -1206,7 +1209,16 @@ body.tema-light{
           <div class="cfg-helper">Valores usados nos relatórios e no cálculo de comissão do Samuel.</div>
           <div class="cfg-form">
             <div class="cfg-row"><label class="cfg-lbl">Meta mensal de vendas (R$)</label><input class="fi cfg-input" id="cfgMeta" type="number" placeholder="45000" value="45000"></div>
-            <div class="cfg-row"><label class="cfg-lbl">Comissão Samuel (%)</label><input class="fi cfg-input" id="cfgComissao" type="number" placeholder="3" value="3"></div>
+            <div class="cfg-row">
+  <label class="cfg-lbl">Tipo de comissão</label>
+  <select class="fi cfg-input" id="cfgComissaoTipo" style="margin-bottom:8px">
+    <option value="percentual">Percentual sobre vendas (%)</option>
+    <option value="fixo">Valor fixo por venda (R$)</option>
+    <option value="nenhuma">Sem comissão</option>
+  </select>
+  <label class="cfg-lbl" style="margin-top:8px">Valor</label>
+  <input class="fi cfg-input" id="cfgComissao" type="number" placeholder="0" value="0">
+</div>
             <div class="cfg-row"><label class="cfg-lbl">Valor hora de desenvolvimento (R$)</label><input class="fi cfg-input" id="cfgValorHora" type="number" placeholder="200" value="200"></div>
             <div class="cfg-row"><label class="cfg-lbl">% padrão do sinal de entrada</label><input class="fi cfg-input" id="cfgSinal" type="number" placeholder="30" value="30"></div>
           </div>
@@ -4150,7 +4162,7 @@ async function loadConfig() {
 }
 
 function _aplicarCfgNaTela(c) {
-  const set = (id,val)=>{ const el=document.getElementById(id); if(el&&val) el.value=val; };
+  const set = (id,val)=>{ const el=document.getElementById(id); if(el&&val!==undefined&&val!==null) el.value=val; };
   set('cfgEmailSamuel',  c['EMAIL_SAMUEL']);
   set('cfgEmailNicolau', c['EMAIL_NICOLAU']);
   set('cfgEmailBruno',   c['EMAIL_BRUNO']);
