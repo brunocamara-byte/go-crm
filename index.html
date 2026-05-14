@@ -4030,13 +4030,20 @@ function renderSamuel() {
 
   
   const pctComissao  = 3;
-  const comissao     = valorFechado * (pctComissao/100);
+  const tipoComissao = cfg['COMISSAO_TIPO'] || 'percentual';
+  const comissao     = tipoComissao === 'percentual' ? valorFechado * (pctComissao/100) :
+                       tipoComissao === 'fixo'        ? pctComissao * dealsFechados :
+                       0;
 
   // Hero — comissão
   document.getElementById('dashSamuelHero').innerHTML = `
     <div class="sh-comissao-lbl">💰 Sua comissão este mês</div>
-    <div class="sh-comissao-val">${fmtMoeda(comissao)}</div>
-    <div class="sh-comissao-sub">${pctComissao}% sobre ${fmtMoeda(valorFechado)} em vendas fechadas</div>
+  <div class="sh-comissao-val">${tipoComissao === 'nenhuma' ? '—' : fmtMoeda(comissao)}</div>
+  <div class="sh-comissao-sub">${
+    tipoComissao === 'percentual' ? pctComissao + '% sobre ' + fmtMoeda(valorFechado) + ' em vendas fechadas' :
+    tipoComissao === 'fixo'       ? 'R$ ' + pctComissao + ' por venda · ' + dealsFechados + ' venda(s) fechada(s)' :
+    'Comissão não configurada'
+  }</div>
     <div class="sh-meta-bar-wrap">
       <div class="sh-meta-bar"><div class="sh-meta-fill" style="width:${pctMeta}%"></div></div>
       <div class="sh-meta-lbl">${pctMeta}% da meta mensal atingida · Meta: ${fmtMoeda(metaMensal)}</div>
