@@ -4234,7 +4234,7 @@ async function salvarConfig() {
     const res = await apiPost({ action:'SALVAR_CONFIG', payload:{config}, usuario:currentUser.nome });
     if(res.success) {
       localStorage.removeItem('go_crm_cfg');
-      await loadConfig(true); // força reload da config do servidor
+      await loadConfig(true);
       toast('✅ Configurações salvas!', 'ok');
     } else {
       toast('❌ Erro: ' + (res.error||''), 'err');
