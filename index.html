@@ -4171,6 +4171,8 @@ function _aplicarCfgNaTela(c) {
   set('cfgEmailMatheus', c['EMAIL_MATHEUS']);
   set('cfgMeta',         c['META_MENSAL']);
   set('cfgComissao',     c['COMISSAO_SAMUEL']);
+  const setSelect = (id,val)=>{ const el=document.getElementById(id); if(el&&val) el.value=val; };
+  setSelect('cfgComissaoTipo', c['COMISSAO_TIPO']||'percentual');
   set('cfgValorHora',    c['VALOR_HORA_DEV']);
   set('cfgSinal',        c['SINAL_PADRAO_PCT']);
   set('cfgDiasParado',   c['ALERTA_LEAD_PARADO_DIAS']);
@@ -4205,7 +4207,8 @@ async function salvarConfig() {
     ['EMAIL_AMANDA',               g('cfgEmailAmanda')?.value||''],
     ['EMAIL_MATHEUS',              g('cfgEmailMatheus')?.value||''],
     ['META_MENSAL',                g('cfgMeta')?.value||'45000'],
-    ['COMISSAO_SAMUEL',            g('cfgComissao')?.value||'3'],
+    ['COMISSAO_SAMUEL',            g('cfgComissao')?.value||'0'],
+    ['COMISSAO_TIPO',              g('cfgComissaoTipo')?.value||'nenhuma'],
     ['VALOR_HORA_DEV',             g('cfgValorHora')?.value||'200'],
     ['SINAL_PADRAO_PCT',           g('cfgSinal')?.value||'30'],
     ['ALERTA_LEAD_PARADO_DIAS',    g('cfgDiasParado')?.value||'5'],
