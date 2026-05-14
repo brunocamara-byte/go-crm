@@ -1104,7 +1104,7 @@ body.tema-light{
       <div class="dash-wrap">
         <div class="dash-card">
           <div class="dash-card-title">📧 Emails dos destinatários</div>
-          <div class="cfg-helper">Todos os emails estão em modo de teste apontando para Bruno. Atualize aqui para produção.</div>
+          <div class="cfg-helper">Todos os emails estão em modo de teste. Atualize aqui para produção.</div>
           <div class="cfg-form">
             <div class="cfg-helper">Cada papel recebe emails específicos. Troque o email sem precisar de desenvolvedor.</div>
             <div class="cfg-row"><label class="cfg-lbl">👤 Vendedor(es) <span style="font-size:10px;color:var(--t3);font-weight:400">— recebe leads, resumo diário, confirmação de sinal</span></label><input class="fi cfg-input" id="cfgEmailSamuel" placeholder="vendedor@gestao-online.com"></div>
@@ -1118,12 +1118,12 @@ body.tema-light{
         <div class="dash-card">
           <div class="dash-card-title">🔔 Automações ativas</div>
           <div class="cfg-toggle-list">
-            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Email novo lead → Samuel</div><div class="cfg-tgl-sub">Quando Nicolau cadastra um contato, Samuel recebe email automático</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifLead" checked><span class="tgl-sl"></span></label></div>
-            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Resumo diário → Samuel (8h)</div><div class="cfg-tgl-sub">Lista de follow-ups do dia enviada toda manhã</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifDiario" checked><span class="tgl-sl"></span></label></div>
-            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Alerta lead parado → Samuel + Nicolau</div><div class="cfg-tgl-sub">Aviso quando um lead fica sem atividade por N dias</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifParado" checked><span class="tgl-sl"></span></label></div>
-            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Relatório semanal → Nicolau (Seg 7h)</div><div class="cfg-tgl-sub">Resumo da semana comercial enviado toda segunda</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifSemanal" checked><span class="tgl-sl"></span></label></div>
-            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Deal fechado → Amanda (financeiro)</div><div class="cfg-tgl-sub">Amanda recebe email com botão de confirmação do sinal</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifAmanda" checked><span class="tgl-sl"></span></label></div>
-            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Sinal confirmado → Matheus (implantação)</div><div class="cfg-tgl-sub">Briefing completo enviado após Amanda confirmar pagamento</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifMatheus" checked><span class="tgl-sl"></span></label></div>
+            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Email novo lead → Vendedor</div><div class="cfg-tgl-sub">Quando CEO cadastra um contato, vendedor recebe email automatico</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifLead" checked><span class="tgl-sl"></span></label></div>
+            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Resumo diario → Vendedor (8h)</div><div class="cfg-tgl-sub">Lista de follow-ups do dia enviada toda manha</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifDiario" checked><span class="tgl-sl"></span></label></div>
+            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Alerta lead parado → Vendedor + CEO</div><div class="cfg-tgl-sub">Aviso quando um lead fica sem atividade por N dias</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifParado" checked><span class="tgl-sl"></span></label></div>
+            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Relatorio semanal → CEO (Seg 7h)</div><div class="cfg-tgl-sub">Resumo da semana comercial enviado toda segunda</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifSemanal" checked><span class="tgl-sl"></span></label></div>
+            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Deal fechado → Time Financeiro</div><div class="cfg-tgl-sub">Time financeiro recebe email com botao de confirmacao do sinal</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifAmanda" checked><span class="tgl-sl"></span></label></div>
+            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Sinal confirmado → Time de Implantacao</div><div class="cfg-tgl-sub">Briefing completo enviado apos time financeiro confirmar pagamento</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifMatheus" checked><span class="tgl-sl"></span></label></div>
           </div>
           <div class="cfg-row" style="margin-top:14px">
             <label class="cfg-lbl">Dias sem atividade para alertar lead parado</label>
@@ -1206,7 +1206,7 @@ body.tema-light{
       <div class="dash-wrap">
         <div class="dash-card">
           <div class="dash-card-title">🎯 Metas e comissões</div>
-          <div class="cfg-helper">Valores usados nos relatórios e no cálculo de comissão do Samuel.</div>
+          <div class="cfg-helper">Valores usados nos relatórios e no cálculo de comissão do vendedor.</div>
           <div class="cfg-form">
             <div class="cfg-row"><label class="cfg-lbl">Meta mensal de vendas (R$)</label><input class="fi cfg-input" id="cfgMeta" type="number" placeholder="45000" value="45000"></div>
             <div class="cfg-row">
@@ -2833,7 +2833,7 @@ function openPanel(mode,id){
     pipeContactId=id;
   } else {
     document.getElementById('panelTitle').textContent='Novo Contato';
-    document.getElementById('saveBtn').textContent='Salvar e notificar Samuel';
+    document.getElementById('saveBtn').textContent='Salvar e notificar vendedor';
     document.getElementById('notifInfo').style.display='flex';
     document.getElementById('pipeInfo').style.display='none';
     const tmrw=new Date();tmrw.setDate(tmrw.getDate()+1);
@@ -2931,7 +2931,7 @@ async function saveContato(){
     } else {
       toast('❌ Erro: '+(res.error||'desconhecido'),'err');
     }
-  }catch(e){toast('❌ Erro de conexão','err');}finally{btn.disabled=false;btn.textContent=editingId?'Salvar alterações':'Salvar e notificar Samuel';}
+  }catch(e){toast('❌ Erro de conexão','err');}finally{btn.disabled=false;btn.textContent=editingId?'Salvar alterações':'Salvar e notificar vendedor';}
 }
 
 // ══ PIPE MODAL ══
@@ -4029,8 +4029,9 @@ function renderSamuel() {
   const pctMeta      = Math.min(Math.round((valorFechado/metaMensal)*100),100);
 
   
-  const pctComissao  = 3;
-  const tipoComissao = cfg['COMISSAO_TIPO'] || 'percentual';
+  const pctComissao  = Number(cfg['COMISSAO_SAMUEL'] || 0);
+  const tipoComissao = cfg['COMISSAO_TIPO'] || 'nenhuma';
+  const dealsFechados = dealsFechadosSamuel.length;
   const comissao     = tipoComissao === 'percentual' ? valorFechado * (pctComissao/100) :
                        tipoComissao === 'fixo'        ? pctComissao * dealsFechados :
                        0;
@@ -4205,7 +4206,7 @@ function renderDashboards() {
 }
 
 async function salvarConfig() {
-  isProcessing = false;
+  isProcessing = true;
   const g = id => document.getElementById(id);
   const campos = [
     ['EMAIL_SAMUEL',               g('cfgEmailSamuel')?.value||''],
