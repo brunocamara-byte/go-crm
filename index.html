@@ -4229,7 +4229,9 @@ async function salvarConfig() {
     ['NOTIF_PAGAMENTO_CONFIRMADO', g('cfgNotifMatheus')?.checked?'true':'false'],
   ];
   try {
-    const res = await apiPost({ action:'SALVAR_CONFIG', payload:{campos}, usuario:currentUser.nome });
+    const config = {};
+    campos.forEach(([k,v]) => { config[k] = v; });
+    const res = await apiPost({ action:'SALVAR_CONFIG', payload:{config}, usuario:currentUser.nome });
     if(res.success) {
       localStorage.removeItem('go_crm_cfg');
       await loadConfig(true); // força reload da config do servidor
