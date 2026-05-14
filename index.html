@@ -4130,21 +4130,22 @@ function setCfgTab(tab) {
   if(tab==='usuarios') renderUsuarios();
 }
 
-async function loadConfig() {
+async function loadConfig(forceReload) {
   try {
-    // Tenta carregar do cache localStorage primeiro (TTL 5 min)
     const cacheKey = 'go_crm_cfg';
-    const cached = localStorage.getItem(cacheKey);
-    if (cached) {
-      try {
-        const { data, ts } = JSON.parse(cached);
-        if (Date.now() - ts < 5 * 60 * 1000) {
-          cfg = data;
-          _aplicarCfgNaTela(cfg);
-          renderDashboards();
-          return;
-        }
-      } catch(e) {}
+    if (!forceReload) {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        try {
+          const { data, ts } = JSON.parse(cached);
+          if (Date.now() - ts < 5 * 60 * 1000) {
+            cfg = data;
+            _aplicarCfgNaTela(cfg);
+            renderDashboards();
+            return;
+          }
+        } catch(e) {}
+      }
     }
     const res = await apiGet('CONFIG');
     if (!res.success) return;
