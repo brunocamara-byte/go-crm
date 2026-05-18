@@ -1414,7 +1414,7 @@ body.tema-light{
       <div class="fsec-lb">Empresa</div>
       <div class="fg">
         <div class="ff"><label class="fl">Nome da empresa *</label><input class="fi" id="fEmpresa" placeholder="Ex: Construtora Vitória LTDA"><div class="freq" id="errEmpresa">Campo obrigatório</div></div>
-        <div><label class="fl">CNPJ</label><input class="fi" id="fCNPJ" placeholder="00.000.000/0001-00" oninput="mascaraCNPJ(this)" onblur="verificarDuplicata()"></div>
+        <div><label class="fl">CNPJ *</label><input class="fi" id="fCNPJ" placeholder="00.000.000/0001-00" oninput="mascaraCNPJ(this)" onblur="verificarDuplicata()"></div>
         <div><label class="fl">Segmento</label><select class="fse" id="fSegmento"><option value="">Selecionar...</option><option>Contabilidade</option><option>Jurídico</option><option>Saúde</option><option>Indústria</option><option>Construção</option><option>Comércio</option><option>Tecnologia</option><option>Educação</option><option>Logística</option><option>Agronegócio</option><option>Outro</option></select></div>
         <div><label class="fl">Papel ICP-Brasil</label><select class="fse" id="fICP"><option value="">Selecionar...</option><option>AR — Autoridade de Registro</option><option>AC2 — 2º nível</option><option>AC — 1º nível</option><option>AR Virtual</option><option>Não se aplica</option></select></div>
       </div>
@@ -1424,7 +1424,7 @@ body.tema-light{
       <div class="fg">
         <div><label class="fl">Nome *</label><input class="fi" id="fNome" placeholder="Nome do decisor"><div class="freq" id="errNome">Obrigatório</div></div>
         <div><label class="fl">Cargo</label><input class="fi" id="fCargo" placeholder="Ex: Sócio, Diretor..."></div>
-        <div><label class="fl">Telefone *</label><input class="fi" id="fTelefone" placeholder="(00) 00000-0000" onblur="verificarDuplicata()"><div class="freq" id="errTelefone">Obrigatório</div></div>
+        <div><label class="fl">Telefone</label><input class="fi" id="fTelefone" placeholder="(00) 00000-0000" onblur="verificarDuplicata()"><div class="freq" id="errTelefone">Mínimo 8 dígitos</div></div>
         <div><label class="fl">Email</label><input class="fi" id="fEmail" placeholder="email@empresa.com" type="email"></div>
       </div>
     </div>
@@ -1432,7 +1432,7 @@ body.tema-light{
       <div class="fsec-lb">Qualificação GO</div>
       <div class="fg">
         <div><label class="fl">Tipo</label><select class="fse" id="fTipo"><option>Lead Novo</option><option>Cliente Ativo</option><option>Inativo — Reativar</option></select></div>
-        <div><label class="fl">Prioridade</label><select class="fse" id="fPrioridade"><option>🌡 Morno</option><option>🔥 Quente</option><option>❄️ Frio</option></select></div>
+        <div><label class="fl">Prioridade</label><select class="fse" id="fPrioridade"><option value="">— Sem prioridade</option><option>🌡 Morno</option><option>🔥 Quente</option><option>❄️ Frio</option></select></div>
         <div><label class="fl">Potencial</label><select class="fse" id="fPotencial"><option>Médio</option><option>Alto</option><option>Baixo</option></select></div>
         <div><label class="fl">Origem</label><select class="fse" id="fOrigem"><option>Prospecção Samuel</option><option>Indicação — Nicolau</option><option>Indicação — Soluti</option><option>Indicação — Prime</option><option>Site</option><option>WhatsApp</option><option>LinkedIn</option><option>Outro</option></select></div>
         <div><label class="fl">Responsável</label><select class="fse" id="fResponsavel"><option>Samuel Mateus</option><option>Nicolau</option><option>Bruno Camara</option></select></div>
@@ -2836,8 +2836,7 @@ function openPanel(mode,id){
     document.getElementById('saveBtn').textContent='Salvar e notificar vendedor';
     document.getElementById('notifInfo').style.display='flex';
     document.getElementById('pipeInfo').style.display='none';
-    const tmrw=new Date();tmrw.setDate(tmrw.getDate()+1);
-    document.getElementById('fFollowup').value=tmrw.toISOString().split('T')[0];
+    document.getElementById('fFollowup').value=''; // follow-up opcional no cadastro
   }
   document.getElementById('panel').classList.add('open');
   document.getElementById('ovbg').classList.add('open');
@@ -2853,7 +2852,8 @@ function closePanel(){
 function clearForm(){
   ['fEmpresa','fCNPJ','fNome','fCargo','fTelefone','fEmail','fObs','fContextoCEO','fProdutosAtuais','editId'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['fSegmento','fICP'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['fTipo','fPrioridade','fPotencial','fOrigem','fResponsavel'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
+  document.getElementById('fPrioridade').value = '';
+  ['fTipo','fPotencial','fOrigem','fResponsavel'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
   ['errEmpresa','errNome','errTelefone'].forEach(id=>document.getElementById(id).classList.remove('show'));
   ['fEmpresa','fNome','fTelefone'].forEach(id=>document.getElementById(id).classList.remove('err'));
 }
@@ -2862,26 +2862,38 @@ function fmtDateInput(d){try{const dt=new Date(d);return `${dt.getFullYear()}-${
 
 function validate(){
   let ok=true;
-  // Campos obrigatórios básicos
-  [['fEmpresa','errEmpresa'],['fNome','errNome'],['fTelefone','errTelefone']].forEach(([fi,er])=>{
+  // Campos obrigatórios: apenas Empresa e Nome Contato
+  [['fEmpresa','errEmpresa'],['fNome','errNome']].forEach(([fi,er])=>{
     const el=document.getElementById(fi);
     if(!el.value.trim()){el.classList.add('err');document.getElementById(er).classList.add('show');ok=false;}
     else{el.classList.remove('err');document.getElementById(er).classList.remove('show');}
   });
-  // Fix Bug 5: Validação mínima de telefone — pelo menos 8 dígitos
+  // Telefone: se preenchido, valida mínimo de dígitos
   const tel=document.getElementById('fTelefone');
-  const telDigits=(tel.value||'').replace(/\D/g,'');
-  if(tel.value.trim() && telDigits.length < 8){
-    tel.classList.add('err');
-    document.getElementById('errTelefone').textContent='Mínimo 8 dígitos';
-    document.getElementById('errTelefone').classList.add('show');
-    ok=false;
+  if(tel.value.trim()){
+    const telDigits=(tel.value||'').replace(/\D/g,'');
+    if(telDigits.length < 8){
+      tel.classList.add('err');
+      document.getElementById('errTelefone').textContent='Mínimo 8 dígitos';
+      document.getElementById('errTelefone').classList.add('show');
+      ok=false;
+    } else {
+      tel.classList.remove('err');
+      document.getElementById('errTelefone').classList.remove('show');
+    }
+  } else {
+    tel.classList.remove('err');
+    document.getElementById('errTelefone').classList.remove('show');
   }
-  // Fix Bug 4: Validação básica de CNPJ — se preenchido, deve ter 14 dígitos
+  // CNPJ obrigatório e deve ter 14 dígitos
   const cnpj=document.getElementById('fCNPJ');
-  if(cnpj.value.trim()){
+  if(!cnpj.value.trim()){
+    cnpj.classList.add('err');
+    toast('⚠ CNPJ é obrigatório','warn');
+    ok=false;
+  } else {
     const digits=(cnpj.value||'').replace(/\D/g,'');
-    if(digits.length>0 && digits.length!==14){
+    if(digits.length!==14){
       cnpj.classList.add('err');
       toast('⚠ CNPJ deve ter 14 dígitos (ex: 00.000.000/0001-00)','warn');
       ok=false;
@@ -4581,12 +4593,14 @@ function processarCSV(file) {
     toast('Arquivo deve ser .csv', 'err'); return;
   }
 
-  // Normaliza prioridade — aceita qualquer variação de texto
+  // Normaliza prioridade — aceita qualquer variação de texto, padrão nulo
   const normalizarPrioridade = (val) => {
+    if (!val || !val.trim()) return ''; // sem prioridade por padrão
     const v = (val||'').toLowerCase().trim().replace(/[^a-z]/g,'');
     if (v.includes('quente') || v === 'q' || v === 'hot')  return '🔥 Quente';
     if (v.includes('frio')   || v === 'f' || v === 'cold') return '❄️ Frio';
-    return '🌡 Morno'; // padrão
+    if (v.includes('morno')  || v === 'm' || v === 'warm') return '🌡 Morno';
+    return ''; // não reconhecido → sem prioridade
   };
 
   // Normaliza origem — aceita texto parcial sem acento
