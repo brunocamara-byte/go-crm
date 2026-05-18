@@ -789,6 +789,38 @@ body.tema-light{
   </div>
 </div>
 
+<!-- MODAL REGISTRAR LEAD PERDIDO -->
+<div id="modalPerdidoOv" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9000;align-items:center;justify-content:center">
+  <div style="background:var(--sf);border-radius:var(--r);padding:28px 32px;width:100%;max-width:460px;box-shadow:0 8px 32px rgba(0,0,0,.4)">
+    <div style="font-size:16px;font-weight:700;color:var(--tx);margin-bottom:6px">❌ Registrar Lead Perdido</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:20px" id="perdidoEmpresaNome">—</div>
+    <input type="hidden" id="perdidoDealId">
+    <div style="margin-bottom:16px">
+      <label class="fl">Motivo da perda *</label>
+      <select class="fi" id="perdidoMotivo" style="margin-bottom:8px">
+        <option value="">Selecione o motivo</option>
+        <option>Preço alto</option>
+        <option>Concorrência</option>
+        <option>Sem orçamento</option>
+        <option>Sem interesse</option>
+        <option>Sem retorno</option>
+        <option>Timing errado</option>
+        <option>Outro</option>
+      </select>
+      <textarea class="fi" id="perdidoObs" rows="2" placeholder="Detalhes adicionais (opcional)" style="margin-top:6px;resize:none"></textarea>
+    </div>
+    <div style="margin-bottom:20px">
+      <label class="fl">Próximo follow-up para reativação</label>
+      <input class="fi" id="perdidoFollowup" type="date">
+      <div style="font-size:11px;color:var(--t3);margin-top:4px">Opcional — quando quiser ser lembrado para tentar reativar este lead</div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn" onclick="fecharModalPerdido()">Cancelar</button>
+      <button class="btn btn-re" id="perdidoSaveBtn" onclick="confirmarLeadPerdido()">Confirmar como Perdido</button>
+    </div>
+  </div>
+</div>
+
 <!-- SIDEBAR -->
 <aside class="sb">
   <div class="sb-lg">
@@ -2182,7 +2214,7 @@ function renderBoard() {
   const pipeColor = PIPE_COLORS[pipe]||'#4f7cff';
   const board = document.getElementById('board');
   board.innerHTML = '';
-  let dealsForPipe = allDeals.filter(d=>d['Pipeline']===pipe&&d['Status']==='Ativo');
+  let dealsForPipe = allDeals.filter(d=>d['Pipeline']===pipe&&(d['Status']==='Ativo'||d['Status']==='Fechado — Ganho'||d['Etapa']==='Fechado'));
   if(activeDealFilter==='hot') dealsForPipe=dealsForPipe.filter(d=>(d['Prioridade']||'').includes('Quente'));
   else if(activeDealFilter==='ni') dealsForPipe=dealsForPipe.filter(d=>(d['Criado Por']||'').includes('Nicolau')||(allContatos.find(c=>c['ID']===d['ID Contato'])||{})['Atribuído Por']==='Nicolau');
   else if(activeDealFilter==='meus') dealsForPipe=dealsForPipe.filter(d=>(d['Responsável']||'').includes(currentUser.nome.split(' ')[0]));
@@ -2296,6 +2328,22 @@ async function dropCard(e,etapa,pipe){
   const deal=allDeals.find(d=>d['ID']===dragged.id);
   if(!deal||deal['Etapa']===etapa)return;
 
+  // Bloqueio: Vendedor não pode mover card que está em Fechado
+  if(deal['Etapa']==='Fechado' && currentUser.perfil==='Vendedor'){
+    toast('⛔ Apenas CEO, CTO ou Gerente podem alterar deals fechados','warn');
+    return;
+  }
+
+  // Bloqueio: Vendedor não pode mover card para Fechado diretamente (só via fluxo normal)
+  // Mas pode mover para Perdido normalmente
+
+  // Se movendo para Perdido — abre modal de motivo primeiro
+  if(etapa==='Perdido'){
+    const deal=allDeals.find(d=>d['ID']===dragged.id);
+    abrirModalPerdido(dragged.id, deal?.['Empresa']||'');
+    return;
+  }
+
   // Valida campos obrigatórios para a etapa destino
   const validacao = validarCamposEtapa(deal, etapa);
   if (!validacao.ok) {
@@ -2314,27 +2362,6 @@ async function dropCard(e,etapa,pipe){
     const res=await apiPost({action:'ATUALIZAR_DEAL',payload:{id:dragged.id,etapa, status: etapa==='Fechado' ? 'Fechado — Ganho' : etapa==='Perdido' ? 'Fechado — Perdido' : 'Ativo'},usuario:currentUser.nome});
     if(res.success){
       toast(`✅ ${etapa}`,'ok');
-
-      // Se movido para Perdido — cria card automaticamente em Reativação/Mapeado
-      if(etapa==='Perdido'){
-        apiPost({
-          action:'CRIAR_DEAL',
-          payload:{
-            idContato:  deal['ID Contato']||'',
-            empresa:    deal['Empresa']||'',
-            pipeline:   'Reativação',
-            etapa:      'Mapeado',
-            valorEstimado: deal['Valor Estimado']||0,
-            responsavel:   deal['Responsável']||currentUser.nome,
-            prioridade:    '❄️ Frio',
-            observacoes:   'Reativação automática — veio de pipeline Perdido',
-          },
-          usuario: currentUser.nome
-        }).then(async ()=>{
-          toast('🔄 Card criado automaticamente em Reativação!','info');
-          await syncAll();
-        });
-      }
 
       // Se fechou — registra evento na timeline e atualiza agenda
       if(etapa==='Fechado'){
@@ -3136,6 +3163,78 @@ async function saveQLog(){
     renderBoard();
     toast('⚠ Atividade não salva — sem conexão','warn');
   } finally { btn.disabled=false; }
+}
+
+// ══ MODAL LEAD PERDIDO ══
+function abrirModalPerdido(dealId, empresa) {
+  document.getElementById('perdidoDealId').value = dealId;
+  document.getElementById('perdidoEmpresaNome').textContent = empresa;
+  document.getElementById('perdidoMotivo').value = '';
+  document.getElementById('perdidoObs').value = '';
+  document.getElementById('perdidoFollowup').value = '';
+  const ov = document.getElementById('modalPerdidoOv');
+  ov.style.display = 'flex';
+}
+
+function fecharModalPerdido() {
+  document.getElementById('modalPerdidoOv').style.display = 'none';
+}
+
+async function confirmarLeadPerdido() {
+  const dealId   = document.getElementById('perdidoDealId').value;
+  const motivo   = document.getElementById('perdidoMotivo').value;
+  const obs      = document.getElementById('perdidoObs').value.trim();
+  const followup = document.getElementById('perdidoFollowup').value;
+
+  if (!motivo) { toast('⚠ Informe o motivo da perda','warn'); return; }
+
+  const btn = document.getElementById('perdidoSaveBtn');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+
+  const deal = allDeals.find(d=>d['ID']===dealId);
+  if (!deal) { btn.disabled=false; btn.textContent='Confirmar como Perdido'; return; }
+
+  const motivoCompleto = obs ? motivo + ' — ' + obs : motivo;
+
+  try {
+    // 1. Atualiza deal para Perdido
+    const res = await apiPost({
+      action:'ATUALIZAR_DEAL',
+      payload:{ id:dealId, etapa:'Perdido', status:'Fechado — Perdido', motivoPerda: motivoCompleto },
+      usuario: currentUser.nome
+    });
+
+    if (!res.success) throw new Error(res.error||'Erro ao salvar');
+
+    deal['Etapa'] = 'Perdido';
+    deal['Status'] = 'Fechado — Perdido';
+
+    // 2. Cria card em Reativação com follow-up se informado
+    await apiPost({
+      action:'CRIAR_DEAL',
+      payload:{
+        idContato:     deal['ID Contato']||'',
+        empresa:       deal['Empresa']||'',
+        pipeline:      'Reativação',
+        etapa:         'Mapeado',
+        valorEstimado: deal['Valor Estimado']||0,
+        responsavel:   deal['Responsável']||currentUser.nome,
+        prioridade:    '❄️ Frio',
+        proximoFollowUp: followup||'',
+        observacoes:   'Reativação automática — Motivo da perda: ' + motivoCompleto,
+      },
+      usuario: currentUser.nome
+    });
+
+    fecharModalPerdido();
+    toast('❌ Lead marcado como perdido. Card criado em Reativação!','ok');
+    await syncAll();
+
+  } catch(e) {
+    toast('❌ Erro: ' + e.message,'err');
+  } finally {
+    btn.disabled=false; btn.textContent='Confirmar como Perdido';
+  }
 }
 
 // ══ DELETE ══
