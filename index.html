@@ -1156,6 +1156,8 @@ body.tema-light{
             <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Relatorio semanal → CEO (Seg 7h)</div><div class="cfg-tgl-sub">Resumo da semana comercial enviado toda segunda</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifSemanal" checked><span class="tgl-sl"></span></label></div>
             <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Deal fechado → Time Financeiro</div><div class="cfg-tgl-sub">Time financeiro recebe email com botao de confirmacao do sinal</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifAmanda" checked><span class="tgl-sl"></span></label></div>
             <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Sinal confirmado → Time de Implantacao</div><div class="cfg-tgl-sub">Briefing completo enviado apos time financeiro confirmar pagamento</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifMatheus" checked><span class="tgl-sl"></span></label></div>
+            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Alerta reativacao → Vendedor</div><div class="cfg-tgl-sub">Aviso quando follow-up de lead em Reativacao esta chegando</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifReativ" checked><span class="tgl-sl"></span></label></div>
+            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Alerta degustacao vencida → Vendedor + CEO</div><div class="cfg-tgl-sub">Aviso quando periodo de degustacao do cliente vence</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifDegust" checked><span class="tgl-sl"></span></label></div>
           </div>
           <div class="cfg-row" style="margin-top:14px">
             <label class="cfg-lbl">Dias sem atividade para alertar lead parado</label>
@@ -1518,7 +1520,7 @@ body.tema-light{
         <div>
           <label class="fl">Prioridade</label>
           <select class="fse" id="dpPrioridade">
-            <option>🌡 Morno</option><option>🔥 Quente</option><option>❄️ Frio</option>
+            <option value="">— Sem prioridade</option><option>🌡 Morno</option><option>🔥 Quente</option><option>❄️ Frio</option>
           </select>
         </div>
         <div>
@@ -2257,7 +2259,7 @@ function cardHTML(d, stage, pipeColor, stages) {
   const pc = (d['Prioridade']||'').includes('Quente')?'ph':(d['Prioridade']||'').includes('Morno')?'pw':'pc';
   const today=new Date();today.setHours(0,0,0,0);
   const fu = d['Próximo Follow-up'];
-  let flHtml = '<span class="cfl fl-ok2">—</span>';
+  let flHtml = '<span class="cfl fl-ok2" style="color:var(--t3);font-style:italic">Aguardando ação</span>';
   if(fu){const fd=new Date(fu);fd.setHours(0,0,0,0);const diff=(fd-today)/86400000;flHtml=diff<0?`<span class="cfl fl-urg2">⚠ Atrasado</span>`:diff===0?`<span class="cfl fl-tod2">📅 Hoje</span>`:`<span class="cfl fl-ok2">📅 ${fd.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</span>`;}
   const stageIdx = stages.findIndex(s=>s.etapa===stage.etapa);
   const dots = stages.map((_,i)=>`<div class="pdot2" style="background:${i<=stageIdx?pipeColor:'var(--bd)'}"></div>`).join('');
@@ -3086,8 +3088,7 @@ function openQLog(dealId, empresa){
   _qlogTipo = 'Ligação';
   document.getElementById('qlogCompany').textContent=empresa;
   document.getElementById('qlogDealId').value=dealId;
-  const tmrw=new Date();tmrw.setDate(tmrw.getDate()+1);
-  document.getElementById('qlogFollowup').value=`${tmrw.getFullYear()}-${String(tmrw.getMonth()+1).padStart(2,'0')}-${String(tmrw.getDate()).padStart(2,'0')}`;
+  document.getElementById('qlogFollowup').value='';
   document.getElementById('qlogHora').value='';
   document.getElementById('qlogNota').value='';
   document.querySelectorAll('.cb').forEach(b=>b.className='cb');
@@ -4275,6 +4276,8 @@ async function loadConfig(forceReload) {
     renderDashboards();
     tgl('NOTIF_DEAL_FECHADO','cfgNotifAmanda');
     tgl('NOTIF_PAGAMENTO_CONFIRMADO','cfgNotifMatheus');
+    tgl('NOTIF_REATIVACAO','cfgNotifReativ');
+    tgl('NOTIF_DEGUSTACAO','cfgNotifDegust');
     const temaSalvo = cfg['TEMA']||'dark';
     const temaEl = document.querySelector(`[data-tema="${temaSalvo}"]`);
     if(temaEl){ document.querySelectorAll('.tema-card').forEach(c=>c.classList.remove('on')); temaEl.classList.add('on'); }
@@ -4301,6 +4304,8 @@ function _aplicarCfgNaTela(c) {
   tgl('NOTIF_RESUMO_DIARIO','cfgNotifDiario');
   tgl('NOTIF_LEAD_PARADO','cfgNotifParado');
   tgl('NOTIF_RELATORIO_SEMANAL','cfgNotifSemanal');
+  tgl('NOTIF_REATIVACAO','cfgNotifReativ');
+  tgl('NOTIF_DEGUSTACAO','cfgNotifDegust');
   const temaSalvo = c['TEMA']||'dark';
   const temaEl = document.querySelector('[data-tema="'+temaSalvo+'"]');
   if(temaEl){ document.querySelectorAll('.tema-card').forEach(c=>c.classList.remove('on')); temaEl.classList.add('on'); }
@@ -4338,6 +4343,8 @@ async function salvarConfig() {
     ['NOTIF_RELATORIO_SEMANAL',    g('cfgNotifSemanal')?.checked?'true':'false'],
     ['NOTIF_DEAL_FECHADO',         g('cfgNotifAmanda')?.checked?'true':'false'],
     ['NOTIF_PAGAMENTO_CONFIRMADO', g('cfgNotifMatheus')?.checked?'true':'false'],
+    ['NOTIF_REATIVACAO',           g('cfgNotifReativ')?.checked?'true':'false'],
+    ['NOTIF_DEGUSTACAO',           g('cfgNotifDegust')?.checked?'true':'false'],
   ];
   try {
     const config = {};
@@ -4524,6 +4531,14 @@ async function salvarUsuario(id, isNovo) {
     if (res.success) {
       closeConfirm();
       toast(isNovo ? '✅ Usuário criado!' : '✅ Usuário atualizado!', 'ok');
+      // Envia email de boas-vindas ao novo usuário
+      if (isNovo) {
+        apiPost({
+          action: 'ENVIAR_EMAIL_USUARIO',
+          payload: { nome, email, perfil, senha },
+          usuario: currentUser.nome
+        }).catch(()=>{});
+      }
       renderUsuarios();
     } else {
       toast('❌ ' + (res.error||'Erro ao salvar'), 'err');
