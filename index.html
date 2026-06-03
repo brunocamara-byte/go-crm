@@ -220,7 +220,7 @@ body.tema-light{
 .board{display:flex;gap:11px;height:100%;min-width:max-content}
 
 /* ══ COLUMN ══ */
-.col{width:300px;display:flex;flex-direction:column;flex-shrink:0;height:100%}
+.col{width:320px;display:flex;flex-direction:column;flex-shrink:0;height:100%}
 .ch{display:flex;align-items:center;gap:7px;padding:0 2px;margin-bottom:7px}
 .cdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 .ctitle{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;flex:1}
@@ -1458,7 +1458,7 @@ body.tema-light{
       <div class="fg">
         <div><label class="fl">Nome *</label><input class="fi" id="fNome" placeholder="Nome do decisor"><div class="freq" id="errNome">Obrigatório</div></div>
         <div><label class="fl">Cargo</label><input class="fi" id="fCargo" placeholder="Ex: Sócio, Diretor..."></div>
-        <div><label class="fl">Telefone</label><input class="fi" id="fTelefone" placeholder="(00) 00000-0000" onblur="verificarDuplicata()"><div class="freq" id="errTelefone">Mínimo 8 dígitos</div></div>
+        <div><label class="fl">Telefone</label><input class="fi" id="fTelefone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)" onblur="verificarDuplicata()"><div class="freq" id="errTelefone">Mínimo 8 dígitos</div></div>
         <div><label class="fl">Email</label><input class="fi" id="fEmail" placeholder="email@empresa.com" type="email"></div>
       </div>
     </div>
@@ -1471,8 +1471,7 @@ body.tema-light{
         <div><label class="fl">Origem</label><select class="fse" id="fOrigem"><option>Prospecção Samuel</option><option>Indicação — Nicolau</option><option>Indicação — Soluti</option><option>Indicação — Prime</option><option>Site</option><option>WhatsApp</option><option>LinkedIn</option><option>Outro</option></select></div>
         <div><label class="fl">Responsável</label><select class="fse" id="fResponsavel"><option>Samuel Mateus</option><option>Nicolau</option><option>Bruno Camara</option></select></div>
         <div><label class="fl">Próximo follow-up</label><input class="fi" id="fFollowup" type="date"></div>
-        <div class="ff"><label class="fl">Observações</label><textarea class="fta" id="fObs" placeholder="Contexto do lead..."></textarea></div>
-        <div class="ff"><label class="fl">Produtos atuais <span style="font-size:10px;color:var(--t3);font-weight:400">(para Reativação)</span></label><input class="fi" id="fProdutosAtuais" placeholder="Ex: GOSigner, Módulo Financeiro..."></div>
+        <div class="ff"><label class="fl">Contexto para o Vendedor</label><textarea class="fta" id="fContextoCEO" placeholder="Nota estratégica para o vendedor..."></textarea></div>
       </div>
     </div>
     <div class="fsec">
@@ -2256,60 +2255,70 @@ function renderBoard() {
 }
 
 function cardHTML(d, stage, pipeColor, stages) {
-  const pc = (d['Prioridade']||'').includes('Quente')?'ph':(d['Prioridade']||'').includes('Morno')?'pw':'pc';
   const today=new Date();today.setHours(0,0,0,0);
   const fu = d['Próximo Follow-up'];
-  let flHtml = '<span class="cfl fl-ok2" style="color:var(--t3);font-style:italic">Aguardando ação</span>';
-  if(fu){const fd=new Date(fu);fd.setHours(0,0,0,0);const diff=(fd-today)/86400000;flHtml=diff<0?`<span class="cfl fl-urg2">⚠ Atrasado</span>`:diff===0?`<span class="cfl fl-tod2">📅 Hoje</span>`:`<span class="cfl fl-ok2">📅 ${fd.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</span>`;}
+  let flHtml = '<span style="font-size:11px;color:var(--t3);font-style:italic">Aguardando ação</span>';
+  if(fu){const fd=new Date(fu);fd.setHours(0,0,0,0);const diff=(fd-today)/86400000;flHtml=diff<0?`<span style="font-size:11px;font-weight:700;color:var(--re)">⚠ Atrasado ${Math.abs(Math.round(diff))}d</span>`:diff===0?`<span style="font-size:11px;font-weight:700;color:var(--ye)">📅 Hoje</span>`:`<span style="font-size:11px;color:var(--t2)">📅 ${fd.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</span>`;}
   const stageIdx = stages.findIndex(s=>s.etapa===stage.etapa);
-  const dots = stages.map((_,i)=>`<div class="pdot2" style="background:${i<=stageIdx?pipeColor:'var(--bd)'}"></div>`).join('');
   const contato = allContatos.find(c=>c['ID']===d['ID Contato'])||{};
   const ceoNote = contato['Contexto CEO']||d['Observações']||'';
-  const seg = contato['Segmento']||''; const cor = SEG_COLORS[seg]||'#8fa3c4';
-  const valor = d['Valor Estimado']?`R$ ${Number(d['Valor Estimado']).toLocaleString('pt-BR')}`:'—';
+  const seg = contato['Segmento']||''; const segCor = SEG_COLORS[seg]||'#8fa3c4';
+  const valor = d['Valor Estimado']?`R$ ${Number(d['Valor Estimado']).toLocaleString('pt-BR',{minimumFractionDigits:0})}`:'—';
   const resp = d['Responsável']||'Samuel';
   const respIc = resp==='Nicolau'?'NI':resp==='Bruno Camara'?'BR':'SA';
   const respCls = resp==='Nicolau'?'uav-ni':resp==='Bruno Camara'?'uav-br':'uav-sa';
+  const prioridade = d['Prioridade']||'';
+  const prioCor = prioridade.includes('Quente')?'#ef4444':prioridade.includes('Morno')?'#f59e0b':'#64748b';
+  const prioLabel = prioridade.includes('Quente')?'🔥 Quente':prioridade.includes('Morno')?'🌡 Morno':prioridade.includes('Frio')?'❄️ Frio':'';
 
-  // Badge de entrada pendente — deal fechado aguardando confirmação
-  const entradaPendente = (d['Etapa']==='Fechado' || d['Status']==='Fechado — Ganho') && !d['Entrada Confirmada'];
-  const entradaBadge = entradaPendente
-    ? `<div style="font-size:10px;font-weight:700;color:var(--ye);background:var(--ys);padding:2px 7px;border-radius:4px;margin-top:4px;display:inline-block">⏳ Entrada pendente</div>`
-    : '';
-  // Contador de atividades no card
+  // Módulos
+  const prodStr = d['Produtos Selecionados']||'';
+  const modulos = prodStr ? prodStr.split('||').map(p=>p.split('::')[1]||p.split('::')[0]).filter(Boolean) : [];
+  const modulosHtml = modulos.length > 0
+    ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin:6px 0">
+        ${modulos.slice(0,3).map(m=>`<span style="font-size:10px;padding:2px 7px;border-radius:4px;background:var(--s2);color:var(--t2);border:1px solid var(--bd)">${m}</span>`).join('')}
+        ${modulos.length>3?`<span style="font-size:10px;padding:2px 7px;border-radius:4px;background:var(--s2);color:var(--t2);border:1px solid var(--bd)">+${modulos.length-3}</span>`:''}
+      </div>`
+    : `<div style="font-size:11px;color:var(--t3);font-style:italic;margin:4px 0">Sem módulos</div>`;
+
+  // Badges
+  const entradaPendente = (d['Etapa']==='Fechado'||d['Status']==='Fechado — Ganho')&&!d['Entrada Confirmada'];
+  const entradaBadge = entradaPendente?`<span style="font-size:10px;font-weight:700;color:var(--ye);background:var(--ys);padding:2px 7px;border-radius:4px">⏳ Entrada pendente</span>`:'';
   const qtdAtivs = (window._atividades||[]).filter(a=>a['ID Deal']===d['ID']).length;
-  const ativBadge = qtdAtivs > 0
-    ? `<div style="font-size:10px;color:var(--t3);font-weight:600">📋 ${qtdAtivs} atividade${qtdAtivs!==1?'s':''}</div>`
-    : '';
+
+  // Barra de progresso etapas
+  const dots = stages.map((_,i)=>`<div style="flex:1;height:4px;border-radius:2px;background:${i<=stageIdx?pipeColor:'var(--bd)'}"></div>`).join('');
 
   return `<div class="card" draggable="true"
     ondragstart="startDrag(event,this,'${d['ID']}')"
     ondragend="this.style.opacity='1'"
     onclick="openDealPanel('${d['ID']}')">
-    <div class="cstripe" style="background:${pipeColor}"></div>
-    <div class="chead">
-      <div class="ctoprow">
-        <div class="cco">${d['Empresa']||'—'}</div>
-        <div class="cprio ${pc}">${(d['Prioridade']||'').includes('Quente')?'🔥':(d['Prioridade']||'').includes('Morno')?'🌡':'❄️'}</div>
+    <div style="height:4px;width:100%;background:${pipeColor}"></div>
+    <div style="padding:12px 14px 8px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--tx);line-height:1.3;flex:1">${d['Empresa']||'—'}</div>
+        ${prioLabel?`<span style="font-size:10px;padding:2px 7px;border-radius:4px;background:${prioCor}22;color:${prioCor};font-weight:700;margin-left:6px;white-space:nowrap">${prioLabel}</span>`:''}
       </div>
-      <div class="ccrow">
-        ${seg?`<div class="cseg" style="background:${cor}22;color:${cor}">${seg}</div>`:''}
-        <div class="ccn">${contato['Nome Contato']||d['Empresa']||''}</div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:2px">${contato['Nome Contato']||''} ${contato['Telefone']?'· '+contato['Telefone']:''}</div>
+      ${seg?`<div style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:${segCor}22;color:${segCor};margin-bottom:4px">${seg}</div>`:''}
+      <div style="display:flex;align-items:center;gap:8px;margin:6px 0">
+        <span style="font-family:'DM Mono',monospace;font-size:16px;font-weight:800;color:var(--gn)">${valor}</span>
+        <span style="font-size:10px;color:var(--t3)">estimado</span>
+        ${qtdAtivs>0?`<span style="font-size:10px;color:var(--t3);margin-left:auto">📋 ${qtdAtivs} ativ.</span>`:''}
       </div>
-      <div class="cvrow">
-        <div class="cval">${valor}</div>
-        <div class="cvlb">estimado</div>
-        ${ativBadge}
-      </div>
-      ${entradaBadge}
-      <div class="cprog">
-        <div class="pdrow">${dots}</div>
-        <div class="prlb">${stage.etapa} · etapa ${stageIdx+1}/${stages.length}</div>
-      </div>
-      ${ceoNote?`<div class="cnote"><div class="cni">🎯</div><div class="cnt">${ceoNote.substring(0,80)}${ceoNote.length>80?'...':''}</div></div>`:''}
+      ${modulosHtml}
+      ${entradaBadge?`<div style="margin:4px 0">${entradaBadge}</div>`:''}
+      ${ceoNote?`<div style="display:flex;gap:6px;align-items:flex-start;background:var(--s2);border-radius:6px;padding:6px 8px;margin:6px 0"><span style="font-size:11px">🎯</span><div style="font-size:11px;color:var(--t2);line-height:1.4">${ceoNote.substring(0,80)}${ceoNote.length>80?'...':''}</div></div>`:''}
     </div>
-    <div class="cfoot">
-      <div class="cowrow"><div class="mav ${respCls}">${respIc}</div><div class="own">${resp.split(' ')[0]}</div></div>
+    <div style="padding:0 14px 4px">
+      <div style="display:flex;gap:3px;margin-bottom:4px">${dots}</div>
+      <div style="font-size:10px;color:var(--t3)">${stage.etapa} · etapa ${stageIdx+1}/${stages.length}</div>
+    </div>
+    <div style="padding:8px 14px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--bd);margin-top:6px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="mav ${respCls}">${respIc}</div>
+        <div style="font-size:11px;color:var(--t2)">${resp.split(' ')[0]}</div>
+      </div>
       ${flHtml}
     </div>
     <div class="cqact">
@@ -2844,8 +2853,7 @@ function openPanel(mode,id){
     document.getElementById('fICP').value=c['Papel ICP-Brasil']||'';
     document.getElementById('fNome').value=c['Nome Contato']||'';
     document.getElementById('fCargo').value=c['Cargo']||'';
-    document.getElementById('fTelefone').value=c['Telefone']||'';
-    document.getElementById('fEmail').value=c['Email']||'';
+    document.getElementById('fTelefone').value=c['Telefone']||'';    document.getElementById('fEmail').value=c['Email']||'';
     document.getElementById('fTipo').value=c['Tipo']||'Lead Novo';
     document.getElementById('fPrioridade').value=c['Prioridade']||'🌡 Morno';
     document.getElementById('fPotencial').value=c['Potencial']||'Médio';
@@ -2879,7 +2887,7 @@ function closePanel(){
 }
 
 function clearForm(){
-  ['fEmpresa','fCNPJ','fNome','fCargo','fTelefone','fEmail','fObs','fContextoCEO','fProdutosAtuais','editId'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['fEmpresa','fCNPJ','fNome','fCargo','fTelefone','fEmail','fContextoCEO','editId'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['fSegmento','fICP'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('fPrioridade').value = '';
   ['fTipo','fPotencial','fOrigem','fResponsavel'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
@@ -2952,7 +2960,7 @@ async function saveContato(){
     proximoFollowUp:document.getElementById('fFollowup').value,
     observacoes:document.getElementById('fObs').value.trim(),
     contextoCEO:document.getElementById('fContextoCEO').value.trim(),
-    produtosAtuais:document.getElementById('fProdutosAtuais')?.value.trim()||'',
+    produtosAtuais:'',
     atribuidoPor:currentUser.nome,
   };
   try{
@@ -5130,6 +5138,15 @@ async function salvarObsImpl(id) {
 }
 
 // ══ MÁSCARA CNPJ ════════════════════════════════════════════
+function mascaraTelefone(input) {
+  let v = input.value.replace(/\D/g,'').substring(0,11);
+  if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3');
+  else if (v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,'($1) $2-$3');
+  else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,5}).*/,'($1) $2');
+  else if (v.length > 0) v = v.replace(/^(\d{0,2}).*/,'($1');
+  input.value = v;
+}
+
 function mascaraCNPJ(input) {
   let v = input.value.replace(/\D/g,'').substring(0,14);
   if (v.length > 12) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2}).*/,'$1.$2.$3/$4-$5');
