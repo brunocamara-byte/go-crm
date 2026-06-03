@@ -2860,9 +2860,9 @@ function openPanel(mode,id){
     document.getElementById('fOrigem').value=c['Origem']||'Prospecção Samuel';
     document.getElementById('fResponsavel').value=c['Responsável']||'Samuel Mateus';
     document.getElementById('fFollowup').value=c['Próximo Follow-up']?fmtDateInput(c['Próximo Follow-up']):'';
-    document.getElementById('fObs').value=c['Observações']||'';
+    document.getElementById('fObs') && (document.getElementById('fObs').value=c['Observações']||'');
     document.getElementById('fContextoCEO').value=c['Contexto CEO']||'';
-    document.getElementById('fProdutosAtuais').value=c['Produtos Atuais']||'';
+    document.getElementById('fProdutosAtuais') && (document.getElementById('fProdutosAtuais').value=c['Produtos Atuais']||'');
     document.getElementById('notifInfo').style.display='none';
     document.getElementById('pipeInfo').style.display='flex';
     document.getElementById('deleteBtn').style.display='flex';
