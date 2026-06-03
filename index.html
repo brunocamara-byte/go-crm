@@ -1471,13 +1471,12 @@ body.tema-light{
         <div><label class="fl">Origem</label><select class="fse" id="fOrigem"><option>Prospecção Samuel</option><option>Indicação — Nicolau</option><option>Indicação — Soluti</option><option>Indicação — Prime</option><option>Site</option><option>WhatsApp</option><option>LinkedIn</option><option>Outro</option></select></div>
         <div><label class="fl">Responsável</label><select class="fse" id="fResponsavel"><option>Samuel Mateus</option><option>Nicolau</option><option>Bruno Camara</option></select></div>
         <div><label class="fl">Próximo follow-up</label><input class="fi" id="fFollowup" type="date"></div>
-        <div class="ff"><label class="fl">Contexto para o Vendedor</label><textarea class="fta" id="fContextoCEO" placeholder="Nota estratégica para o vendedor..."></textarea></div>
       </div>
     </div>
     <div class="fsec">
       <div class="ceo-bx">
         <div class="ceo-lb">🎯 Contexto para o vendedor</div>
-        <textarea class="fta" id="fContextoCEO" style="background:transparent;border:none;padding:0;color:var(--tx);font-size:13px;width:100%" placeholder="Nota estratégica para Samuel..."></textarea>
+        <textarea class="fta" id="fContextoCEO" style="background:transparent;border:none;padding:0;color:var(--tx);font-size:13px;width:100%" placeholder="Nota estratégica para o vendedor..."></textarea>
       </div>
     </div>
     <div class="notif-info" id="notifInfo"><span>📧</span><span><strong style="color:var(--ac)">Automação:</strong> ao salvar, Samuel receberá email com os dados do lead.</span></div>
@@ -2293,31 +2292,31 @@ function cardHTML(d, stage, pipeColor, stages) {
     ondragstart="startDrag(event,this,'${d['ID']}')"
     ondragend="this.style.opacity='1'"
     onclick="openDealPanel('${d['ID']}')">
-    <div style="height:4px;width:100%;background:${pipeColor}"></div>
-    <div style="padding:12px 14px 8px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--tx);line-height:1.3;flex:1">${d['Empresa']||'—'}</div>
-        ${prioLabel?`<span style="font-size:10px;padding:2px 7px;border-radius:4px;background:${prioCor}22;color:${prioCor};font-weight:700;margin-left:6px;white-space:nowrap">${prioLabel}</span>`:''}
+    <div style="height:5px;width:100%;background:${pipeColor}"></div>
+    <div style="padding:16px 16px 10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--tx);line-height:1.3;flex:1">${d['Empresa']||'—'}</div>
+        ${prioLabel?`<span style="font-size:10px;padding:3px 8px;border-radius:4px;background:${prioCor}22;color:${prioCor};font-weight:700;margin-left:8px;white-space:nowrap">${prioLabel}</span>`:''}
       </div>
-      <div style="font-size:12px;color:var(--t2);margin-bottom:2px">${contato['Nome Contato']||''} ${contato['Telefone']?'· '+contato['Telefone']:''}</div>
-      ${seg?`<div style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:${segCor}22;color:${segCor};margin-bottom:4px">${seg}</div>`:''}
-      <div style="display:flex;align-items:center;gap:8px;margin:6px 0">
-        <span style="font-family:'DM Mono',monospace;font-size:16px;font-weight:800;color:var(--gn)">${valor}</span>
+      <div style="font-size:12.5px;color:var(--t2);margin-bottom:4px">${contato['Nome Contato']||''} ${contato['Telefone']?'· '+contato['Telefone']:''}</div>
+      ${seg?`<div style="display:inline-block;font-size:10px;padding:2px 7px;border-radius:3px;background:${segCor}22;color:${segCor};margin-bottom:6px">${seg}</div>`:''}
+      <div style="display:flex;align-items:center;gap:8px;margin:8px 0">
+        <span style="font-family:'DM Mono',monospace;font-size:17px;font-weight:800;color:var(--gn)">${valor}</span>
         <span style="font-size:10px;color:var(--t3)">estimado</span>
         ${qtdAtivs>0?`<span style="font-size:10px;color:var(--t3);margin-left:auto">📋 ${qtdAtivs} ativ.</span>`:''}
       </div>
       ${modulosHtml}
-      ${entradaBadge?`<div style="margin:4px 0">${entradaBadge}</div>`:''}
-      ${ceoNote?`<div style="display:flex;gap:6px;align-items:flex-start;background:var(--s2);border-radius:6px;padding:6px 8px;margin:6px 0"><span style="font-size:11px">🎯</span><div style="font-size:11px;color:var(--t2);line-height:1.4">${ceoNote.substring(0,80)}${ceoNote.length>80?'...':''}</div></div>`:''}
+      ${entradaBadge?`<div style="margin:6px 0">${entradaBadge}</div>`:''}
+      ${ceoNote?`<div style="display:flex;gap:6px;align-items:flex-start;background:var(--s2);border-radius:6px;padding:8px 10px;margin:8px 0"><span style="font-size:12px">🎯</span><div style="font-size:11.5px;color:var(--t2);line-height:1.5">${ceoNote.substring(0,90)}${ceoNote.length>90?'...':''}</div></div>`:''}
     </div>
-    <div style="padding:0 14px 4px">
-      <div style="display:flex;gap:3px;margin-bottom:4px">${dots}</div>
-      <div style="font-size:10px;color:var(--t3)">${stage.etapa} · etapa ${stageIdx+1}/${stages.length}</div>
+    <div style="padding:0 16px 6px">
+      <div style="display:flex;gap:3px;margin-bottom:5px">${dots}</div>
+      <div style="font-size:10.5px;color:var(--t3)">${stage.etapa} · etapa ${stageIdx+1}/${stages.length}</div>
     </div>
-    <div style="padding:8px 14px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--bd);margin-top:6px">
+    <div style="padding:10px 16px 14px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--bd);margin-top:8px">
       <div style="display:flex;align-items:center;gap:6px">
         <div class="mav ${respCls}">${respIc}</div>
-        <div style="font-size:11px;color:var(--t2)">${resp.split(' ')[0]}</div>
+        <div style="font-size:11.5px;color:var(--t2)">${resp.split(' ')[0]}</div>
       </div>
       ${flHtml}
     </div>
@@ -2958,7 +2957,7 @@ async function saveContato(){
     origem:document.getElementById('fOrigem').value,
     responsavel:document.getElementById('fResponsavel').value,
     proximoFollowUp:document.getElementById('fFollowup').value,
-    observacoes:document.getElementById('fObs').value.trim(),
+    observacoes:document.getElementById('fContextoCEO')?.value.trim()||'',
     contextoCEO:document.getElementById('fContextoCEO').value.trim(),
     produtosAtuais:'',
     atribuidoPor:currentUser.nome,
