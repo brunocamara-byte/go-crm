@@ -2573,8 +2573,13 @@ function editarContatoPeloDeal(idContato) {
   showScr('contatos');
   setTimeout(() => {
     const c = allContatos.find(x => x['ID'] === idContato);
-    if (c) openPanel(idContato);
-  }, 300);
+    if (c) {
+      // Garante que o editId está correto antes de abrir
+      const editIdEl = document.getElementById('editId');
+      if (editIdEl) editIdEl.value = idContato;
+      openPanel(idContato);
+    }
+  }, 500);
 }
 
 // Calcula total automaticamente a partir dos produtos selecionados
@@ -5553,11 +5558,12 @@ function setDealFilterResponsavel(nome) {
 
 // ══ CAMPOS OBRIGATÓRIOS POR ETAPA ════════════════════════════
 const CAMPOS_OBRIGATORIOS_ETAPA = {
-  '1º Contato':       ['Nome Contato','Telefone'],
-  'Qualificação':     ['Nome Contato','Telefone','Email'],
-  'Proposta Enviada': ['Nome Contato','Telefone','Email'],
-  'Negociação':       ['Nome Contato','Telefone','Email'],
-  'Fechado':          ['Nome Contato','Telefone','Email'],
+  '1º Contato':              ['Nome Contato','Telefone'],
+  'Qualificação':            ['Nome Contato','Telefone'],
+  'Proposta Enviada':        ['Nome Contato','Telefone'],
+  'Negociação':              ['Nome Contato','Telefone'],
+  'Fechado':                 ['Nome Contato','Telefone'],
+  'Cliente em Degustacao':   ['Nome Contato','Telefone'],
 };
 
 function validarCamposEtapa(deal, novaEtapa) {
