@@ -1490,7 +1490,7 @@ body.tema-light{
       <div class="fsec-lb">Empresa</div>
       <div class="fg">
         <div class="ff"><label class="fl">Nome da empresa *</label><input class="fi" id="fEmpresa" placeholder="Ex: Construtora Vitória LTDA"><div class="freq" id="errEmpresa">Campo obrigatório</div></div>
-        <div><label class="fl">CNPJ *</label><input class="fi" id="fCNPJ" placeholder="00.000.000/0001-00" oninput="mascaraCNPJ(this)" onblur="verificarDuplicata()"></div>
+        <div><label class="fl">CNPJ</label><input class="fi" id="fCNPJ" placeholder="00.000.000/0001-00" oninput="mascaraCNPJ(this)" onblur="verificarDuplicata()"></div>
         <div><label class="fl">Segmento</label><select class="fse" id="fSegmento"><option value="">Selecionar...</option><option>Contabilidade</option><option>Jurídico</option><option>Saúde</option><option>Indústria</option><option>Construção</option><option>Comércio</option><option>Tecnologia</option><option>Educação</option><option>Logística</option><option>Agronegócio</option><option>Outro</option></select></div>
         <div><label class="fl">Papel ICP-Brasil</label><select class="fse" id="fICP"><option value="">Selecionar...</option><option>AR — Autoridade de Registro</option><option>AC2 — 2º nível</option><option>AC — 1º nível</option><option>AR Virtual</option><option>Não se aplica</option></select></div>
       </div>
@@ -1500,7 +1500,7 @@ body.tema-light{
       <div class="fg">
         <div><label class="fl">Nome *</label><input class="fi" id="fNome" placeholder="Nome do decisor"><div class="freq" id="errNome">Obrigatório</div></div>
         <div><label class="fl">Cargo</label><input class="fi" id="fCargo" placeholder="Ex: Sócio, Diretor..."></div>
-        <div><label class="fl">Telefone</label><input class="fi" id="fTelefone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)" onblur="verificarDuplicata()"><div class="freq" id="errTelefone">Mínimo 8 dígitos</div></div>
+        <div><label class="fl">Telefone *</label><input class="fi" id="fTelefone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)" onblur="verificarDuplicata()"><div class="freq" id="errTelefone">Obrigatório</div></div>
         <div><label class="fl">Email</label><input class="fi" id="fEmail" placeholder="email@empresa.com" type="email"></div>
       </div>
     </div>
@@ -2982,13 +2982,13 @@ function fmtDateInput(d){try{const dt=new Date(d);return `${dt.getFullYear()}-${
 
 function validate(){
   let ok=true;
-  // Campos obrigatórios: apenas Empresa e Nome Contato
-  [['fEmpresa','errEmpresa'],['fNome','errNome']].forEach(([fi,er])=>{
+  // Obrigatórios: Empresa, Nome Contato e Telefone
+  [['fEmpresa','errEmpresa'],['fNome','errNome'],['fTelefone','errTelefone']].forEach(([fi,er])=>{
     const el=document.getElementById(fi);
     if(!el.value.trim()){el.classList.add('err');document.getElementById(er).classList.add('show');ok=false;}
     else{el.classList.remove('err');document.getElementById(er).classList.remove('show');}
   });
-  // Telefone: se preenchido, valida mínimo de dígitos
+  // Telefone preenchido — valida mínimo de dígitos
   const tel=document.getElementById('fTelefone');
   if(tel.value.trim()){
     const telDigits=(tel.value||'').replace(/\D/g,'');
@@ -3001,24 +3001,17 @@ function validate(){
       tel.classList.remove('err');
       document.getElementById('errTelefone').classList.remove('show');
     }
-  } else {
-    tel.classList.remove('err');
-    document.getElementById('errTelefone').classList.remove('show');
   }
-  // CNPJ obrigatório e deve ter 14 dígitos
+  // CNPJ opcional — se preenchido, valida 14 dígitos
   const cnpj=document.getElementById('fCNPJ');
-  if(!cnpj.value.trim()){
-    cnpj.classList.add('err');
-    toast('⚠ CNPJ é obrigatório','warn');
-    ok=false;
-  } else {
+  if(cnpj.value.trim()){
     const digits=(cnpj.value||'').replace(/\D/g,'');
     if(digits.length!==14){
       cnpj.classList.add('err');
       toast('⚠ CNPJ deve ter 14 dígitos (ex: 00.000.000/0001-00)','warn');
       ok=false;
     } else { cnpj.classList.remove('err'); }
-  }
+  } else { cnpj.classList.remove('err'); }
   return ok;
 }
 
