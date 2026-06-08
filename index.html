@@ -3975,10 +3975,12 @@ async function confirmarDesqualificar() {
 let relTab = 'nicolau';
 
 function setRelTab(tab) {
+  relTab = tab;
   ['nicolau','samuel','atividades','financeiro'].forEach(t => {
     document.getElementById('rtab-'+t)?.classList.toggle('on', t===tab);
     document.getElementById('rcont-'+t)?.classList.toggle('on', t===tab);
   });
+  if (tab==='nicolau' || tab==='samuel') renderDashboard();
   if (tab==='atividades') iniciarRelAtividades();
   if (tab==='financeiro') iniciarRelFinanceiro();
 }
