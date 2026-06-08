@@ -957,36 +957,29 @@ body.tema-light{
     </div>
   </div>
   <div class="scr" id="scr-relatorios">
-    <!-- Abas de visão -->
     <div class="rel-tabs">
       <div class="rel-tab on" id="rtab-nicolau" onclick="setRelTab('nicolau')">📊 Visão Executiva</div>
       <div class="rel-tab" id="rtab-samuel" onclick="setRelTab('samuel')">📈 Minha Performance</div>
+      <div class="rel-tab" id="rtab-atividades" onclick="setRelTab('atividades')">📋 Atividades</div>
+      <div class="rel-tab" id="rtab-financeiro" onclick="setRelTab('financeiro')">💰 Financeiro</div>
       <div class="dash-updated" id="dashUpdated" style="margin-left:auto;padding-right:16px"></div>
     </div>
 
-    <!-- VISÃO NICOLAU -->
+    <!-- VISÃO EXECUTIVA -->
     <div class="rel-content on" id="rcont-nicolau">
       <div class="dash-wrap">
-
-        <!-- Pergunta 1: Vou bater a meta? -->
         <div class="dash-card">
           <div class="dash-card-title">🎯 Meta do Mês</div>
           <div id="dashMetaNicolau"></div>
         </div>
-
-        <!-- Pergunta 2: O Samuel está trabalhando? -->
         <div class="dash-card">
           <div class="dash-card-title">📞 Atividade Comercial</div>
           <div id="dashSamuelAtividade"></div>
         </div>
-
-        <!-- Pergunta 3: Qual lead tá quente? -->
         <div class="dash-card">
           <div class="dash-card-title">🔥 Oportunidades Quentes</div>
           <div id="dashLeadsQuentes"></div>
         </div>
-
-        <!-- Pipeline resumo -->
         <div class="dash-row2">
           <div class="dash-card" style="flex:1">
             <div class="dash-card-title">📊 Pipeline por status</div>
@@ -997,34 +990,82 @@ body.tema-light{
             <div id="dashOrigem"></div>
           </div>
         </div>
-
-        <!-- Bloco Implantação -->
         <div class="dash-card">
           <div class="dash-card-title">🚀 Projetos de Implantação</div>
           <div id="dashImplantacao"></div>
         </div>
-
       </div>
     </div>
 
-    <!-- VISÃO SAMUEL -->
+    <!-- MINHA PERFORMANCE -->
     <div class="rel-content" id="rcont-samuel">
       <div class="dash-wrap">
-
-        <!-- Hero — comissão do mês -->
         <div class="dash-card samuel-hero" id="dashSamuelHero"></div>
-
-        <!-- Stats do mês -->
         <div class="dash-kpis" id="dashSamuelKpis"></div>
-
-        <!-- Deals fechados no mês -->
         <div class="dash-card">
           <div class="dash-card-title">✅ Minhas Oportunidades Fechadas</div>
           <div id="dashSamuelDeals"></div>
         </div>
-
       </div>
     </div>
+
+    <!-- RELATÓRIO DE ATIVIDADES POR PERÍODO -->
+    <div class="rel-content" id="rcont-atividades">
+      <div class="dash-wrap">
+        <div class="dash-card">
+          <div class="dash-card-title">📋 Atividades por Período</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px">
+            <div>
+              <label class="fl" style="margin-bottom:4px">Data inicial</label>
+              <input class="fi" type="date" id="relAtvDtIni" style="width:160px">
+            </div>
+            <div>
+              <label class="fl" style="margin-bottom:4px">Data final</label>
+              <input class="fi" type="date" id="relAtvDtFim" style="width:160px">
+            </div>
+            <div>
+              <label class="fl" style="margin-bottom:4px">Vendedor</label>
+              <select class="fse" id="relAtvVendedor" style="width:180px">
+                <option value="">Todos</option>
+              </select>
+            </div>
+            <button class="btn btn-p" onclick="gerarRelAtividades()">🔍 Gerar relatório</button>
+            <button class="btn btn-g" id="relAtvExportBtn" onclick="exportarRelAtividades()" style="display:none">⬇ Exportar CSV</button>
+          </div>
+          <div id="relAtvResultado">
+            <div style="font-size:13px;color:var(--t3);text-align:center;padding:32px">Selecione o período e clique em Gerar relatório</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RELATÓRIO FINANCEIRO CEO -->
+    <div class="rel-content" id="rcont-financeiro">
+      <div class="dash-wrap">
+        <div class="dash-card">
+          <div class="dash-card-title">💰 Relatório Financeiro</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px">
+            <div>
+              <label class="fl" style="margin-bottom:4px">Período</label>
+              <select class="fse" id="relFinPeriodo" onchange="onRelFinPeriodo()" style="width:200px">
+                <option value="mes">Mês atual</option>
+                <option value="personalizado">Personalizado</option>
+              </select>
+            </div>
+            <div id="relFinDatasWrap" style="display:none;gap:10px;display:flex">
+              <input class="fi" type="date" id="relFinDtIni" style="width:160px">
+              <input class="fi" type="date" id="relFinDtFim" style="width:160px">
+            </div>
+            <button class="btn btn-p" onclick="gerarRelFinanceiro()">🔍 Gerar relatório</button>
+            <button class="btn btn-g" id="relFinExportBtn" onclick="exportarRelFinanceiro()" style="display:none">⬇ Exportar CSV</button>
+          </div>
+          <div id="relFinResultado">
+            <div style="font-size:13px;color:var(--t3);text-align:center;padding:32px">Selecione o período e clique em Gerar relatório</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
   <div class="scr" id="scr-produtos">
     <!-- Toolbar Produtos -->
@@ -3934,13 +3975,269 @@ async function confirmarDesqualificar() {
 let relTab = 'nicolau';
 
 function setRelTab(tab) {
-  relTab = tab;
-  ['nicolau','samuel'].forEach(t => {
-    document.getElementById('rtab-'+t).classList.toggle('on', t===tab);
-    document.getElementById('rcont-'+t).classList.toggle('on', t===tab);
+  ['nicolau','samuel','atividades','financeiro'].forEach(t => {
+    document.getElementById('rtab-'+t)?.classList.toggle('on', t===tab);
+    document.getElementById('rcont-'+t)?.classList.toggle('on', t===tab);
   });
-  renderDashboard();
+  if (tab==='atividades') iniciarRelAtividades();
+  if (tab==='financeiro') iniciarRelFinanceiro();
 }
+
+function iniciarRelAtividades() {
+  // Preenche dropdown de vendedores
+  const sel = document.getElementById('relAtvVendedor');
+  if (sel && sel.options.length <= 1) {
+    const vendedores = [...new Set((window._atividades||[]).map(a=>a['Responsável']).filter(Boolean))];
+    vendedores.forEach(v => { const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); });
+  }
+  // Preenche datas padrão — mês atual
+  const hoje = new Date();
+  const ini  = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  if (!document.getElementById('relAtvDtIni').value) {
+    document.getElementById('relAtvDtIni').value = ini.toISOString().split('T')[0];
+    document.getElementById('relAtvDtFim').value = hoje.toISOString().split('T')[0];
+  }
+}
+
+function iniciarRelFinanceiro() {
+  const hoje = new Date();
+  if (!document.getElementById('relFinDtIni').value) {
+    const ini = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+    document.getElementById('relFinDtIni').value = ini.toISOString().split('T')[0];
+    document.getElementById('relFinDtFim').value = hoje.toISOString().split('T')[0];
+  }
+}
+
+function onRelFinPeriodo() {
+  const v = document.getElementById('relFinPeriodo').value;
+  document.getElementById('relFinDatasWrap').style.display = v==='personalizado' ? 'flex' : 'none';
+}
+
+function gerarRelAtividades() {
+  const dtIni    = document.getElementById('relAtvDtIni').value;
+  const dtFim    = document.getElementById('relAtvDtFim').value;
+  const vendedor = document.getElementById('relAtvVendedor').value;
+  if (!dtIni || !dtFim) { toast('Selecione o período','warn'); return; }
+
+  const ini = new Date(dtIni); ini.setHours(0,0,0,0);
+  const fim = new Date(dtFim); fim.setHours(23,59,59,999);
+
+  let ativs = (window._atividades||[]).filter(a => {
+    const d = new Date(a['Data Hora']);
+    return d >= ini && d <= fim;
+  });
+  if (vendedor) ativs = ativs.filter(a => a['Responsável'] === vendedor);
+
+  if (ativs.length === 0) {
+    document.getElementById('relAtvResultado').innerHTML = '<div style="font-size:13px;color:var(--t3);text-align:center;padding:32px">Nenhuma atividade encontrada no período</div>';
+    document.getElementById('relAtvExportBtn').style.display = 'none';
+    return;
+  }
+
+  // Totais por tipo
+  const tipos = {};
+  ativs.forEach(a => { const t=a['Tipo']||'Outro'; tipos[t]=(tipos[t]||0)+1; });
+  const totalCards = Object.entries(tipos).map(([t,n]) =>
+    `<div style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:12px 16px;min-width:100px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--ac)">${n}</div>
+      <div style="font-size:11px;color:var(--t2);margin-top:3px">${t}</div>
+    </div>`
+  ).join('');
+
+  // Novos leads cadastrados no período
+  const novosLeads = (window.allContatos||[]).filter(c => {
+    const d = new Date(c['Data Cadastro']);
+    return d >= ini && d <= fim;
+  }).length;
+
+  // Follow-ups marcados
+  const fuMarcados = ativs.filter(a => a['Próximo Follow-up']).length;
+
+  // Lista detalhada
+  const lista = [...ativs].sort((a,b) => new Date(b['Data Hora'])-new Date(a['Data Hora'])).map(a => {
+    const d = new Date(a['Data Hora']);
+    const dtStr = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    const nota = a['Nota']||'';
+    return `<tr style="border-bottom:1px solid var(--bd)">
+      <td style="padding:8px 10px;font-size:12px;color:var(--t2)">${dtStr}</td>
+      <td style="padding:8px 10px;font-size:12px;font-weight:600;color:var(--tx)">${a['Empresa']||'—'}</td>
+      <td style="padding:8px 10px;font-size:12px"><span style="background:var(--s2);border:1px solid var(--bd);border-radius:4px;padding:2px 7px;font-size:11px">${a['Tipo']||'—'}</span></td>
+      <td style="padding:8px 10px;font-size:12px;color:var(--t2)">${a['Status Ligação']||'—'}</td>
+      <td style="padding:8px 10px;font-size:12px;color:var(--t2);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nota||'—'}</td>
+      <td style="padding:8px 10px;font-size:12px;color:var(--t2)">${a['Responsável']||'—'}</td>
+    </tr>`;
+  }).join('');
+
+  const dtIniStr = new Date(dtIni).toLocaleDateString('pt-BR');
+  const dtFimStr = new Date(dtFim).toLocaleDateString('pt-BR');
+
+  document.getElementById('relAtvResultado').innerHTML = `
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;color:var(--t3);margin-bottom:8px">Período: ${dtIniStr} a ${dtFimStr} ${vendedor?'· Vendedor: '+vendedor:''}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:12px 16px;min-width:100px;text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--ac)">${ativs.length}</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:3px">Total atividades</div>
+        </div>
+        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:12px 16px;min-width:100px;text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--gn)">${novosLeads}</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:3px">Novos cadastros</div>
+        </div>
+        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:12px 16px;min-width:100px;text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--ye)">${fuMarcados}</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:3px">Follow-ups marcados</div>
+        </div>
+        ${totalCards}
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:var(--s2);border-bottom:2px solid var(--bd)">
+              <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--t2);font-weight:600">Data/Hora</th>
+              <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--t2);font-weight:600">Empresa</th>
+              <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--t2);font-weight:600">Tipo</th>
+              <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--t2);font-weight:600">Resultado</th>
+              <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--t2);font-weight:600">Nota</th>
+              <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--t2);font-weight:600">Vendedor</th>
+            </tr>
+          </thead>
+          <tbody>${lista}</tbody>
+        </table>
+      </div>
+    </div>`;
+  document.getElementById('relAtvExportBtn').style.display = 'inline-block';
+  window._relAtvData = ativs;
+}
+
+function exportarRelAtividades() {
+  const ativs = window._relAtvData || [];
+  if (!ativs.length) return;
+  const header = ['Data Hora','Empresa','Tipo','Status Ligação','Nota','Responsável','Próximo Follow-up'];
+  const rows = ativs.map(a => header.map(h => '"'+(String(a[h]||'').replace(/"/g,'""'))+'"').join(','));
+  const csv = '\uFEFF' + header.map(h=>'"'+h+'"').join(',') + '\n' + rows.join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='atividades_'+new Date().toISOString().split('T')[0]+'.csv'; a.click();
+}
+
+function gerarRelFinanceiro() {
+  const periodo = document.getElementById('relFinPeriodo').value;
+  let ini, fim;
+  const hoje = new Date();
+  if (periodo === 'mes') {
+    ini = new Date(hoje.getFullYear(), hoje.getMonth(), 1); ini.setHours(0,0,0,0);
+    fim = new Date(hoje.getFullYear(), hoje.getMonth()+1, 0); fim.setHours(23,59,59,999);
+  } else {
+    const dtIni = document.getElementById('relFinDtIni').value;
+    const dtFim = document.getElementById('relFinDtFim').value;
+    if (!dtIni || !dtFim) { toast('Selecione o período','warn'); return; }
+    ini = new Date(dtIni); ini.setHours(0,0,0,0);
+    fim = new Date(dtFim); fim.setHours(23,59,59,999);
+  }
+
+  const fechados = (window.allDeals||[]).filter(d => {
+    if (d['Status'] !== 'Fechado — Ganho') return false;
+    const dt = new Date(d['Data Fechamento']);
+    return dt >= ini && dt <= fim;
+  });
+
+  if (fechados.length === 0) {
+    document.getElementById('relFinResultado').innerHTML = '<div style="font-size:13px;color:var(--t3);text-align:center;padding:32px">Nenhuma loja fechada no período selecionado</div>';
+    document.getElementById('relFinExportBtn').style.display = 'none';
+    return;
+  }
+
+  const totalStart      = fechados.reduce((s,d) => s + (Number(d['Valor Start'])||0), 0);
+  const totalMensalidade= fechados.reduce((s,d) => s + (Number(d['Mensalidade'])||0), 0);
+  const fmtMoeda = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  const resumo = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:14px;text-align:center">
+        <div style="font-size:22px;font-weight:800;color:var(--ac)">${fechados.length}</div>
+        <div style="font-size:11px;color:var(--t2);margin-top:3px">Lojas fechadas</div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:14px;text-align:center">
+        <div style="font-size:16px;font-weight:800;color:var(--gn)">${fmtMoeda(totalStart)}</div>
+        <div style="font-size:11px;color:var(--t2);margin-top:3px">Total em Start</div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:14px;text-align:center">
+        <div style="font-size:16px;font-weight:800;color:var(--ye)">${fmtMoeda(totalMensalidade)}</div>
+        <div style="font-size:11px;color:var(--t2);margin-top:3px">Mensalidade recorrente</div>
+      </div>
+    </div>`;
+
+  const lista = fechados.map(d => {
+    const dtFech = d['Data Fechamento'] ? new Date(d['Data Fechamento']).toLocaleDateString('pt-BR') : '—';
+    const start  = d['Valor Start'] ? fmtMoeda(d['Valor Start']) : '—';
+    const parcel = d['Parcelamento Start'] && Number(d['Parcelamento Start'])>1 ? Number(d['Parcelamento Start'])+'x' : 'À vista';
+    const mens   = d['Mensalidade'] ? fmtMoeda(d['Mensalidade']) : '—';
+    const contato= (window.allContatos||[]).find(c=>c['ID']===d['ID Contato']);
+    const nomeC  = contato ? contato['Nome Contato']||'—' : '—';
+    const pipe   = d['Pipeline']||'—';
+    return `<tr style="border-bottom:1px solid var(--bd)">
+      <td style="padding:8px 10px;font-size:12px;font-weight:600;color:var(--tx)">${d['Empresa']||'—'}</td>
+      <td style="padding:8px 10px;font-size:12px;color:var(--t2)">${nomeC}</td>
+      <td style="padding:8px 10px;font-size:12px;color:var(--t2)">${dtFech}</td>
+      <td style="padding:8px 10px;font-size:12px"><span style="background:var(--s2);border:1px solid var(--bd);border-radius:4px;padding:2px 6px;font-size:11px">${pipe}</span></td>
+      <td style="padding:8px 10px;font-size:12px;color:var(--gn);font-weight:700">${start}</td>
+      <td style="padding:8px 10px;font-size:12px;color:var(--t2)">${parcel}</td>
+      <td style="padding:8px 10px;font-size:12px;color:var(--ye);font-weight:700">${mens}</td>
+    </tr>`;
+  }).join('');
+
+  const iniStr = ini.toLocaleDateString('pt-BR');
+  const fimStr = fim.toLocaleDateString('pt-BR');
+
+  document.getElementById('relFinResultado').innerHTML = `
+    <div style="font-size:12px;color:var(--t3);margin-bottom:12px">Período: ${iniStr} a ${fimStr}</div>
+    ${resumo}
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:var(--s2);border-bottom:2px solid var(--bd)">
+            <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--t2);font-weight:600">Empresa</th>
+            <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--t2);font-weight:600">Contato</th>
+            <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--t2);font-weight:600">Data Fechamento</th>
+            <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--t2);font-weight:600">Pipeline</th>
+            <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--t2);font-weight:600">Valor Start</th>
+            <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--t2);font-weight:600">Parcelamento</th>
+            <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--t2);font-weight:600">Mensalidade</th>
+          </tr>
+        </thead>
+        <tbody>${lista}</tbody>
+        <tfoot>
+          <tr style="background:var(--s2);border-top:2px solid var(--bd)">
+            <td colspan="4" style="padding:8px 10px;font-size:12px;font-weight:700;color:var(--tx)">TOTAL (${fechados.length} loja${fechados.length!==1?'s':''})</td>
+            <td style="padding:8px 10px;font-size:12px;font-weight:800;color:var(--gn)">${fmtMoeda(totalStart)}</td>
+            <td></td>
+            <td style="padding:8px 10px;font-size:12px;font-weight:800;color:var(--ye)">${fmtMoeda(totalMensalidade)}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>`;
+  document.getElementById('relFinExportBtn').style.display = 'inline-block';
+  window._relFinData = fechados;
+}
+
+function exportarRelFinanceiro() {
+  const deals = window._relFinData || [];
+  if (!deals.length) return;
+  const header = ['Empresa','Data Fechamento','Pipeline','Valor Start','Parcelamento Start','Mensalidade'];
+  const rows = deals.map(d => [
+    '"'+String(d['Empresa']||'').replace(/"/g,'""')+'"',
+    '"'+(d['Data Fechamento']?new Date(d['Data Fechamento']).toLocaleDateString('pt-BR'):'')+'"',
+    '"'+String(d['Pipeline']||'')+'"',
+    d['Valor Start']||'',
+    d['Parcelamento Start']||'',
+    d['Mensalidade']||''
+  ].join(','));
+  const csv = '\uFEFF' + header.map(h=>'"'+h+'"').join(',') + '\n' + rows.join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='financeiro_'+new Date().toISOString().split('T')[0]+'.csv'; a.click();
+}
+
 
 function renderDashboard() {
   if (relTab === 'nicolau') renderNicolau();
