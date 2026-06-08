@@ -2572,13 +2572,7 @@ function closeDealPanel() {
 function editarContatoPeloDeal(idContato) {
   showScr('contatos');
   setTimeout(() => {
-    const c = allContatos.find(x => x['ID'] === idContato);
-    if (c) {
-      // Garante que o editId está correto antes de abrir
-      const editIdEl = document.getElementById('editId');
-      if (editIdEl) editIdEl.value = idContato;
-      openPanel(idContato);
-    }
+    openPanel('edit', idContato);
   }, 500);
 }
 
