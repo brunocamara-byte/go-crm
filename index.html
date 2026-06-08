@@ -2343,6 +2343,18 @@ function cardHTML(d, stage, pipeColor, stages) {
       </div>`
     : `<div style="font-size:11px;color:var(--t3);font-style:italic;margin:4px 0">Sem módulos</div>`;
 
+  // Badge degustação
+  let degustBadge = '';
+  if (d['Etapa'] === 'Cliente em Degustacao' && d['Data Degustacao']) {
+    const dtDeg = new Date(d['Data Degustacao']); dtDeg.setHours(0,0,0,0);
+    const hj = new Date(); hj.setHours(0,0,0,0);
+    let diasUteis = 0; let dd2 = new Date(dtDeg);
+    while (dd2 < hj) { dd2.setDate(dd2.getDate()+1); if(dd2.getDay()!==0&&dd2.getDay()!==6) diasUteis++; }
+    const restam = Math.max(0, 5 - diasUteis);
+    const cor = restam <= 1 ? '#dc2626' : restam <= 3 ? '#f59e0b' : '#a855f7';
+    degustBadge = `<div style="margin:4px 0"><span style="font-size:10px;padding:2px 8px;border-radius:4px;background:${cor}22;color:${cor};font-weight:700">⏱ Degustação: ${restam > 0 ? restam + ' dia(s) úteis restantes' : 'VENCIDA'}</span></div>`;
+  }
+
   // Badges
   const entradaPendente = (d['Etapa']==='Fechado'||d['Status']==='Fechado — Ganho')&&!d['Entrada Confirmada'];
   const entradaBadge = entradaPendente?`<span style="font-size:10px;font-weight:700;color:var(--ye);background:var(--ys);padding:2px 7px;border-radius:4px">⏳ Entrada pendente</span>`:'';
@@ -2370,6 +2382,7 @@ function cardHTML(d, stage, pipeColor, stages) {
       </div>
       ${modulosHtml}
       ${entradaBadge?`<div style="margin:6px 0">${entradaBadge}</div>`:''}
+      ${degustBadge}
       ${ceoNote?`<div style="display:flex;gap:6px;align-items:flex-start;background:var(--s2);border-radius:6px;padding:8px 10px;margin:8px 0"><span style="font-size:12px">🎯</span><div style="font-size:11.5px;color:var(--t2);line-height:1.5">${ceoNote.substring(0,90)}${ceoNote.length>90?'...':''}</div></div>`:''}
     </div>
     <div style="padding:0 16px 6px">
