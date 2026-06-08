@@ -2445,7 +2445,9 @@ async function dropCard(e,etapa,pipe){
 
   // Grava no Sheets em segundo plano
   try{
-    const res=await apiPost({action:'ATUALIZAR_DEAL',payload:{id:dragged.id,etapa, status: etapa==='Fechado' ? 'Fechado — Ganho' : etapa==='Perdido' ? 'Fechado — Perdido' : 'Ativo', dataDegustacao: etapa==='Cliente em Degustacao' ? new Date().toISOString() : undefined},usuario:currentUser.nome});
+    const payloadDrop = {id:dragged.id, etapa, status: etapa==='Fechado' ? 'Fechado — Ganho' : etapa==='Perdido' ? 'Fechado — Perdido' : 'Ativo'};
+    if (etapa==='Cliente em Degustacao') payloadDrop.dataDegustacao = new Date().toISOString();
+    const res=await apiPost({action:'ATUALIZAR_DEAL', payload:payloadDrop, usuario:currentUser.nome});
     if(res.success){
       toast(`✅ ${etapa}`,'ok');
 
