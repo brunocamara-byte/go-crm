@@ -1507,7 +1507,7 @@ body.tema-light{
     <!-- INFO READONLY DO DEAL -->
     <div class="deal-info-row" id="dealInfoRow"></div>
 
-    <!-- VALOR E ENTRADA -->
+    <!-- VALOR E PAGAMENTO -->
     <div class="fsect">
       <div class="fsect-lbl">Valor da venda</div>
       <div class="fgrid">
@@ -1522,19 +1522,40 @@ body.tema-light{
             <option value="">— Sem prioridade</option><option>🌡 Morno</option><option>🔥 Quente</option><option>❄️ Frio</option>
           </select>
         </div>
+      </div>
+    </div>
+
+    <!-- START E MENSALIDADE -->
+    <div class="fsect">
+      <div class="fsect-lbl">💰 Condições comerciais</div>
+      <div class="fgrid">
         <div>
-          <label class="fl">Entrada</label>
-          <div style="display:flex;gap:6px;align-items:center">
-            <select class="fse" id="dpEntradaTipo" onchange="calcEntrada()" style="width:72px;flex-shrink:0">
-              <option value="pct">%</option>
-              <option value="fixo">R$</option>
-            </select>
-            <input class="fi" id="dpEntradaVal" type="number" placeholder="30" oninput="calcEntrada()">
-          </div>
+          <label class="fl">Valor do Start (R$)</label>
+          <input class="fi" id="dpValorStart" type="number" placeholder="0,00" oninput="calcStart()">
+          <div style="font-size:10px;color:var(--t3);margin-top:3px">Valor de implementação negociado</div>
         </div>
         <div>
-          <label class="fl">Entrada calculada</label>
-          <div class="deal-entrada-result" id="dpEntradaResult">R$ —</div>
+          <label class="fl">Parcelamento do Start</label>
+          <select class="fse" id="dpParcelamentoStart">
+            <option value="1">À vista (1x)</option>
+            <option value="2">2x</option>
+            <option value="3">3x</option>
+            <option value="4">4x</option>
+            <option value="5">5x</option>
+            <option value="6">6x</option>
+            <option value="10">10x</option>
+            <option value="12">12x</option>
+          </select>
+        </div>
+        <div>
+          <label class="fl">Valor da parcela do Start</label>
+          <div class="deal-entrada-result" id="dpStartParcela" style="color:var(--ac)">R$ —</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:3px">Calculado automaticamente</div>
+        </div>
+        <div>
+          <label class="fl">Mensalidade (R$)</label>
+          <input class="fi" id="dpMensalidade" type="number" placeholder="0,00">
+          <div style="font-size:10px;color:var(--t3);margin-top:3px">Recorrência mensal do cliente</div>
         </div>
       </div>
     </div>
@@ -2447,13 +2468,12 @@ function openDealPanel(id) {
 
   // Valores
   const valorTotal = d['Valor Estimado'] || '';
-  document.getElementById('dpPrioridade').value = d['Prioridade'] || '🌡 Morno';
-  // Carrega entrada salva — ou padrão 30%
-  const entTipo = d['Entrada Tipo'] || 'pct';
-  const entVal  = d['Entrada Valor'] || '30';
-  document.getElementById('dpEntradaTipo').value = entTipo;
-  document.getElementById('dpEntradaVal').value  = entVal;
-  calcEntrada();
+  document.getElementById('dpPrioridade').value = d['Prioridade'] || '';
+  // Campos Start/Parcelamento/Mensalidade
+  document.getElementById('dpValorStart').value       = d['Valor Start'] || '';
+  document.getElementById('dpParcelamentoStart').value= d['Parcelamento Start'] || '1';
+  document.getElementById('dpMensalidade').value      = d['Mensalidade'] || '';
+  calcStart();
 
   // Produtos — parse do campo Produtos Selecionados
   dealProdutosSelecionados = [];
@@ -2523,6 +2543,16 @@ function calcTotal() {
   if (totalEl) totalEl.textContent = 'R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
   calcEntrada();
   return total;
+}
+
+function calcStart() {
+  const start  = parseFloat(document.getElementById('dpValorStart')?.value||0)||0;
+  const parcel = parseInt(document.getElementById('dpParcelamentoStart')?.value||1)||1;
+  const result = parcel > 0 ? start/parcel : start;
+  const el = document.getElementById('dpStartParcela');
+  if (el) el.textContent = parcel > 1
+    ? `${parcel}x de R$ ${result.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`
+    : `R$ ${result.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
 }
 
 function calcEntrada() {
@@ -2659,12 +2689,15 @@ async function saveDealPanel() {
   const valorEstimado = dealProdutosSelecionados.reduce((s, p) => s + (Number(p.valorNeg)||0), 0);
 
   const payload = {
-    id:                  editingId,
+    id:                   editingId,
     valorEstimado,
-    prioridade:          document.getElementById('dpPrioridade').value,
-    produtosSelecionados:serializarProdutos(),
-    proximoFollowUp:     followUp,
-    observacoes:         document.getElementById('dpObs').value.trim(),
+    prioridade:           document.getElementById('dpPrioridade').value,
+    produtosSelecionados: serializarProdutos(),
+    proximoFollowUp:      followUp,
+    observacoes:          document.getElementById('dpObs').value.trim(),
+    valorStart:           document.getElementById('dpValorStart').value || '',
+    parcelamentoStart:    document.getElementById('dpParcelamentoStart').value || '1',
+    mensalidade:          document.getElementById('dpMensalidade').value || '',
   };
 
   try {
