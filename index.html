@@ -1158,6 +1158,7 @@ body.tema-light{
             <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Sinal confirmado → Time de Implantacao</div><div class="cfg-tgl-sub">Briefing completo enviado apos time financeiro confirmar pagamento</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifMatheus" checked><span class="tgl-sl"></span></label></div>
             <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Alerta reativacao → Vendedor</div><div class="cfg-tgl-sub">Aviso quando follow-up de lead em Reativacao esta chegando</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifReativ" checked><span class="tgl-sl"></span></label></div>
             <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Alerta degustacao vencida → Vendedor + CEO</div><div class="cfg-tgl-sub">Aviso quando periodo de degustacao do cliente vence</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifDegust" checked><span class="tgl-sl"></span></label></div>
+            <div class="cfg-toggle-row"><div class="cfg-tgl-info"><div class="cfg-tgl-lbl">Notificacao de atividade → CEO + Gerente</div><div class="cfg-tgl-sub">Email a cada atividade registrada pelo vendedor</div></div><label class="tgl-sw"><input type="checkbox" id="cfgNotifAtiv" checked><span class="tgl-sl"></span></label></div>
           </div>
           <div class="cfg-row" style="margin-top:14px">
             <label class="cfg-lbl">Dias sem atividade para alertar lead parado</label>
@@ -2369,7 +2370,7 @@ async function dropCard(e,etapa,pipe){
 
   // Grava no Sheets em segundo plano
   try{
-    const res=await apiPost({action:'ATUALIZAR_DEAL',payload:{id:dragged.id,etapa, status: etapa==='Fechado' ? 'Fechado — Ganho' : etapa==='Perdido' ? 'Fechado — Perdido' : 'Ativo'},usuario:currentUser.nome});
+    const res=await apiPost({action:'ATUALIZAR_DEAL',payload:{id:dragged.id,etapa, status: etapa==='Fechado' ? 'Fechado — Ganho' : etapa==='Perdido' ? 'Fechado — Perdido' : 'Ativo', dataDegustacao: etapa==='Cliente em Degustacao' ? new Date().toISOString() : undefined},usuario:currentUser.nome});
     if(res.success){
       toast(`✅ ${etapa}`,'ok');
 
@@ -2441,6 +2442,7 @@ function openDealPanel(id) {
     <div class="deal-info-chip">📞 <strong>${tel}</strong></div>
     <div class="deal-info-chip">👤 Resp: <strong>${responsavel}</strong></div>
     ${c['Contexto CEO'] ? `<div class="deal-info-chip" style="color:var(--ye)">🎯 ${c['Contexto CEO'].substring(0,50)}...</div>` : ''}
+    ${d['ID Contato']?`<div class="deal-info-chip" style="cursor:pointer;color:var(--ac);text-decoration:underline" onclick="closeDealPanel();editarContatoPeloDeal('${d['ID Contato']}')">✏️ Editar contato</div>`:''}
   `;
 
   // Valores
@@ -2504,6 +2506,14 @@ function closeDealPanel() {
   document.getElementById('dealPanelOv').classList.remove('open');
   editingId = null;
   dealProdutosSelecionados = [];
+}
+
+function editarContatoPeloDeal(idContato) {
+  showScr('contatos');
+  setTimeout(() => {
+    const c = allContatos.find(x => x['ID'] === idContato);
+    if (c) openPanel(idContato);
+  }, 300);
 }
 
 // Calcula total automaticamente a partir dos produtos selecionados
@@ -3165,6 +3175,21 @@ async function saveQLog(){
           if(editingId===dealId) renderTimeline(dealId, deal['ID Contato']||'');
         }
       });
+      // Notificação de atividade por email (se habilitado na config)
+      if(cfg && String(cfg['NOTIF_ATIVIDADE']).toLowerCase()==='true'){
+        apiPost({
+          action:'NOTIFICAR_ATIVIDADE',
+          payload:{
+            empresa: deal['Empresa']||'',
+            tipo: _qlogTipo,
+            status: status,
+            nota: nota,
+            vendedor: currentUser.nome,
+            followup: fu||''
+          },
+          usuario: currentUser.nome
+        }).catch(()=>{});
+      }
     }
   }catch(e){
     deal['Próximo Follow-up']=fuAnterior;
@@ -4285,6 +4310,7 @@ async function loadConfig(forceReload) {
     tgl('NOTIF_PAGAMENTO_CONFIRMADO','cfgNotifMatheus');
     tgl('NOTIF_REATIVACAO','cfgNotifReativ');
     tgl('NOTIF_DEGUSTACAO','cfgNotifDegust');
+    tgl('NOTIF_ATIVIDADE','cfgNotifAtiv');
     const temaSalvo = cfg['TEMA']||'dark';
     const temaEl = document.querySelector(`[data-tema="${temaSalvo}"]`);
     if(temaEl){ document.querySelectorAll('.tema-card').forEach(c=>c.classList.remove('on')); temaEl.classList.add('on'); }
@@ -4352,6 +4378,7 @@ async function salvarConfig() {
     ['NOTIF_PAGAMENTO_CONFIRMADO', g('cfgNotifMatheus')?.checked?'true':'false'],
     ['NOTIF_REATIVACAO',           g('cfgNotifReativ')?.checked?'true':'false'],
     ['NOTIF_DEGUSTACAO',           g('cfgNotifDegust')?.checked?'true':'false'],
+    ['NOTIF_ATIVIDADE',            g('cfgNotifAtiv')?.checked?'true':'false'],
   ];
   try {
     const config = {};
