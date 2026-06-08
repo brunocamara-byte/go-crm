@@ -4060,7 +4060,7 @@ function gerarRelAtividades() {
     const nota = a['Nota']||'';
     return `<tr style="border-bottom:1px solid var(--bd)">
       <td style="padding:8px 10px;font-size:12px;color:var(--t2)">${dtStr}</td>
-      <td style="padding:8px 10px;font-size:12px;font-weight:600;color:var(--tx)">${a['Empresa']||'—'}</td>
+      <td style="padding:8px 10px;font-size:12px;font-weight:600;color:var(--tx)">${a['Empresa'] || (a['ID Deal']?(window.allDeals||[]).find(d=>d['ID']===a['ID Deal'])?.['Empresa']||'—':'—')}</td>
       <td style="padding:8px 10px;font-size:12px"><span style="background:var(--s2);border:1px solid var(--bd);border-radius:4px;padding:2px 7px;font-size:11px">${a['Tipo']||'—'}</span></td>
       <td style="padding:8px 10px;font-size:12px;color:var(--t2)">${a['Status Ligação']||'—'}</td>
       <td style="padding:8px 10px;font-size:12px;color:var(--t2);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nota||'—'}</td>
